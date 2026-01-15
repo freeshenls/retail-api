@@ -1,0 +1,5 @@
+<%# app/views/designer/orders/edit.html.erb %>
+<%= render layout: "designer/layout" do %>
+  <%# 这里的代码会注入到 layout 的 yield 位置，也就是 main_content 内部 %>
+  <%= render Designer::OrderUpdateComponent.new(order: @order) %>
+<% end %>

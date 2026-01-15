@@ -1,0 +1,7 @@
+<%# app/views/devise/registrations/new.html.erb %>
+<%= render Auth::RegisterComponent.new(
+      resource: resource,
+      resource_name: resource_name,
+      url: registration_path(resource_name),
+      link_path: new_session_path(resource_name)
+    ) %>

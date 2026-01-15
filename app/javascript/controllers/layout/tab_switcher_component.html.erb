@@ -1,0 +1,35 @@
+<div class="h-10 bg-white border-b border-slate-200 flex items-center px-2 shadow-sm overflow-hidden"
+     data-turbo-cache="false"
+     data-controller="layout--tab-switcher-component">
+  
+  <%# 关键：tab_container 是动态追加标签的目标 %>
+  <div class="flex items-center h-full overflow-x-auto no-scrollbar scroll-smooth">
+    <% @tabs.each do |tab| %>
+      <% tab_id = "tab_#{Digest::MD5.hexdigest(tab[:path])}" %>
+
+<div id="<%= tab_id %>"
+     class="group relative flex items-center h-7 px-3 mr-1 rounded-t border transition-all cursor-pointer whitespace-nowrap
+            <%= tab[:active] ? 'bg-slate-50 border-slate-200 border-b-white text-blue-600 z-10' : 'bg-transparent border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50/50' %>">
+  
+  <a href="<%= tab[:path] %>" 
+     data-action="click->layout--tab-switcher-component#activateTab"
+     class="text-xs font-medium decoration-none text-current leading-none">
+    <%= tab[:label] %>
+  </a>
+
+  <% if tab.fetch(:closable, true) %>
+    <button class="ml-2 p-0.5 rounded-full hover:bg-slate-200 transition-colors opacity-0 group-hover:opacity-100 <%= 'opacity-100 text-slate-400' if tab[:active] %>"
+            data-path="<%= tab[:path]%>"
+            data-action="click->layout--tab-switcher-component#closeTab">
+      <%= heroicon "x-mark", options: { class: "h-3 w-3" } %>
+    </button>
+  <% end %>
+
+  <% if tab[:active] %>
+    <div class="absolute -bottom-px left-0 right-0 h-px bg-slate-50"></div>
+  <% end %>
+</div>
+
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,38 @@
+<%# app/components/designer/order_completed_component.html.erb %>
+<div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm opacity-95">
+  <table class="min-w-full divide-y divide-slate-200">
+    <thead class="bg-slate-50/50">
+      <tr>
+        <th class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">完成编号</th>
+        <th class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">结算日期</th>
+        <th class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">结算状态</th>
+        <th class="px-6 py-4 text-right text-xs font-bold text-slate-400 uppercase tracking-wider">详情</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-slate-100">
+      <% @orders.each do |order| %>
+        <tr class="hover:bg-slate-50/30 transition-colors grayscale-[0.2]">
+          <td class="px-6 py-4 font-bold text-slate-600 text-[13px] tracking-tight">
+            <%= order.order_no %>
+          </td>
+          <td class="px-6 py-4">
+            <div class="text-[13px] text-slate-500 font-medium">
+              <%= order.updated_at.strftime("%Y-%m-%d") %>
+            </div>
+          </td>
+          <td class="px-6 py-4">
+            <span class="inline-flex items-center px-2.5 py-1 rounded text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
+              结算完成
+            </span>
+          </td>
+          <td class="px-6 py-4 text-right">
+            <button class="p-2 text-slate-400 hover:text-[#0066b3] hover:bg-blue-50 rounded-full transition-all">
+              <%= heroicon "document-magnifying-glass", variant: :solid, options: { class: "h-5 w-5" } %>
+            </button>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

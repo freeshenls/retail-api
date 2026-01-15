@@ -1,0 +1,89 @@
+<div class="space-y-6">
+  <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+    <h3 class="text-sm font-bold text-gray-700 mb-4 flex items-center gap-2">
+      <span class="w-1 h-4 bg-blue-600 rounded-full"></span>
+      生成新邀请码
+    </h3>
+    
+    <%= form_with(model: @new_invite_code, 
+                  url: "/admin/invite_codes", 
+                  method: :post, 
+                  class: "flex flex-wrap items-end gap-6") do |f| %>
+      
+      <div class="w-64 relative group">
+        <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 ml-1">
+          分配角色权限
+        </label>
+        
+        <div class="relative">
+          <%# 使用 appearance-none 移除原生箭头 %>
+          <%= f.collection_select :role_id, @roles, :id, :name, {}, 
+                class: "appearance-none w-full bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg 
+                        focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white
+                        block p-2.5 pr-10 transition-all cursor-pointer" %>
+          
+          <%# 自定义右侧箭头图标 %>
+          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 group-hover:text-blue-500 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <%= f.submit "立即生成", 
+            class: "px-6 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-lg 
+                   hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200 
+                   active:transform active:scale-95 transition-all cursor-pointer shadow-md" %>
+    <% end %>
+  </div>
+
+  <%# 列表部分也进行了同步美化 %>
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-100">
+      <thead class="bg-gray-50/50">
+        <tr>
+          <th class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">代码</th>
+          <th class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">角色</th>
+          <th class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">状态</th>
+          <th class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">使用者</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-50 text-sm">
+        <% @invite_codes.each do |ic| %>
+          <tr class="hover:bg-blue-50/30 transition-colors">
+            <td class="px-6 py-4">
+              <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded font-mono font-bold border border-blue-100">
+                <%= ic.code %>
+              </span>
+            </td>
+            <td class="px-6 py-4 text-gray-600 font-medium"><%= ic.role&.name %></td>
+            <td class="px-6 py-4">
+              <% if ic.used_at %>
+                <span class="flex items-center gap-1.5 text-gray-400">
+                  <span class="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
+                  已使用
+                </span>
+              <% else %>
+                <span class="flex items-center gap-1.5 text-green-600 font-bold">
+                  <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                  可使用
+                </span>
+              <% end %>
+            </td>
+            <td class="px-6 py-4">
+              <% if ic.user %>
+                <div class="flex flex-col">
+                  <span class="text-gray-900 font-medium"><%= ic.user.name %></span>
+                  <span class="text-xs text-gray-400"><%= ic.user.email %></span>
+                </div>
+              <% else %>
+                <span class="text-gray-300">-</span>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,5 @@
+<%# app/views/admin/users/index.html.erb %>
+
+<%= render layout: "admin/layout" do %>
+  <%= render Admin::UserIndexComponent.new(users: @users) %>
+<% end %>

@@ -1,0 +1,4 @@
+<%= render layout: "designer/layout" do %>
+  <%# 仅传入数据，列表由组件全权负责 %>
+  <%= render Designer::DraftShowComponent.new(draft: @draft) %>
+<% end %>

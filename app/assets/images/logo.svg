@@ -1,0 +1,44 @@
+<svg width="292" height="71" viewBox="0 0 292 71" xmlns="http://www.w3.org/2000/svg">
+  <!-- 调整：增强文字阴影滤镜参数 -->
+  <defs>
+    <filter id="textShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="1.5" dy="1.5" stdDeviation="2" flood-color="#004a99" flood-opacity="0.5"/>
+    </filter>
+
+    <!-- 原有渐变定义完全保留 -->
+    <linearGradient id="circleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0073e6" />
+      <stop offset="100%" stop-color="#005ca6" />
+    </linearGradient>
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#005ca6" />
+    </linearGradient>
+    <linearGradient id="titleGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#CCE0FF" />
+    </linearGradient>
+    <linearGradient id="subGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#AECBFA" />
+      <stop offset="100%" stop-color="#AECBFA" />
+    </linearGradient>
+  </defs>
+
+  <!-- Logo部分：完全保留你提供的版本 -->
+  <g transform="translate(35, 35.5)">
+    <circle cx="0" cy="0" r="25" fill="url(#circleGrad)" />
+    <circle cx="0" cy="0" r="24" fill="none" stroke="url(#ringGrad)" stroke-width="3" 
+            stroke-dasharray="150.8 150.8" stroke-dashoffset="37.7" 
+            transform="rotate(30)" />
+    <text x="0" y="-2" font-family="SimHei, Microsoft YaHei, sans-serif" font-size="12" 
+          font-weight="normal" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle">零售</text>
+    <text x="0" y="8" font-family="Arial, sans-serif" font-size="7" 
+          font-weight="normal" fill="url(#subGrad)" text-anchor="middle" dominant-baseline="middle">RetailSys</text>
+  </g>
+
+  <!-- 文字区域：应用增强后的阴影 -->
+  <g font-family="SimHei, Microsoft YaHei, sans-serif" text-anchor="middle">
+    <text x="170" y="38" font-size="22" font-weight="600" fill="url(#titleGrad)" letter-spacing="3px" filter="url(#textShadow)">综合服务管理系统</text>
+    <text x="170" y="58" font-size="9" fill="url(#subGrad)">INTEGRATED SERVICE MANAGEMENT SYSTEM</text>
+  </g>
+</svg>

@@ -1,0 +1,78 @@
+<%# app/components/admin/user_component.html.erb %>
+<div class="overflow-x-auto">
+  <table class="min-w-full divide-y divide-slate-200 bg-white">
+    <thead class="bg-slate-50/50">
+      <tr>
+        <th class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">用户信息</th>
+        <th class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">角色权限</th>
+        <th class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">注册时间</th>
+        <th class="px-6 py-4 text-right text-xs font-bold text-slate-400 uppercase tracking-widest">管理操作</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-slate-100 text-sm">
+      <% @users.each do |user| %>
+        <tr class="hover:bg-blue-50/30 transition-colors group">
+          <%# 1. 用户基本信息列 %>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex items-center">
+              <div class="h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 font-bold text-xs mr-3">
+                <%= user.name[0].upcase %>
+              </div>
+              <div>
+                <div class="font-bold text-slate-800"><%= user.name %></div>
+                <div class="text-xs text-slate-400 font-mono"><%= user.email %></div>
+              </div>
+            </div>
+          </td>
+
+          <%# 2. 角色列 %>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-600 border border-indigo-100">
+              <%= user.role&.name || "未分配" %>
+            </span>
+          </td>
+
+          <%# 3. 时间列 %>
+          <td class="px-6 py-4 whitespace-nowrap text-slate-500 font-mono text-xs">
+            <%= user.created_at.strftime("%Y-%m-%d %H:%M") %>
+          </td>
+
+          <%# 4. 操作列 - 路径全部写死以解决路由推导报错 %>
+          <td class="px-6 py-4 whitespace-nowrap text-right space-x-2">
+            <%# 编辑按钮 %>
+            <a href="/admin/users/<%= user.id %>/edit" 
+               data-turbo-frame="main_content"
+               class="inline-flex items-center px-3 py-1.5 border border-slate-200 text-xs font-bold rounded-lg text-slate-600 bg-white hover:bg-slate-50 hover:text-blue-600 transition-all shadow-sm">
+              编辑
+            </a>
+
+            <%# 删除按钮 - 只有非本人可以删除 %>
+            <% if user != helpers.current_user %>
+              <%= link_to "/admin/users/#{user.id}", 
+                  class: "inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-bold rounded-lg text-red-500 bg-red-50 hover:bg-red-100 transition-all",
+                  data: { 
+                    turbo_method: :delete, 
+                    turbo_confirm: "⚠️ 警告：确定要彻底注销用户 [#{user.name}] 吗？此操作不可逆。",
+                    turbo_frame: "main_content" 
+                  } do %>
+                注销
+              <% end %>
+            <% else %>
+              <span class="inline-flex items-center px-3 py-1.5 text-xs font-bold text-slate-300 bg-slate-50 rounded-lg cursor-not-allowed" title="无法删除当前登录账号">
+                本人
+              </span>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+
+      <% if @users.empty? %>
+        <tr>
+          <td colspan="4" class="px-6 py-12 text-center text-slate-400 italic">
+            暂无注册用户数据
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

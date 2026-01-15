@@ -1,0 +1,14 @@
+<%# app/views/designer/drafts/index.html.erb %>
+<%= render layout: "designer/layout" do %>
+  <div data-controller="layout--tab-init" 
+       data-layout--tab-init-label-value="我的稿件" 
+       data-layout--tab-init-path-value="<%= request.path %>">
+    
+    <%= render Designer::DraftIndexComponent.new(
+          drafts: @drafts, 
+          pagy: @pagy, 
+          params: params # 这里的 params 是 Rails 提供的全局请求参数
+        ) %>
+    
+  </div>
+<% end %>

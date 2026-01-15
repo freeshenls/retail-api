@@ -1,0 +1,46 @@
+<div class="fixed inset-0 flex flex-col overflow-hidden bg-slate-100 select-none">
+  <%
+    # 1. 固定 Navbar 逻辑：强制让“系统管理”高亮
+    nav_items = [
+      { label: "系统管理", path: admin_path, active: true, icon: "cog-6-tooth" }
+    ]
+
+    tabs = [{ :label => "控制台", :path => admin_path, :active => true, :closable => false }]
+  %>
+
+  <%# 顶部导航 %>
+  <%= render Layout::NavbarComponent.new(
+        user_name: current_user.name, 
+        role: current_user.role.description,
+        nav_items: nav_items
+      ) %>
+
+  <main class="flex flex-1 overflow-hidden">
+    <%# 侧边栏 - 确保 items 里的链接触发 turbo_stream %>
+    <aside class="h-full shrink-0 relative z-20">
+      <%= render Layout::SidebarComponent.new(
+            title: "系统配置",
+            icon: "cog-6-tooth", 
+            items: [
+              { label: "用户管理", active: request.path == admin_users_path, path: admin_users_path, icon: "users"},
+              { label: "角色管理", active: request.path == admin_roles_path, path: admin_roles_path, icon: "users"},
+              { label: "邀请码管理", active: request.path == admin_invites_path, path: admin_invites_path, icon: "users"}
+            ]
+          ) %>
+    </aside>
+
+    <div class="flex-1 flex flex-col min-w-0 bg-slate-50 relative z-10">
+      <%# 标签切换栏 - 保持你原来的结构 %>
+      <div id="tabs" class="shrink-0 border-b border-slate-200 bg-white">
+        <%= render Layout::TabSwitcherComponent.new(tabs: @cookie_tabs.empty? ? tabs : @cookie_tabs) %>
+      </div>
+
+      <%# 内容滚动区域 %>
+      <div class="flex-1 overflow-y-auto p-4 lg:p-6 shadow-inner">
+        <%= turbo_frame_tag "main_content" do %>
+        	<%= yield %>
+        <% end %>
+      </div>
+    </div>
+  </main>
+</div>

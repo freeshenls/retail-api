@@ -1,0 +1,5 @@
+<%# app/views/admin/invites/index.html.erb %>
+
+<%= render layout: "admin/layout" do %>
+  <%= render Admin::InviteIndexComponent.new(invite_codes: @invites, roles: @roles) %>
+<% end %>

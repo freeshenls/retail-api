@@ -1,0 +1,101 @@
+<%# app/views/layouts/designer/layout.html.erb %>
+<div class="fixed inset-0 flex flex-col overflow-hidden bg-slate-100 select-none">
+  <%
+    # 1. 基础路径与状态计算
+    curr_path = request.path
+    
+    # 路由 Helper 定义 (确保 routes.rb 已配置 collection)
+    path_pending   = pending_designer_orders_path
+    path_completed = completed_designer_orders_path
+    path_drafts    = designer_drafts_path
+    path_home      = designer_path
+
+    # 模块激活逻辑判断
+    is_home  = curr_path == path_home
+    is_draft = curr_path.start_with?("/designer/drafts")
+    is_order = curr_path.start_with?("/designer/orders")
+
+    # 2. Navbar 配置
+    nav_items = [
+      { label: "首页", path: path_home, active: is_home, icon: "home" },
+      { label: "稿件管理", path: path_drafts, active: is_draft, icon: "document-text" },
+      { label: "订单管理", path: path_pending, active: is_order, icon: "shopping-cart" }
+    ]
+
+    # 3. Sidebar 动态属性配置
+    sidebar_props = { title: "菜单导航", icon: "home", items: [], submenus: [] }
+
+    if is_home
+      sidebar_props.merge!(
+        title: "工作台", icon: "home",
+        items: [{ label: "主页概览", active: true, path: path_home, icon: "chart-bar" }]
+      )
+    elsif is_draft
+      sidebar_props.merge!(
+        title: "稿件管理", icon: "document-text",
+        items: [
+          { label: "我的稿件", active: curr_path == path_drafts, path: path_drafts, icon: "document" },
+          { label: "上传稿件", active: curr_path == new_designer_draft_path, path: new_designer_draft_path, icon: "document-plus" }
+        ]
+      )
+    elsif is_order
+      sidebar_props.merge!(
+        title: "业务订单", 
+        icon: "shopping-cart",
+        submenus: [{ 
+          label: "我的订单", 
+          icon: "clipboard-document-list", 
+          active: true, # 订单模块下默认展开
+          items: [
+            { 
+              label: "待提交订单", 
+              path: path_pending, 
+              active: curr_path == path_pending 
+              # 不传 icon，组件内部会自动渲染您设计的小圆点
+            },
+            { 
+              label: "审核中订单", 
+              path: path_completed, 
+              active: curr_path == path_completed 
+            }
+          ]
+        }]
+      )
+    end
+
+    # 4. Tab 默认配置
+    default_tabs = [{ label: "控制台", path: path_home, active: is_home, closable: false }]
+  %>
+
+  <%# --- 顶部导航栏 --- %>
+  <%= render Layout::NavbarComponent.new(
+        nav_items: nav_items, 
+        user_name: current_user.name, 
+        role: current_user.role.description
+      ) %>
+
+  <main class="flex flex-1 overflow-hidden">
+    
+    <%# --- 侧边栏区域 --- %>
+    <aside class="h-full shrink-0 relative z-20">
+      <%= render Layout::SidebarComponent.new(**sidebar_props) %>
+    </aside>
+
+    <%# --- 右侧内容主区 --- %>
+    <div class="flex-1 flex flex-col min-w-0 bg-slate-50 relative z-10">
+      
+      <%# 标签切换页签 %>
+      <div id="tabs" class="h-10 shrink-0 border-b border-slate-200 bg-white">
+        <%= render Layout::TabSwitcherComponent.new(tabs: @cookie_tabs.presence || default_tabs) %>
+      </div>
+
+      <%# 业务内容动态加载区 %>
+      <div class="flex-1 overflow-y-auto p-4 lg:p-6 shadow-inner">
+        <%= turbo_frame_tag "main_content" do %>
+          <%= yield %>
+        <% end %>
+      </div>
+      
+    </div>
+  </main>
+</div>

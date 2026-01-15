@@ -1,0 +1,10 @@
+<%# app/views/designer/orders/pending.html.erb %>
+<%= render layout: "designer/layout" do %>
+  <div data-controller="layout--tab-init" 
+       data-layout--tab-init-label-value="待处理订单" 
+       data-layout--tab-init-path-value="<%= request.path %>">
+    
+    <%= render Designer::OrderPendingComponent.new(orders: @orders, pagy: @pagy) %>
+    
+  </div>
+<% end %>

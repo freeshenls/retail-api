@@ -1,0 +1,88 @@
+<aside class="group/sidebar flex flex-col bg-white text-slate-600 h-full border-r border-slate-200 w-64 transition-[width] duration-300 ease-in-out shadow-[2px_0_8px_rgba(0,0,0,0.02)] overflow-hidden z-20 cursor-pointer"
+       data-controller="layout--sidebar-component"
+       data-layout--sidebar-component-target="container"
+       data-collapsed="false">
+  
+  <div class="h-[60px] flex items-center justify-between px-5 shrink-0 overflow-hidden cursor-pointer bg-white">
+    <div class="flex items-center min-w-[180px] h-full" 
+         data-action="click->layout--sidebar-component#toggleSidebar">
+      <div class="flex shrink-0 items-center justify-center w-6 h-6 text-[#0066b3]">
+        <%= heroicon @icon, variant: :solid, options: { class: "h-5 w-5" } %>
+      </div>
+      <span class="ml-3 text-[14px] font-bold text-slate-800 tracking-wider whitespace-nowrap group-data-[collapsed=true]/sidebar:opacity-0 transition-opacity">
+        <%= @title %>
+      </span>
+    </div>
+
+    <%# 折叠小箭头 %>
+    <button data-action="click->layout--sidebar-component#toggleSidebar" 
+            class="p-1 text-slate-400 hover:text-[#0066b3] transition-all cursor-pointer group-data-[collapsed=true]/sidebar:rotate-180 focus:outline-none bg-transparent border-none">
+      <%= heroicon "chevron-double-left", variant: :solid, options: { class: "h-4 w-4" } %>
+    </button>
+  </div>
+
+  <nav class="flex-1 overflow-y-auto py-2 scrollbar-hide cursor-pointer border-none">
+    <ul class="space-y-1 px-3 list-none border-none">
+      <%# 一级菜单项目 %>
+      <% @items.each do |item| %>
+        <li class="list-none border-none">
+          <a href="<%= item[:path] %>" 
+             data-label="<%= item[:label]%>"
+             data-action="click->layout--sidebar-component#handleItemClick"
+             class="group relative flex items-center h-10 px-2 rounded-lg transition-all cursor-pointer
+                    <%= item[:active] ? 'text-[#0066b3] font-bold' : 'text-slate-500 hover:text-slate-900' %>">
+            <div class="flex shrink-0 items-center justify-center w-8 h-8 transition-all
+                        <%= item[:active] ? "text-[#0066b3]" : "text-slate-400 group-hover:text-slate-600" %>">
+              <%= heroicon item[:icon], variant: :solid, options: { class: "h-[18px] w-[18px]" } %>
+            </div>
+            <span class="ml-2 text-[14px] tracking-wide whitespace-nowrap group-data-[collapsed=true]/sidebar:hidden">
+              <%= item[:label] %>
+            </span>
+          </a>
+        </li>
+      <% end %>
+
+      <%# 二级菜单部分 %>
+      <% @submenus.each do |menu| %>
+        <% menu_id = "menu_#{menu[:label].hash.abs}" %>
+        <li class="list-none border-none">
+          <button data-action="click->layout--sidebar-component#toggleSubmenu" 
+                  data-layout--sidebar-component-menu-id-param="<%= menu_id %>"
+                  class="w-full group/btn flex items-center h-10 px-2 rounded-lg text-slate-500 hover:text-slate-900 transition-all focus:outline-none cursor-pointer border-none bg-transparent">
+            <div class="flex shrink-0 items-center justify-center w-8 h-8 text-[#0066b3]/70 group-hover/btn:text-[#0066b3]">
+              <%= heroicon menu[:icon], variant: :solid, options: { class: "h-[18px] w-[18px]" } %>
+            </div>
+            <span class="ml-2 text-[14px] font-bold tracking-wide whitespace-nowrap group-data-[collapsed=true]/sidebar:hidden">
+              <%= menu[:label] %>
+            </span>
+            <div class="ml-auto transition-transform duration-200 group-data-[collapsed=true]/sidebar:hidden" 
+                 id="arrow_<%= menu_id %>"
+                 style="<%= menu[:active] ? 'transform: rotate(90deg);' : '' %>">
+              <%= heroicon "chevron-right", variant: :mini, options: { class: "h-4 w-4 opacity-40" } %>
+            </div>
+          </button>
+          
+          <ul id="<%= menu_id %>" 
+              class="ml-2 space-y-1 list-none overflow-hidden group-data-[collapsed=true]/sidebar:!hidden border-none"
+              style="display: <%= menu[:active] ? 'block' : 'none' %>;">
+            <% menu[:items].each do |sub| %>
+              <li class="list-none border-none">
+                <a href="<%= sub[:path] %>" 
+                   data-label="<%= sub[:label]%>"
+                   data-action="click->layout--sidebar-component#handleItemClick"
+                   class="flex items-center h-9 pl-8 pr-2 rounded-lg transition-all whitespace-nowrap cursor-pointer
+                          <%= sub[:active] ? "text-[#0066b3] font-bold" : "text-slate-500 hover:text-slate-900" %>">
+                  <div class="flex shrink-0 items-center justify-center w-4 h-4 mr-2 transition-all
+                              <%= sub[:active] ? "text-[#0066b3]" : "text-slate-300" %>">
+                    <div class="w-1.5 h-1.5 rounded-full bg-current"></div>
+                  </div>
+                  <span class="text-[13px] tracking-tight"><%= sub[:label] %></span>
+                </a>
+              </li>
+            <% end %>
+          </ul>
+        </li>
+      <% end %>
+    </ul>
+  </nav>
+</aside>
