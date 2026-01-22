@@ -13,11 +13,11 @@ class Staff::OrdersController < ApplicationController
     @order = Biz::Order.new(order_params)
     @order.staff = current_user # 自动记录当前登录的员工作为制作员
     
-    # 自动生成工单号：2026 + 6位自增码
+    # 自动生成订单号：2026 + 6位自增码
     # 也可以把这个逻辑写在 Biz::Order 的 before_create 回调里
     
     if @order.save
-      redirect_to staff_orders_path, notice: "工单创建成功"
+      redirect_to staff_orders_path, notice: "订单创建成功"
     else
       render :new, status: :unprocessable_entity
     end

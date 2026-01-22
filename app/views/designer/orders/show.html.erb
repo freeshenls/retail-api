@@ -1,10 +1,10 @@
-<%# app/views/designer/orders/completed.html.erb %>
+<%# app/views/designer/orders/edit.html.erb %>
 <%= render layout: "designer/layout" do %>
   <div data-controller="layout--tab-init" 
-       data-layout--tab-init-label-value="已提交订单" 
+       data-layout--tab-init-label-value="订单<%= @order.order_no%>" 
        data-layout--tab-init-path-value="<%= request.path %>">
   <%# 这里的代码会注入到 layout 的 yield 位置，也就是 main_content 内部 %>
-  <%= render Designer::OrderCompletedComponent.new(orders: @orders, pagy: @pagy) %>
-  
+  <%= render Designer::OrderShowComponent.new(order: @order) %>
+
   </div>
 <% end %>

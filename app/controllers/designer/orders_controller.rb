@@ -1,10 +1,33 @@
 # app/controllers/designer/orders_controller.rb
 class Designer::OrdersController < ApplicationController
-  before_action :set_order, only: [:edit, :update]
+  before_action :set_order, only: [:edit, :update, :show]
+
+  def new
+    # 此处由 OrderNewComponent 接管渲染
+  end
+
+  def create
+    @order = Biz::Order.new(order_params)
+    
+    # 逻辑判断：是保存待提交还是直接提交
+    is_submit = params[:commit_type] == "submit"
+    @order.status = is_submit ? "submitted" : "pending"
+    
+    if @order.save
+      # 执行硬跳转，确保业务流转
+      if is_submit
+        redirect_to completed_designer_orders_path, notice: "订单 #{@order.order_no} 已成功提交审核"
+      else
+        redirect_to pending_designer_orders_path, notice: "订单 #{@order.order_no} 已保存至待提交列表"
+      end
+    else
+      # 如果校验失败，返回 422 让 Turbo 渲染错误信息
+      render :new, status: :unprocessable_entity
+    end
+  end
 
   def pending
     # 设计师视角：显示所有“待处理”或“被退回”且“未结算”的订单
-    # 这样如果审核没通过被驳回，会重新出现在这个列表中
     query = Biz::Order.includes(draft: :user)
                       .where(status: [:pending, :rejected], is_settled: false)
                       .order(created_at: :desc)
@@ -26,46 +49,48 @@ class Designer::OrdersController < ApplicationController
   end
 
   def update
-    # 1. 自动从关联的 unit 获取冗余字段（如 service_type, category_name）
-    # 2. 将状态改为 submitted (提交审核)
-    # 3. 计算总金额 amount (也可以放在 Model 的 before_save 里)
+    # 1. 识别点击了哪个按钮
+    is_submit = params[:commit_type] == "submit"
     
-    update_data = order_params.merge(status: 'submitted')
+    # 2. 准备更新数据
+    # 如果点击“确认并提交”，状态变为 submitted；否则保持 pending
+    update_params = order_params.merge(
+      status: is_submit ? "submitted" : "pending"
+    )
 
-    # 如果传了 unit_id，我们尝试同步冗余名称信息
-    if params[:biz_order][:unit_id].present?
-      unit = Biz::Unit.find_by(id: params[:biz_order][:unit_id])
-      if unit
-        update_data[:service_type] = unit.service_type
-        update_data[:category_name] = unit.category&.name
+    # 3. 执行更新
+    # Model 里的 before_validation 会自动处理名称同步和金额重算
+    if @order.update(update_params)
+      # 4. 根据状态执行跳转
+      if is_submit
+        redirect_to completed_designer_orders_path, notice: "订单 #{@order.order_no} 已成功提交审核"
+      else
+        redirect_to pending_designer_orders_path, notice: "订单 #{@order.order_no} 信息已更新并暂存"
       end
-    end
-
-    if @order.update(update_data)
-      # 提交审核后，跳转到“已完成/已提交”页面
-      redirect_to completed_designer_orders_path, notice: "工单已提交财务审核"
     else
+      # 失败则重新渲染编辑页，显示错误
       render :edit, status: :unprocessable_entity
     end
   end
 
   private
 
-  def set_order
-    @order = Biz::Order.find(params[:id])
-  end
-
+  # 唯一的、合并后的参数控制方法
   def order_params
-    # 增加组件中涉及的所有字段
     params.require(:biz_order).permit(
-      :customer_id,
-      :unit_id,
+      :order_no, 
+      :customer_id, 
+      :unit_id, 
       :quantity, 
       :unit_price, 
       :delivery_fee, 
-      :delivery_method, 
-      :payment_method,
-      :remark
+      :payment_method, 
+      :remark,
+      draft_attributes: [:id, :file, :user_id] # update 动作建议加上 :id 以便更新现有附件
     )
+  end
+
+  def set_order
+    @order = Biz::Order.find(params[:id])
   end
 end

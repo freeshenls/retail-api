@@ -1,0 +1,191 @@
+<%# app/javascript/controllers/designer/order_new_component.html.erb %>
+<div data-controller="designer--order-new-component" 
+     data-designer--order-new-component-units-value="<%= Biz::Unit.all.map { |u| { service_type: u.service_type, category_id: u.category_id, price: u.price.to_f, unit_id: u.id } }.to_json %>"
+     class="w-full max-w-4xl mx-auto space-y-4 pb-12 text-slate-700">
+
+  <%# 顶部：标题与实时金额预览 %>
+  <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+    <div class="flex items-center gap-3">
+      <div class="flex items-center justify-center w-9 h-9 bg-white border border-slate-200 rounded-xl text-[#0066b3] shadow-sm">
+        <%= heroicon "plus", variant: :outline, options: { class: "h-5 w-5" } %>
+      </div>
+      <div>
+        <h2 class="text-lg font-black text-slate-900 tracking-tight">新增订单</h2>
+        <p class="text-[10px] text-slate-400 font-mono tracking-tighter uppercase">单号: <%= @order.order_no %></p>
+      </div>
+    </div>
+    
+    <%# 金额预览卡片 %>
+    <div class="px-5 py-2 bg-[#0066b3] rounded-xl shadow-lg shadow-blue-900/20">
+      <div class="text-[9px] font-bold text-blue-100 uppercase tracking-widest text-right opacity-80">预计合计金额</div>
+      <div class="text-xl font-mono font-black text-white leading-none">
+        <span class="text-xs mr-0.5 italic">¥</span>
+        <span data-designer--order-new-component-target="amountDisplay">0.00</span>
+      </div>
+    </div>
+  </div>
+
+  <%= form_with model: @order, url: designer_orders_path, method: :post, multipart: true, 
+                data: { turbo: false }, class: "space-y-4" do |f| %>
+    <%= f.hidden_field :order_no %>
+    <%= f.hidden_field :unit_id, value: @order.unit_id, data: { "designer--order-new-component-target" => "unitIdInput" } %>
+
+    <%# 第一区：稿件上传 (文件名回显 + 只能传一个) %>
+    <div class="bg-white border-2 border-dashed border-slate-200 rounded-2xl p-6 transition-all hover:border-[#0066b3]/30 group cursor-pointer relative"
+         data-designer--order-new-component-target="uploadContainer">
+      <%= f.fields_for :draft do |df| %>
+        <%= df.hidden_field :user_id %>
+        <label for="order_draft_file" class="flex flex-col items-center justify-center space-y-2 cursor-pointer w-full h-full">
+          <div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-blue-50 transition-colors">
+            <%= heroicon "document-arrow-up", variant: :outline, options: { class: "h-5 w-5 text-slate-400 group-hover:text-[#0066b3]" } %>
+          </div>
+          <div class="text-center">
+            <span class="text-xs font-black text-slate-600 block transition-all" data-designer--order-new-component-target="fileNameDisplay">点击上传设计原稿</span>
+            <%= df.file_field :file, required: true, id: "order_draft_file", class: "sr-only", data: { action: "change->designer--order-new-component#handleFileChange" } %>
+            <p class="text-[9px] text-slate-400 mt-1 uppercase tracking-tighter" data-designer--order-new-component-target="uploadHint">支持文件: PDF, AI, JPG, PNG, ZIP</p>
+          </div>
+        </label>
+      <% end %>
+    </div>
+
+    <%# 第二区：核心选择区 (默认选中第一条) %>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <%# 1. 结算客户 %>
+      <div class="space-y-1" data-controller="dropdown">
+        <label class="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">结算客户</label>
+        <div class="relative">
+          <button type="button" data-action="dropdown#toggle click@window->dropdown#hide" 
+                  class="w-full flex items-center justify-between px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold hover:border-[#0066b3] transition-all shadow-sm cursor-pointer">
+            <span data-designer--order-new-component-target="customerNameText" class="truncate">
+              <%= @order.customer&.name %>
+            </span>
+            <%= heroicon "chevron-down", variant: :mini, options: { class: "h-4 w-4 text-slate-300" } %>
+          </button>
+          <%= f.hidden_field :customer_id, value: @order.customer_id, data: { "designer--order-new-component-target" => "customerIdInput" } %>
+          <div data-dropdown-target="menu" class="hidden absolute z-50 mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-2xl py-1 max-h-48 overflow-y-auto">
+            <% @customers.each do |c| %>
+              <button type="button" data-action="click->designer--order-new-component#selectCustomer" data-id="<%= c.id %>" data-name="<%= c.name %>" 
+                      class="w-full text-left px-4 py-2 text-xs font-bold text-slate-600 hover:bg-blue-50 cursor-pointer">
+                <%= c.name %>
+              </button>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <%# 2. 服务项目 %>
+      <div class="space-y-1" data-controller="dropdown">
+        <label class="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">服务项目</label>
+        <div class="relative">
+          <button type="button" data-action="dropdown#toggle click@window->dropdown#hide" 
+                  class="w-full flex items-center justify-between px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold hover:border-[#0066b3] transition-all shadow-sm cursor-pointer">
+            <span data-designer--order-new-component-target="serviceTypeText">
+              <%= @order.unit&.service_type %>
+            </span>
+            <%= heroicon "chevron-down", variant: :mini, options: { class: "h-4 w-4 text-slate-300" } %>
+          </button>
+          <input type="hidden" value="<%= @order.unit&.service_type %>" data-designer--order-new-component-target="serviceTypeInput">
+          <div data-dropdown-target="menu" class="hidden absolute z-50 mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-2xl py-1">
+            <% Biz::Unit.pluck(:service_type).uniq.each do |type| %>
+              <button type="button" data-action="click->designer--order-new-component#selectService" data-value="<%= type %>" 
+                      class="w-full text-left px-4 py-2 text-xs font-bold text-slate-600 hover:bg-blue-50 cursor-pointer">
+                <%= type %>
+              </button>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <%# 3. 规格/幅面 %>
+      <div class="space-y-1" data-controller="dropdown">
+        <label class="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">规格/幅面</label>
+        <div class="relative">
+          <button type="button" data-action="dropdown#toggle click@window->dropdown#hide" 
+                  class="w-full flex items-center justify-between px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold hover:border-[#0066b3] transition-all shadow-sm cursor-pointer">
+            <span data-designer--order-new-component-target="categoryText">
+              <%= @order.unit&.category&.name %>
+            </span>
+            <%= heroicon "chevron-down", variant: :mini, options: { class: "h-4 w-4 text-slate-300" } %>
+          </button>
+          <input type="hidden" value="<%= @order.unit&.category_id %>" data-designer--order-new-component-target="categoryIdInput">
+          <div data-dropdown-target="menu" class="hidden absolute z-50 mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-2xl py-1 max-h-48 overflow-y-auto">
+            <% @categories.each do |cat| %>
+              <button type="button" data-action="click->designer--order-new-component#selectCategory" data-id="<%= cat.id %>" data-name="<%= cat.name %>" 
+                      class="w-full text-left px-4 py-2 text-xs font-bold text-slate-600 hover:bg-blue-50 cursor-pointer">
+                <%= cat.name %>
+              </button>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%# 第三区：详情卡片 (包含所有计算必需的 Target) %>
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden p-5 grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="space-y-1">
+        <%= f.label :quantity, "数量", class: "text-[10px] font-black text-slate-400 uppercase ml-1" %>
+        <%= f.number_field :quantity, step: 0.01, 
+            data: { 
+              "designer--order-new-component-target" => "quantity", 
+              action: "input->designer--order-new-component#calculate" 
+            }, 
+            class: "block w-full px-4 py-2.5 bg-slate-50 border-none rounded-xl font-mono font-bold" %>
+      </div>
+
+      <div class="space-y-1">
+        <%= f.label :unit_price, "单价", class: "text-[10px] font-black text-slate-400 uppercase ml-1" %>
+        <%= f.number_field :unit_price, step: 0.0001, value: @order.unit&.price,
+            data: { 
+              "designer--order-new-component-target" => "unitPrice", 
+              action: "input->designer--order-new-component#handlePriceManualChange" 
+            }, 
+            class: "block w-full px-4 py-2.5 bg-slate-50 border-none rounded-xl font-mono font-bold text-orange-600" %>
+      </div>
+
+      <div class="space-y-1 relative" data-controller="dropdown">
+        <label class="text-[10px] font-black text-slate-400 uppercase ml-1">付款方式</label>
+        <button type="button" data-action="dropdown#toggle click@window->dropdown#hide" class="w-full flex items-center justify-between px-4 py-2.5 bg-slate-50 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 cursor-pointer">
+          <span data-designer--order-new-component-target="paymentMethodText">微信</span>
+          <%= heroicon "credit-card", variant: :mini, options: { class: "h-4 w-4 text-slate-400" } %>
+        </button>
+        <%= f.hidden_field :payment_method, value: "微信", data: { "designer--order-new-component-target" => "paymentMethodInput" } %>
+        <div data-dropdown-target="menu" class="hidden absolute z-50 mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-2xl py-1 transition transform">
+          <% ["微信", "支付宝", "现金", "对公", "记账"].each do |m| %>
+            <button type="button" data-action="click->designer--order-new-component#selectPayment click->dropdown#hide" data-value="<%= m %>" class="w-full text-left px-4 py-2 text-xs font-bold text-slate-600 hover:bg-blue-50 cursor-pointer">
+              <%= m %>
+            </button>
+          <% end %>
+        </div>
+      </div>
+      
+      <div class="space-y-1">
+        <%= f.label :delivery_fee, "运费/额外", class: "text-[10px] font-black text-slate-400 uppercase ml-1" %>
+        <%= f.number_field :delivery_fee, step: 0.01, value: 0, 
+            data: { 
+              "designer--order-new-component-target" => "deliveryFee", 
+              "action" => "input->designer--order-new-component#calculate" 
+            }, 
+            class: "block w-full px-4 py-2.5 bg-slate-50 border-none rounded-xl font-mono text-sm" %>
+      </div>
+
+      <div class="md:col-span-2 space-y-1">
+        <%= f.label :remark, "说明备注", class: "text-[10px] font-black text-slate-400 uppercase ml-1" %>
+        <%= f.text_field :remark, placeholder: "备注...", class: "block w-full px-4 py-2.5 bg-slate-50 border-none rounded-xl text-xs" %>
+      </div>
+    </div>
+
+    <%# 底部：移除取消，强化跳转按钮对比度 %>
+    <div class="flex justify-end items-center gap-4 pt-4 border-t border-slate-100">
+      <button type="submit" name="commit_type" value="save" 
+              class="px-8 py-3 bg-white border border-slate-200 text-slate-600 text-xs font-black rounded-xl hover:bg-slate-50 cursor-pointer shadow-sm active:scale-95 transition-all">
+        保存待提交
+      </button>
+      
+      <button type="submit" name="commit_type" value="submit" 
+              class="flex items-center gap-2 px-12 py-3 bg-[#0066b3] text-white text-xs font-black rounded-xl hover:bg-[#005596] shadow-md cursor-pointer active:scale-95 transition-all">
+        确认并提交
+        <%= heroicon "paper-airplane", variant: :solid, options: { class: "h-3.5 w-3.5" } %>
+      </button>
+    </div>
+  <% end %>
+</div>

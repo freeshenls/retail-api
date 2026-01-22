@@ -1,38 +1,102 @@
 <%# app/components/designer/order_completed_component.html.erb %>
-<div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm opacity-95">
-  <table class="min-w-full divide-y divide-slate-200">
-    <thead class="bg-slate-50/50">
-      <tr>
-        <th class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">完成编号</th>
-        <th class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">结算日期</th>
-        <th class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">结算状态</th>
-        <th class="px-6 py-4 text-right text-xs font-bold text-slate-400 uppercase tracking-wider">详情</th>
-      </tr>
-    </thead>
-    <tbody class="divide-y divide-slate-100">
-      <% @orders.each do |order| %>
-        <tr class="hover:bg-slate-50/30 transition-colors grayscale-[0.2]">
-          <td class="px-6 py-4 font-bold text-slate-600 text-[13px] tracking-tight">
-            <%= order.order_no %>
-          </td>
-          <td class="px-6 py-4">
-            <div class="text-[13px] text-slate-500 font-medium">
-              <%= order.updated_at.strftime("%Y-%m-%d") %>
-            </div>
-          </td>
-          <td class="px-6 py-4">
-            <span class="inline-flex items-center px-2.5 py-1 rounded text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
-              结算完成
-            </span>
-          </td>
-          <td class="px-6 py-4 text-right">
-            <button class="p-2 text-slate-400 hover:text-[#0066b3] hover:bg-blue-50 rounded-full transition-all">
-              <%= heroicon "document-magnifying-glass", variant: :solid, options: { class: "h-5 w-5" } %>
-            </button>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
+<div data-controller="designer--order-completed-component" class="w-full space-y-4">
+  <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-200">
+        <thead class="bg-slate-50/50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">订单编号</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">稿件详情</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">状态</th>
+            <th scope="col" class="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">操作</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200 bg-white text-slate-700">
+          <% @orders.each do |order| %>
+            <tr class="hover:bg-slate-50/50 transition-colors group">
+              <%# 1. 订单编号 %>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <div class="flex items-center">
+                  <div class="w-1 h-4 bg-[#0066b3] rounded-full mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <span class="text-slate-900 font-mono font-bold tracking-tight">
+                    <%= order.order_no %>
+                  </span>
+                </div>
+              </td>
+
+              <%# 2. 稿件详情 %>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <% if order.draft %>
+                  <div class="text-sm font-semibold text-slate-700"><%= order.draft.name %></div>
+                  <div class="mt-1 flex items-center gap-2">
+                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-orange-50 text-orange-600 border border-orange-100 uppercase">
+                      BY: <%= order.draft.user&.name %>
+                    </span>
+                    <% if order.draft.file.attached? %>
+                      <%= link_to rails_blob_path(order.draft.file, disposition: "attachment"), 
+                                  class: "flex items-center text-[10px] font-bold text-emerald-600 hover:text-emerald-700 transition-colors" do %>
+                        <svg class="w-3.5 h-3.5 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        附件下载
+                      <% end %>
+                    <% end %>
+                  </div>
+                <% end %>
+              </td>
+
+              <%# 3. 状态：单行展示 %>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center gap-x-2">
+                  <%# 流程状态 %>
+                  <% if order.submitted? %>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">已提交</span>
+                  <% elsif order.approved? %>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">审核通过</span>
+                  <% end %>
+
+                  <%# 结算状态 (一行展示，加一个中间的分隔点或直接靠间距) %>
+                  <% if order.respond_to?(:settled?) && order.settled? %>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200">已结算</span>
+                  <% else %>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-orange-50 text-orange-600 border border-orange-200">未结算</span>
+                  <% end %>
+                </div>
+              </td>
+
+              <%# 4. 操作 %>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <%= link_to "查看", designer_order_path(order), 
+                            data: { turbo: false },
+                            class: "text-[#0066b3] hover:text-[#005596] font-bold transition-colors" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <%# Pagy 分页器 (样式完全复刻) %>
+    <% if @pagy.pages > 1 %>
+      <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="text-xs text-slate-500 font-medium">
+          <%== @pagy.info_tag %>
+        </div>
+        <div class="flex items-center
+                    [&_nav]:inline-flex [&_nav]:rounded-lg [&_nav]:shadow-sm [&_nav]:overflow-hidden [&_nav]:border [&_nav]:border-slate-300
+                    [&_a]:px-4 [&_a]:py-2 [&_a]:text-sm [&_a]:font-bold [&_a]:text-slate-600 [&_a]:bg-white [&_a]:transition-colors [&_a]:no-underline
+                    [&_a:hover]:bg-[#0066b3] [&_a:hover]:text-white
+                    [&_.current]:px-4 [&_.current]:py-2 [&_.current]:text-sm [&_.current]:font-bold [&_.current]:bg-[#0066b3] [&_.current]:text-white [&_.current]:relative
+                    [&_.current]:after:content-[''] [&_.current]:after:absolute [&_.current]:after:bottom-0 [&_.current]:after:left-0 [&_.current]:after:w-full [&_.current]:after:h-[3.5px] [&_.current]:after:bg-orange-400
+                    [&_.disabled]:px-4 [&_.disabled]:py-2 [&_.disabled]:text-slate-300 [&_.disabled]:bg-slate-50 [&_.disabled]:cursor-not-allowed
+                    [&_.gap]:px-4 [&_.gap]:py-2 [&_.gap]:text-slate-400 [&_.gap]:bg-slate-50">
+          <%== @pagy.series_nav %>
+        </div>
+      </div>
+    <% end %>
+
+    <% if @orders.empty? %>
+      <div class="px-6 py-16 text-center text-slate-400 italic text-sm">
+        当前暂无已提交或结算订单
+      </div>
+    <% end %>
+  </div>
 </div>

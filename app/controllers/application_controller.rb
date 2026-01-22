@@ -42,7 +42,7 @@ class ApplicationController < ActionController::Base
         label: item["label"],
         path: path,
         active: request.path == path || params[:current] == path,
-        closable: path != "/admin" && path != "/designer" && path != "/staff" && path != "/finance"
+        closable: [true, "true"].include?(item["closable"])
       }
     end
   end

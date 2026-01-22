@@ -5,6 +5,7 @@ class Biz::Order < ApplicationRecord
   belongs_to :unit, class_name: "Biz::Unit", optional: true
   belongs_to :customer, class_name: "Biz::Customer", optional: true
   belongs_to :draft, class_name: "Biz::Draft", foreign_key: "draft_id"
+  accepts_nested_attributes_for :draft
 
   enum :status, { 
       pending: "pending",     # 待处理
@@ -15,10 +16,14 @@ class Biz::Order < ApplicationRecord
 
   
   before_save :set_total_amount
+  before_save :calculate_amount
   before_validation :sync_names_from_associations
-  before_validation :assign_order_no, on: :create
 
   private
+  
+  def calculate_amount
+    self.amount = (quantity.to_f * unit_price.to_f) + delivery_fee.to_f
+  end
 
   def sync_names_from_associations
     # 同步客户名称
@@ -40,12 +45,5 @@ class Biz::Order < ApplicationRecord
     p = unit_price.to_f
     f = delivery_fee.to_f
     self.amount = (q * p) + f
-  end
-
-  def assign_order_no
-    return if order_no.present?
-    
-    # 只需要调用 Sequence 的方法即可
-    self.order_no = Biz::Sequence.generate_next_no
   end
 end

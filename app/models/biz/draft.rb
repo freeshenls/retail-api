@@ -7,7 +7,6 @@ class Biz::Draft < ApplicationRecord
   has_one_attached :file
 
   before_save :sync_file_info, if: -> { attachment_changes.key?("file") }
-  after_create :create_associated_order
 
   # 校验
   validates :file, presence: true
@@ -22,14 +21,5 @@ class Biz::Draft < ApplicationRecord
     self.file_path = blob.key
     self.file_type = blob.content_type
     self.upload_time = Time.current
-  end
-
-  def create_associated_order
-    # 仅需创建订单记录并关联 draft_id
-    # Biz::Order 自身的 before_validation 会去调用 Biz::Sequence 获取单号
-    Biz::Order.create!(
-      draft_id: self.id,
-      is_settled: false
-    )
   end
 end

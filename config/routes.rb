@@ -35,14 +35,11 @@ Rails.application.routes.draw do
   end
   
   authenticated :user, ->(u) { u.role.name == "designer" } do
-    get "designer", to: "designer#index", as: :designer
-    root to: redirect("/designer"), as: :designer_root
+    root to: redirect("/designer/orders/new"), as: :designer_root
 
-    namespace :designer do
-      resources :drafts, only: [:index, :new, :create, :show]
-      
+    namespace :designer do      
       # 移除了 :index
-      resources :orders, only: [:edit, :update, :show, :destroy] do
+      resources :orders, only: [:new, :create, :edit, :update, :show, :destroy] do
         collection do
           get :pending
           get :completed

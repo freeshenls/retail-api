@@ -48,8 +48,8 @@
               <%# 4. 操作：纯文字加粗链接 %>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
   <%# 直接使用路由方法，去掉 helpers. %>
-  <%= link_to "立即处理", edit_designer_order_path(order), 
-              data: { turbo_frame: "main_content" },
+  <%= link_to "查看", edit_designer_order_path(order), 
+              data: { turbo: false },
               class: "text-[#0066b3] hover:text-[#005596] font-bold transition-colors" %>
 </td>
             </tr>
