@@ -6,6 +6,9 @@ class Biz::Order < ApplicationRecord
   belongs_to :customer, class_name: "Biz::Customer", optional: true
   belongs_to :draft, class_name: "Biz::Draft", foreign_key: "draft_id"
   accepts_nested_attributes_for :draft
+  after_update_commit :broadcast_approved_notifications
+
+  scope :for_designer, ->(user) { joins(:draft).where(biz_draft: { user_id: user.id }) }
 
   enum :status, { 
       pending: "pending",     # 待处理
@@ -13,14 +16,34 @@ class Biz::Order < ApplicationRecord
       approved: "approved",   # 审核通过
       rejected: "rejected"    # 已退回
     }, default: :pending
-
   
   before_save :set_total_amount
   before_save :calculate_amount
   before_validation :sync_names_from_associations
 
   private
-  
+
+  def broadcast_approved_notifications
+    # 找到受影响的设计师
+    target_user = draft&.user
+    return unless target_user
+
+    # 重新查询该设计师所有处于 approved 状态的单子
+    approved_orders = Biz::Order.joins(:draft)
+                                .where(biz_draft: { user_id: target_user.id })
+                                .where(status: :approved, is_settled: false)
+                                .order(updated_at: :desc)
+
+    # 广播：直接替换掉 ID 为 "approved_notification_wrapper" 的整个容器
+    broadcast_replace_to "notifications_user_#{target_user.id}",
+      target: "approved_notification_wrapper",
+      partial: "designer/orders/approved_notification",
+      locals: { 
+        orders: approved_orders, 
+        count: approved_orders.count 
+      }
+  end
+
   def calculate_amount
     self.amount = (quantity.to_f * unit_price.to_f) + delivery_fee.to_f
   end

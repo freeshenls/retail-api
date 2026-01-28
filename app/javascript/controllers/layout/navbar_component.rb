@@ -1,7 +1,9 @@
 class Layout::NavbarComponent < ViewComponent::Base
-
-  def initialize(user_name:, role:, nav_items:)
+  renders_one :notification
+  
+  def initialize(user_name:, avatar:, role:, nav_items:)
     @user_name = user_name
+    @avatar = avatar
     @role = role
     @nav_items = nav_items
   end

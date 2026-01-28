@@ -39,13 +39,7 @@
 
   <%# 右侧工具栏与用户信息 %>
   <div class="w-64 h-full flex items-center justify-end px-6 space-x-5">
-    <%# 消息通知按钮 %>
-    <button class="relative p-1.5 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-all group">
-      <%= heroicon "bell", variant: :solid, options: { class: "h-6 w-6" } %>
-      <span class="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-[#0066b3]">
-        3
-      </span>
-    </button>
+    <%= notification %>
 
     <%# 用户下拉菜单按钮 %>
     <div class="relative">
@@ -56,7 +50,15 @@
           <span class="text-[14px] font-bold text-white"><%= @user_name %></span>
         </div>
         <div class="w-9 h-9 bg-white/10 rounded-full flex items-center justify-center shrink-0 border border-white/20 group-hover:border-white/40 transition-all overflow-hidden">
-          <%= heroicon "user", variant: :solid, options: { class: "h-5 w-5 text-white/90" } %>
+          <%# 核心：判断头像是否存在 %>
+          <% if @avatar.attached? %>
+            <%= image_tag @avatar, 
+                class: "w-full h-full object-cover", 
+                alt: @user_name %>
+          <% else %>
+            <%# 没有头像时显示原有的 Heroicon %>
+            <%= heroicon "user", variant: :solid, options: { class: "h-5 w-5 text-white/90" } %>
+          <% end %>
         </div>
       </button>
 
@@ -64,7 +66,7 @@
       <div data-layout--navbar-component-target="dropdown" 
            class="hidden absolute right-0 mt-2 w-44 bg-white rounded shadow-2xl py-1 text-slate-700 ring-1 ring-black/10 z-50 overflow-hidden">
         
-        <a class="block px-4 py-2.5 text-sm hover:bg-slate-50 flex items-center transition-colors" href="#">
+        <a class="block px-4 py-2.5 text-sm hover:bg-slate-50 flex items-center transition-colors" href="<%= profile_path %>">
           <%= heroicon "user-circle", variant: :solid, options: { class: "h-5 w-5 mr-3 text-slate-400" } %>
           个人中心
         </a>

@@ -176,12 +176,12 @@
 
     <%# 底部：移除取消，强化跳转按钮对比度 %>
     <div class="flex justify-end items-center gap-4 pt-4 border-t border-slate-100">
-      <button type="submit" name="commit_type" value="save" 
+      <button type="submit" name="biz_order[status]" value="pending" 
               class="px-8 py-3 bg-white border border-slate-200 text-slate-600 text-xs font-black rounded-xl hover:bg-slate-50 cursor-pointer shadow-sm active:scale-95 transition-all">
         保存待提交
       </button>
       
-      <button type="submit" name="commit_type" value="submit" 
+      <button type="submit" name="biz_order[status]" value="submitted" 
               class="flex items-center gap-2 px-12 py-3 bg-[#0066b3] text-white text-xs font-black rounded-xl hover:bg-[#005596] shadow-md cursor-pointer active:scale-95 transition-all">
         确认并提交
         <%= heroicon "paper-airplane", variant: :solid, options: { class: "h-3.5 w-3.5" } %>

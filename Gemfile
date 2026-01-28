@@ -63,3 +63,5 @@ gem "seed_dump", "~> 3.4"
 gem "devise", "~> 4.9"
 gem "heroicons", "~> 2.2"
 gem "pagy", "~> 43.2"
+
+gem "redis", "~> 5.4"

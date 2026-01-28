@@ -1,0 +1,10 @@
+<%# app/views/designer/orders/edit.html.erb %>
+<%= render layout: "designer/layout" do %>
+  <div data-controller="layout--tab-init" 
+       data-layout--tab-init-label-value="个人中心" 
+       data-layout--tab-init-path-value="<%= request.path %>">
+  <%# 这里的代码会注入到 layout 的 yield 位置，也就是 main_content 内部 %>
+  <%= render Layout::ProfileComponent.new(user: current_user) %>
+
+  </div>
+<% end %>

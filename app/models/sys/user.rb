@@ -5,7 +5,8 @@ class Sys::User < ApplicationRecord
          :recoverable, :rememberable, :validatable
 
   attr_accessor :code
-
+  has_one_attached :avatar
+  
   belongs_to :role
   has_one :invite_code
   has_many :customer_users, class_name: "Biz::CustomerUser"

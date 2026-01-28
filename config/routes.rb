@@ -1,7 +1,4 @@
 Rails.application.routes.draw do
-  namespace :designer do
-    get "orders/index"
-  end
   devise_for :users, class_name: "Sys::User", controllers: {
     sessions: 'users/sessions',
     registrations: 'users/registrations'
@@ -35,9 +32,11 @@ Rails.application.routes.draw do
   end
   
   authenticated :user, ->(u) { u.role.name == "designer" } do
+    get "profile", to: "designer#profile", as: :profile
+    patch "profile", to: "designer#profile_update"
     root to: redirect("/designer/orders/new"), as: :designer_root
 
-    namespace :designer do      
+    namespace :designer do
       # 移除了 :index
       resources :orders, only: [:new, :create, :edit, :update, :show, :destroy] do
         collection do

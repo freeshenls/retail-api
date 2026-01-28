@@ -8,27 +8,26 @@ class Designer::OrdersController < ApplicationController
 
   def create
     @order = Biz::Order.new(order_params)
-    
-    # 逻辑判断：是保存待提交还是直接提交
-    is_submit = params[:commit_type] == "submit"
-    @order.status = is_submit ? "submitted" : "pending"
-    
+  
     if @order.save
-      # 执行硬跳转，确保业务流转
-      if is_submit
-        redirect_to completed_designer_orders_path, notice: "订单 #{@order.order_no} 已成功提交审核"
-      else
-        redirect_to pending_designer_orders_path, notice: "订单 #{@order.order_no} 已保存至待提交列表"
+      respond_to do |format|
+        # 方案 A：由 JS 处理跳转（保持你之前要求的“由 JS 跳”）
+        format.turbo_stream { head :no_content }
+        format.html {
+          # 即使是普通 HTML 提交，我们也根据 status 自动分流
+          path = @order.submitted? ? completed_designer_orders_path : pending_designer_orders_path
+          redirect_to path, notice: "订单 #{@order.order_no} 操作成功"
+        }
       end
     else
-      # 如果校验失败，返回 422 让 Turbo 渲染错误信息
       render :new, status: :unprocessable_entity
     end
   end
 
   def pending
     # 设计师视角：显示所有“待处理”或“被退回”且“未结算”的订单
-    query = Biz::Order.includes(draft: :user)
+    query = Biz::Order.for_designer(current_user)
+                      .includes(draft: :user)
                       .where(status: [:pending, :rejected], is_settled: false)
                       .order(created_at: :desc)
     
@@ -37,7 +36,8 @@ class Designer::OrdersController < ApplicationController
 
   def completed
     # 设计师视角：显示“已提交审核”、“已审核”或“已结算”的订单
-    query = Biz::Order.includes(draft: :user)
+    query = Biz::Order.for_designer(current_user)
+                      .includes(draft: :user)
                       .where.not(status: [:pending, :rejected])
                       .order(updated_at: :desc)
     
@@ -49,26 +49,19 @@ class Designer::OrdersController < ApplicationController
   end
 
   def update
-    # 1. 识别点击了哪个按钮
-    is_submit = params[:commit_type] == "submit"
-    
-    # 2. 准备更新数据
-    # 如果点击“确认并提交”，状态变为 submitted；否则保持 pending
-    update_params = order_params.merge(
-      status: is_submit ? "submitted" : "pending"
-    )
-
-    # 3. 执行更新
-    # Model 里的 before_validation 会自动处理名称同步和金额重算
-    if @order.update(update_params)
-      # 4. 根据状态执行跳转
-      if is_submit
-        redirect_to completed_designer_orders_path, notice: "订单 #{@order.order_no} 已成功提交审核"
-      else
-        redirect_to pending_designer_orders_path, notice: "订单 #{@order.order_no} 信息已更新并暂存"
+    if @order.update(order_params)
+      respond_to do |format|
+        # 情况 A：如果是从下拉框 Dialog 发来的“确认收货”，保持静默
+        # 这里不返回任何内容，浏览器不跳转，UI 等待 Model 的广播
+        format.turbo_stream { head :no_content } 
+        
+        # 情况 B：如果是编辑表单提交，执行常规跳转
+        format.html { 
+          path = @order.submitted? ? completed_designer_orders_path : pending_designer_orders_path
+          redirect_to path, notice: "订单已处理" 
+        }
       end
     else
-      # 失败则重新渲染编辑页，显示错误
       render :edit, status: :unprocessable_entity
     end
   end
@@ -86,6 +79,8 @@ class Designer::OrdersController < ApplicationController
       :delivery_fee, 
       :payment_method, 
       :remark,
+      :status,
+      :is_settled,
       draft_attributes: [:id, :file, :user_id] # update 动作建议加上 :id 以便更新现有附件
     )
   end
