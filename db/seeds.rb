@@ -76,4 +76,5 @@ Biz::Unit.create!([
 ])
 Biz::CustomerUser.create!([
   {customer_id: 1, user_id: 2}
+  {customer_id: 1, user_id: 3}
 ])
