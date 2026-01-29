@@ -2,7 +2,7 @@
 class Biz::Order < ApplicationRecord
   attribute :status, :string
 
-  belongs_to :staff, class_name: "Biz::Staff", optional: true
+  belongs_to :staff, class_name: "Sys::User", optional: true
   belongs_to :unit, class_name: "Biz::Unit", optional: true
   belongs_to :customer, class_name: "Biz::Customer", optional: true
   belongs_to :draft, class_name: "Biz::Draft", foreign_key: "draft_id"

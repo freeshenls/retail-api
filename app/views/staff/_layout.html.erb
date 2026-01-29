@@ -2,6 +2,7 @@
   <%
     # 1. 基础路径与状态计算
     curr_path = request.path
+    path_submitted   = submitted_staff_orders_path
     path_approved   = approved_staff_orders_path
     path_rejected = rejected_staff_orders_path
 
@@ -19,6 +20,7 @@
         icon: "clipboard-document-list", 
         active: true,
         items: [
+          { label: "待审核订单", path: path_submitted, active: curr_path == path_submitted },
           { label: "已审核订单", path: path_approved, active: curr_path == path_approved },
           { label: "已退回订单", path: path_rejected, active: curr_path == path_rejected }
         ]
@@ -38,7 +40,7 @@
     <% navbar.with_notification do %>
       <% 
         # 实时获取该提交的订单
-        submitted_orders = Biz::Order.where(status: :submitted)
+        submitted_orders = Biz::Order.where(status: :submitted, staff_id: nil)
                               .order(updated_at: :desc)
       %>
       <%= render "staff/orders/submitted_notification", 

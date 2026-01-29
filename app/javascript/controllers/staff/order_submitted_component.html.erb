@@ -1,5 +1,5 @@
-<%# app/components/designer/order_pending_component.html.erb %>
-<div data-controller="designer--order-pending-component" class="w-full space-y-4">
+<%# app/components/staff/order_submitted_component.html.erb %>
+<div data-controller="staff--order-submitted-component" class="w-full space-y-4">
   
   <%# 数据表格区域 %>
   <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
@@ -8,15 +8,18 @@
         <thead class="bg-slate-50/50">
           <tr>
             <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">订单编号</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">稿件详情</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">规格与业务类型</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">客户信息</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">金额</th>
             <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">状态</th>
             <th scope="col" class="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">操作</th>
           </tr>
         </thead>
+        
         <tbody class="divide-y divide-slate-200 bg-white text-slate-700">
           <% @orders.each do |order| %>
             <tr class="hover:bg-slate-50/50 transition-colors group">
-              <%# 1. 订单编号：左侧蓝色装饰条 %>
+              <%# 1. 订单编号：左侧带有品牌色装饰条 %>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <div class="flex items-center">
                   <div class="w-1 h-4 bg-[#0066b3] rounded-full mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -26,48 +29,64 @@
                 </div>
               </td>
 
-              <%# 2. 稿件详情：带橙色上传者标签 %>
+              <%# 2. 规格与业务类型：展示 category_name 和 service_type %>
               <td class="px-6 py-4 whitespace-nowrap">
-                <% if order.draft %>
-                  <div class="text-sm font-semibold text-slate-700"><%= order.draft.name %></div>
-                  <div class="mt-1">
-                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-orange-50 text-orange-600 border border-orange-100 uppercase">
-                      BY: <%= order.draft.user&.name %>
-                    </span>
-                  </div>
-                <% end %>
+                <div class="text-sm font-black text-slate-700">
+                  <%= order.category_name || "未分类规格" %>
+                </div>
+                <div class="mt-1 flex items-center gap-2">
+                  <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200 uppercase tracking-tight">
+                    <%= order.service_type || "标准服务" %>
+                  </span>
+                  <span class="text-[10px] font-bold text-slate-400">
+                    数量: <%= order.quantity.to_i %>
+                  </span>
+                </div>
               </td>
 
-              <%# 3. 状态 %>
+              <%# 3. 客户信息 %>
               <td class="px-6 py-4 whitespace-nowrap">
-                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                  <%= order.status == 'rejected' ? '已退回 / 待处理' : '待处理' %>
+                <div class="text-xs font-bold text-slate-600 uppercase tracking-tighter">
+                  <%= order.customer_name %>
+                </div>
+              </td>
+
+              <%# 4. 金额：蓝色粗体，增强识别度 %>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="text-[13px] font-black text-[#0066b3] font-mono italic">
+                  ¥ <%= number_with_precision(order.amount, precision: 2) %>
                 </span>
               </td>
 
-              <%# 4. 操作：纯文字加粗链接 %>
+              <%# 5. 状态标签 %>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-[#0066b3] border border-blue-100 uppercase">
+                  已接单 / 待审核
+                </span>
+              </td>
+
+              <%# 6. 操作链接 %>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-  <%# 直接使用路由方法，去掉 helpers. %>
-  <%= link_to "查看", edit_designer_order_path(order), 
-              data: { turbo: false },
-              class: "text-[#0066b3] hover:text-[#005596] font-bold transition-colors" %>
-</td>
+                <%= link_to "详情", staff_order_path(order), 
+                            data: { turbo: false },
+                            class: "text-[#0066b3] hover:text-[#005596] font-bold transition-colors" %>
+              </td>
             </tr>
           <% end %>
         </tbody>
       </table>
     </div>
 
-    <%# 3. Pagy 分页底栏 - 完全复刻 draft_index 逻辑 %>
-    <% if @pagy.pages > 1 %>
+    <%# Pagy 分页底栏 - 复刻设计师端的样式 %>
+    <% if @pagy.present? && @pagy.pages > 1 %>
       <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
         
-        <%# 左侧：分页信息 %>
+        <%# 左侧：分页计数信息 %>
         <div class="text-xs text-slate-500 font-medium">
           <%== @pagy.info_tag %>
         </div>
         
-        <%# 右侧：Pagy 导航器 (包含 Navbar 同款橙色横条样式) %>
+        <%# 右侧：Pagy 导航 (带橙色横条装饰) %>
         <div class="flex items-center
                     [&_nav]:inline-flex [&_nav]:rounded-lg [&_nav]:shadow-sm [&_nav]:overflow-hidden [&_nav]:border [&_nav]:border-slate-300
                     [&_a]:px-4 [&_a]:py-2 [&_a]:text-sm [&_a]:font-bold [&_a]:text-slate-600 [&_a]:bg-white [&_a]:transition-colors [&_a]:no-underline
@@ -85,7 +104,7 @@
 
     <% if @orders.empty? %>
       <div class="px-6 py-16 text-center text-slate-400 italic text-sm">
-        当前暂无待处理订单
+        当前暂无已接单订单，请从右上方铃铛处抢单
       </div>
     <% end %>
   </div>

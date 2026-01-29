@@ -15,7 +15,7 @@
       </div>
     </div>
     
-    <%# 金额预览卡片 - 绑定到 edit 控制器 %>
+    <%# 金额预览卡片 %>
     <div class="px-5 py-2 bg-[#0066b3] rounded-xl shadow-lg shadow-blue-900/20">
       <div class="text-[9px] font-bold text-blue-100 uppercase tracking-widest text-right opacity-80">当前合计金额</div>
       <div class="text-xl font-mono font-black text-white leading-none">
@@ -27,13 +27,34 @@
     </div>
   </div>
 
+  <%# --- 核心新增：退回原因显示区域 --- %>
+  <% if @order.status == "rejected" && @order.reject_reason.present? %>
+    <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5 flex gap-4 items-start animate-in fade-in slide-in-from-top-4 duration-500">
+      <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-amber-500 shrink-0 shadow-sm">
+        <%= heroicon "exclamation-triangle", variant: :solid, options: { class: "h-5 w-5" } %>
+      </div>
+      <div class="space-y-1">
+        <h4 class="text-[10px] font-black text-amber-800 uppercase tracking-widest">审核退回说明</h4>
+        <p class="text-sm font-bold text-amber-900 leading-relaxed"><%= @order.reject_reason %></p>
+        <div class="flex items-center gap-2 mt-2">
+          <span class="text-[9px] px-1.5 py-0.5 bg-amber-200/50 text-amber-800 rounded font-bold uppercase">
+            操作人: <%= @order.staff&.name || "核查员" %>
+          </span>
+          <span class="text-[9px] text-amber-600/60 font-mono font-bold">
+            <%= @order.updated_at.strftime("%Y-%m-%d %H:%M") %>
+          </span>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
   <%= form_with model: @order, url: designer_order_path(@order), method: :patch, multipart: true, 
                 data: { turbo: false }, class: "space-y-4" do |f| %>
     
     <%= f.hidden_field :order_no %>
     <%= f.hidden_field :unit_id, data: { "designer--order-edit-component-target" => "unitIdInput" } %>
 
-    <%# 第一区：稿件回显 (文件名回显 + 重新上传逻辑) %>
+    <%# 第一区：稿件回显 %>
     <div class="bg-white border-2 border-dashed border-slate-200 rounded-2xl p-6 transition-all hover:border-[#0066b3]/30 group cursor-pointer relative"
          data-designer--order-edit-component-target="uploadContainer">
       <%= f.fields_for :draft do |df| %>
@@ -53,7 +74,7 @@
       <% end %>
     </div>
 
-    <%# 第二区：选择区 (复刻新增页逻辑) %>
+    <%# 第二区：选择区 (保持原样) %>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
       <%# 1. 结算客户 %>
       <div class="space-y-1" data-controller="dropdown">
@@ -125,7 +146,7 @@
       </div>
     </div>
 
-    <%# 第三区：详情数值卡片 %>
+    <%# 第三区：详情数值卡片 (保持原样) %>
     <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden p-5 grid grid-cols-1 md:grid-cols-3 gap-4">
       <div class="space-y-1">
         <%= f.label :quantity, "数量", class: "text-[10px] font-black text-slate-400 uppercase ml-1" %>

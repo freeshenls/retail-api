@@ -32,10 +32,16 @@ Rails.application.routes.draw do
     root to: redirect("/staff/orders/approved"), as: :staff_root
     namespace :staff do
       # 移除了 :index
-      resources :orders, only: [:edit, :update, :show] do
+      resources :orders, only: [:show] do
         collection do
+          get :submitted
           get :approved
           get :rejected
+        end
+        member do
+          patch :accept
+          patch :approve
+          patch :reject
         end
       end
     end

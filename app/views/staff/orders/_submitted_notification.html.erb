@@ -43,7 +43,7 @@
 
             <%# 按钮与 Hover 气泡区 %>
             <div class="flex justify-end gap-2 items-center relative">
-              <%= link_to staff_order_path(order), data: { turbo_frame: "main_content" }, 
+              <%= link_to staff_order_path(order), data: { turbo: false }, 
                           class: "px-2 py-1 text-slate-400 hover:text-slate-900 text-[11px] font-bold cursor-pointer transition-colors" do %>
                 详情
               <% end %>
@@ -62,7 +62,7 @@
                   
                   <div class="bg-white border border-slate-200 shadow-xl rounded-lg p-1.5 flex items-center gap-1.5 whitespace-nowrap">
                     <%# 抢单按钮：不传参数，由 Controller 处理 %>
-                    <%= button_to staff_order_path(order), 
+                    <%= button_to accept_staff_order_path(order), 
                                   method: :patch,
                                   class: "flex items-center gap-1.5 px-4 py-1.5 bg-[#0066b3] text-white text-[11px] font-black rounded shadow-sm hover:bg-[#005596] cursor-pointer border-none transition-all" do %>
                       <%= heroicon "bolt", variant: :mini, options: { class: "h-4 w-4" } %>

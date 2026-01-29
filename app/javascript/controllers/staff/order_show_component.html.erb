@@ -1,0 +1,262 @@
+<%# app/components/staff/order_show_component.html.erb %>
+<div class="max-w-5xl mx-auto py-8 px-4" data-controller="staff--order-show-component">
+  
+  <%# 1. 顶部导航与状态 - no-print %>
+  <div class="mb-6 flex justify-between items-center px-1 border-b border-slate-100 pb-5 no-print">
+    <div class="flex items-center gap-3">
+      <%= link_to submitted_staff_orders_path, class: "p-2 bg-white border-2 border-slate-100 rounded-lg text-slate-400 hover:text-[#0066b3] hover:border-[#0066b3] transition-all shadow-sm" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+        </svg>
+      <% end %>
+      <div>
+        <h1 class="text-xl font-black text-slate-800 tracking-tight">订单详情</h1>
+        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">订单编号: <%= @order.order_no %></p>
+      </div>
+    </div>
+    
+    <div class="flex flex-col items-end">
+      <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 text-right">当前状态</span>
+      <div class="px-4 py-1.5 bg-blue-50 border border-blue-100 text-[#0066b3] text-[11px] font-black rounded-lg uppercase tracking-wider">
+        <%= status_label %>
+      </div>
+    </div>
+  </div>
+
+  <%# 2. 打印专用抬头 %>
+  <div class="hidden print:block border-b-4 border-slate-900 pb-6 mb-8">
+    <div class="flex justify-between items-end">
+      <div>
+        <h1 class="text-3xl font-black tracking-tighter uppercase text-slate-900">生产任务指令单</h1>
+        <p class="text-xs font-bold text-slate-500 mt-1">PRODUCTION TASK ORDER</p>
+      </div>
+      <div class="text-right">
+        <p class="text-sm font-black font-mono text-slate-900">单号: <%= @order.order_no %></p>
+        <p class="text-[10px] text-slate-400 font-bold tracking-tight">打印时间: <%= Time.current.strftime("%Y-%m-%d %H:%M") %></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 print:block">
+    <%# 左侧主内容区 %>
+    <div class="lg:col-span-2 space-y-6 print:w-full">
+      
+      <%# 业务规格卡片 %>
+      <div class="bg-white border-2 border-slate-200 rounded-2xl overflow-hidden shadow-sm print:shadow-none print:border-slate-900 print:rounded-none">
+        <div class="p-6 border-b-2 border-slate-50 flex items-center justify-between print:bg-slate-50 print:border-slate-900">
+          <h3 class="text-sm font-black text-slate-800 flex items-center gap-2">
+            <div class="w-1.5 h-4 bg-[#0066b3] rounded-full print:bg-slate-900"></div>
+            业务规格信息
+          </h3>
+        </div>
+        
+        <div class="p-8 grid grid-cols-1 md:grid-cols-3 gap-8 text-slate-700 print:grid-cols-3 print:gap-4 print:p-6">
+          <div class="space-y-1">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest print:text-slate-500">服务类型</label>
+            <p class="text-sm font-bold"><%= @order.service_type.presence || "标准服务" %></p>
+          </div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest print:text-slate-500">产品分类</label>
+            <p class="text-sm font-bold"><%= @order.category_name.presence || "未分类规格" %></p>
+          </div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest print:text-slate-500">生产数量</label>
+            <p class="text-sm font-bold font-mono print:text-xl"><%= @order.quantity.to_i %> PCS</p>
+          </div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest print:text-slate-500">业务单价</label>
+            <p class="text-sm font-bold text-orange-600 font-mono print:text-slate-900">¥ <%= number_with_precision(@order.unit_price, precision: 4) %></p>
+          </div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest print:text-slate-500">运费明细</label>
+            <p class="text-sm font-bold font-mono print:text-slate-900">¥ <%= number_with_precision(@order.delivery_fee, precision: 2) %></p>
+          </div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest print:text-slate-500">付款方式</label>
+            <p class="text-sm font-bold uppercase"><%= @order.payment_method || "微信" %></p>
+          </div>
+        </div>
+      </div>
+
+      <%# 稿件资料卡片 %>
+      <div class="bg-white border-2 border-slate-200 rounded-2xl overflow-hidden shadow-sm print:shadow-none print:border-slate-900 print:rounded-none">
+        <div class="p-6 border-b-2 border-slate-50 print:border-slate-900">
+          <h3 class="text-sm font-black text-slate-800">稿件基础资料</h3>
+        </div>
+        <div class="p-8 print:p-6">
+          <div class="group flex items-center justify-between p-4 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200 print:border-slate-400 print:bg-white">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-[#0066b3] shadow-sm print:border print:border-slate-900">
+                <%= heroicon "document-text", variant: :outline, options: { class: "h-5 w-5" } %>
+              </div>
+              <div>
+                <p class="text-sm font-black text-slate-700"><%= @order.draft_name || @order.draft&.name %></p>
+                <p class="text-[9px] text-slate-400 mt-1 uppercase tracking-tighter font-bold print:text-slate-600">设计稿件详情 / Design Draft Details</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <%# --- 打印合并底栏 --- %>
+      <div class="hidden print:grid grid-cols-4 divide-x-2 divide-slate-900 border-2 border-slate-900 mt-12 items-stretch">
+        <div class="p-4 bg-slate-50/50">
+          <label class="text-[9px] font-black text-slate-500 uppercase block mb-2">订单金额总计</label>
+          <p class="text-xl font-black font-mono text-slate-900">¥ <%= number_with_precision(@order.amount, precision: 2) %></p>
+          <p class="text-[8px] text-slate-400 mt-1 font-bold">客户: <%= @order.customer_name %></p>
+        </div>
+        <div class="p-4 min-h-[80px]">
+          <p class="text-[9px] font-black text-slate-500 uppercase mb-8">制单负责人</p>
+          <p class="text-xs font-bold text-slate-900"><%= @order.staff&.name %></p>
+        </div>
+        <div class="p-4"><p class="text-[9px] font-black text-slate-500 uppercase mb-8">生产审核</p></div>
+        <div class="p-4"><p class="text-[9px] font-black text-slate-500 uppercase mb-8">成品签收</p></div>
+      </div>
+    </div>
+
+    <%# 右侧侧边栏 %>
+    <div class="space-y-6 no-print">
+      <div class="bg-slate-900 rounded-2xl p-6 text-white shadow-lg">
+        <label class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block text-slate-400/80">订单金额总计</label>
+        <div class="flex items-baseline gap-1 mb-6">
+          <span class="text-xl font-light text-slate-400">¥</span>
+          <span class="text-4xl font-black tracking-tighter"><%= number_with_precision(@order.amount, precision: 2) %></span>
+        </div>
+        <div class="space-y-3 pt-6 border-t border-white/10 text-[11px]">
+          <div class="flex justify-between font-black"><span class="text-slate-400 uppercase font-bold">关联客户</span><span><%= @order.customer_name %></span></div>
+          <div class="flex justify-between font-black"><span class="text-slate-400 uppercase font-bold">负责人</span><span class="text-blue-400"><%= @order.staff&.name || "等待抢单..." %></span></div>
+        </div>
+      </div>
+
+      <%# 操作区 %>
+      <div class="space-y-3 pt-2">
+        <% if @order.staff.blank? %>
+          <%= button_to accept_staff_order_path(@order), method: :patch, data: { turbo: false },
+              class: "w-full py-3 bg-[#0066b3] text-white text-xs font-black rounded-xl hover:bg-[#005596] shadow-md cursor-pointer transition-all active:scale-95 border-none" do %>
+            立即接单抢单
+          <% end %>
+
+        <% elsif @order.status == "submitted" && @order.staff == helpers.current_user %>
+          <div class="space-y-4" data-controller="dialog">
+            <%= button_to approve_staff_order_path(@order), method: :patch, data: { turbo: false },
+                class: "w-full flex items-center justify-center gap-2 px-12 py-3 bg-[#0066b3] text-white text-xs font-black rounded-xl hover:bg-[#005596] shadow-md cursor-pointer active:scale-95 transition-all border-none" do %>
+              确认并审核通过
+              <%= heroicon "paper-airplane", variant: :solid, options: { class: "h-3.5 w-3.5 text-white/90" } %>
+            <% end %>
+            
+            <div class="text-center mt-3">
+              <button type="button" 
+                      data-action="click->dialog#open"
+                      class="text-[11px] font-bold text-slate-400 hover:text-[#0066b3] transition-colors cursor-pointer underline underline-offset-4 decoration-slate-200 hover:decoration-[#0066b3]/30">
+                发现问题？退回修改
+              </button>
+            </div>
+
+            <%# --- 退回弹窗 --- %>
+            <dialog data-dialog-target="dialog" 
+                    class="backdrop:bg-slate-900/50 rounded-2xl border-none shadow-2xl p-0 w-full max-w-md fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+              <div class="p-8 bg-white">
+                <div class="flex items-center gap-3 mb-6 text-[#0066b3]">
+                  <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
+                    <%= heroicon "arrow-uturn-left", variant: :outline, options: { class: "h-5 w-5" } %>
+                  </div>
+                  <h3 class="text-lg font-black text-slate-800 tracking-tight">退回修正</h3>
+                </div>
+                
+                <%= form_with model: @order, url: reject_staff_order_path(@order), method: :patch, data: { turbo: false } do |f| %>
+                  <div class="space-y-5">
+                    <div>
+                      <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">退回原因说明</label>
+                      <%= f.text_area :reject_reason, 
+                          class: "w-full rounded-xl border-slate-200 text-sm focus:ring-[#0066b3] focus:border-[#0066b3] min-h-[120px] p-4 shadow-sm transition-all",
+                          placeholder: "请详细说明哪些规格或稿件需要修改...",
+                          required: true %>
+                    </div>
+                    
+                    <div class="flex gap-3">
+                      <%# 这里统一风格：蓝色背景 + 阴影 + 缩放反馈 %>
+                      <%= f.submit "确认提交退回", class: "flex-1 py-3 bg-[#0066b3] text-white text-xs font-black rounded-xl cursor-pointer hover:bg-[#005596] active:scale-95 transition-all shadow-md border-none" %>
+                      <button type="button" 
+                              data-action="click->dialog#close" 
+                              class="flex-1 py-3 bg-white border border-slate-200 text-slate-500 text-xs font-bold rounded-xl cursor-pointer hover:bg-slate-50 active:scale-95 transition-all">
+                        取消返回
+                      </button>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            </dialog>
+          </div>
+
+        <% elsif @order.status == "approved" %>
+          <div class="space-y-2">
+            <div class="w-full flex items-center justify-center gap-2 py-3.5 bg-slate-50 border border-slate-200 text-[#0066b3] text-xs font-black rounded-xl cursor-default uppercase">
+              <%= heroicon "check-circle", variant: :solid, options: { class: "h-4 w-4" } %>
+              订单审核已通过
+            </div>
+            <button onclick="window.print()" class="w-full flex items-center justify-center gap-2 px-8 py-3 bg-white border border-slate-200 text-slate-600 text-xs font-black rounded-xl hover:bg-slate-50 cursor-pointer shadow-sm active:scale-95 transition-all">
+              <%= heroicon "printer", variant: :outline, options: { class: "h-4 w-4" } %>
+              打印生产任务单
+            </button>
+          </div>
+        <% end %>
+      </div>
+
+      <%# 流程进度 - 增加 Amber 状态显示逻辑 %>
+      <div class="bg-white border-2 border-slate-200 rounded-2xl p-6 shadow-sm no-print">
+        <h4 class="text-[11px] font-black text-slate-800 uppercase tracking-widest mb-4 border-b border-slate-50 pb-2">流程进度</h4>
+        <div class="space-y-5">
+          <%# 阶段1：已抢单 %>
+          <div class="flex gap-3 items-center">
+            <div class="w-5 h-5 rounded-full bg-[#0066b3] flex items-center justify-center shrink-0">
+              <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+            </div>
+            <p class="text-[11px] font-black text-slate-700 uppercase">员工已接单</p>
+          </div>
+
+          <%# 阶段2：有reject_reason %>
+          <% unless @order.reject_reason.nil? %>
+            <div class="flex gap-3 items-start">
+              <div class="w-5 h-5 rounded-full bg-amber-500 flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+                <%= heroicon "arrow-uturn-left", variant: :solid, options: { class: "h-3 w-3 text-white" } %>
+              </div>
+              <div class="bg-amber-50 border border-amber-100 rounded-xl p-3 w-full">
+                <div class="flex justify-between items-center mb-1">
+                  <p class="text-[11px] font-black text-amber-800 uppercase">已退回修正</p>
+                  <span class="text-[9px] font-bold text-amber-600/70 font-mono"><%= @order.updated_at.strftime("%m/%d %H:%M") %></span>
+                </div>
+                <p class="text-[11px] font-bold text-amber-700 leading-relaxed"><%= @order.reject_reason %></p>
+              </div>
+            </div>
+          <% end %>
+
+          <%# 阶段3：审核通过 %>
+          <% if @order.status == "approved" %>
+            <div class="flex gap-3">
+              <div class="w-5 h-5 rounded-full bg-[#0066b3] flex items-center justify-center shrink-0">
+                <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+              </div>
+              <div class="flex flex-col">
+                <p class="text-[11px] font-black text-slate-700 uppercase">已审核通过</p>
+                <p class="text-[10px] text-slate-400 font-mono font-bold mt-0.5"><%= @order.updated_at.strftime("%m/%d %H:%M") %></p>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @media print {
+      body { background: white !important; font-family: "SimSun", "Songti SC", serif; }
+      .no-print { display: none !important; }
+      @page { size: A4; margin: 1.5cm; }
+      #tabs, aside, nav, header, footer { display: none !important; }
+      body, html { background: white !important; margin: 0 !important; padding: 0 !important; }
+      .max-w-5xl { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
+      .print\:grid-cols-4 { display: grid !important; grid-template-columns: 1.5fr 1fr 1fr 1fr !important; }
+      p, h1, h3, label, span { color: black !important; }
+    }
+  </style>
+</div>
