@@ -65,3 +65,5 @@ gem "heroicons", "~> 2.2"
 gem "pagy", "~> 43.2"
 
 gem "redis", "~> 5.4"
+
+gem "groupdate", "~> 6.7"

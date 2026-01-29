@@ -10,3 +10,6 @@ pin "@stimulus-components/dropdown", to: "@stimulus-components--dropdown.js" # @
 pin "stimulus-use" # @0.52.3
 pin "@stimulus-components/dialog", to: "@stimulus-components--dialog.js" # @1.0.1
 pin "@stimulus-components/popover", to: "@stimulus-components--popover.js" # @7.0.0
+pin "@stimulus-components/chartjs", to: "@stimulus-components--chartjs.js" # @6.0.1
+pin "@kurkle/color", to: "@kurkle--color.js" # @0.3.4
+pin "chart.js" # @4.5.1

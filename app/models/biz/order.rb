@@ -12,6 +12,7 @@ class Biz::Order < ApplicationRecord
 
   scope :for_staff, ->(user) { where(staff_id: user.id ) }
   scope :for_designer, ->(user) { joins(:draft).where(biz_draft: { user_id: user.id }) }
+  scope :for_finance, ->(user) { joins(draft: { user: :customers }).where(biz_customer: { id: user.customer_ids }).distinct}
 
   enum :status, { 
       pending: "pending",     # 待处理

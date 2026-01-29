@@ -1,10 +1,10 @@
-<%# app/views/staff/orders/approved.html.erb %>
-<%= render layout: "staff/layout" do %>
+<%# app/views/finance/charts/draft.html.erb %>
+<%= render layout: "finance/layout" do %>
   <div data-controller="layout--tab-init" 
-       data-layout--tab-init-label-value="待审核订单" 
+       data-layout--tab-init-label-value="稿件统计" 
        data-layout--tab-init-closable-value="false" 
        data-layout--tab-init-path-value="<%= request.path %>">
   <%# 这里的代码会注入到 layout 的 yield 位置，也就是 main_content 内部 %>
-  	<%= render Staff::OrderSubmittedComponent.new(orders: @orders, pagy: @pagy) %>
+    <%= render Finance::ChartDraftComponent.new(stats: @draft_stats) %>
   </div>
 <% end %>

@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get '/assets/_/:filename', to: redirect { |params, request| "/_/#{params[:filename]}" }
+  
   devise_for :users, class_name: "Sys::User", controllers: {
     sessions: 'users/sessions',
     registrations: 'users/registrations'
@@ -29,7 +31,8 @@ Rails.application.routes.draw do
   end
 
   authenticated :user, ->(u) { u.role.name == "staff" } do
-    root to: redirect("/staff/orders/approved"), as: :staff_root
+    root to: redirect("/staff/orders/submitted"), as: :staff_root
+
     namespace :staff do
       # 移除了 :index
       resources :orders, only: [:show] do
@@ -62,10 +65,21 @@ Rails.application.routes.draw do
   end
 
   authenticated :user, ->(u) { u.role.name == "finance" } do
-    get "finance", to: "finance#index", as: :finance
-    root to: redirect("/finance"), as: :finance_root
+    root to: redirect("/finance/charts/draft"), as: :finance_root
+
     namespace :finance do
-      resources :drafts, only: [:index, :new, :create]
+      resources :charts, only: [:index] do
+        collection do
+          get :draft
+          get :order
+        end
+      end
+      resources :orders, only: [:index, :show] do
+        collection do
+          get :unsettled
+          get :settled
+        end
+      end
     end
   end
 

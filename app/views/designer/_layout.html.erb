@@ -2,6 +2,8 @@
   <%
     # 1. 基础路径与状态计算
     curr_path = request.path
+    is_profile = curr_path.start_with?("/profile")
+
     path_new       = new_designer_order_path
     path_pending   = pending_designer_orders_path
     path_completed = completed_designer_orders_path
@@ -26,6 +28,14 @@
         ]
       }]
     }
+
+    sidebars = { 
+      title: "信息维护",
+      icon: "squares-2x2", 
+      items: [
+        { label: "个人中心", path: profile_path, active: request.path == profile_path, icon: "user"}
+      ]
+    } if is_profile
   %>
 
   <%# --- 顶部导航栏 --- %>

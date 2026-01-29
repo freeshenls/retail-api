@@ -1,0 +1,9 @@
+<%# app/views/finance/charts/order.html.erb %>
+<%= render layout: "finance/layout" do %>
+  <div data-controller="layout--tab-init" 
+       data-layout--tab-init-label-value="未结算订单" 
+       data-layout--tab-init-path-value="<%= request.path %>">
+  <%# 这里的代码会注入到 layout 的 yield 位置，也就是 main_content 内部 %>
+    <%= render Finance::OrderUnsettledComponent.new(orders: @orders, pagy: @pagy) %>
+  </div>
+<% end %>

@@ -29,7 +29,6 @@ module RetailApi
     config.generators.helper = nil
     config.generators.test_framework = nil
     config.active_record.schema_format = :ruby
-    config.active_record.default_timezone = :local
     # config.active_record.record_timestamps = false
     config.active_record.pluralize_table_names = false
     config.active_record.dump_schema_after_migration = false

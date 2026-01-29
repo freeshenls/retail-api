@@ -3,6 +3,7 @@ class Biz::Draft < ApplicationRecord
   belongs_to :user, class_name: "Sys::User"
   has_one :order, class_name: "Biz::Order"
   
+  scope :for_finance, ->(user) { joins(user: :customers).where(biz_customer: { id: user.customer_ids }).distinct }
   # Active Storage 附件
   has_one_attached :file
 

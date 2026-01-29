@@ -1,47 +1,87 @@
-<%# _admin.html.erb%>
 <div class="fixed inset-0 flex flex-col overflow-hidden bg-slate-100 select-none">
   <%
-    # 1. 固定 Navbar 逻辑：强制让“系统管理”高亮
+    # 1. 基础路径与状态计算
+    curr_path = request.path
+    path_draft   = draft_finance_charts_path
+    path_order   = order_finance_charts_path
+
+    path_unsettled   = unsettled_finance_orders_path
+    path_settled   = settled_finance_orders_path
+
+    is_profile = curr_path.start_with?("/profile")
+    is_chart = curr_path.start_with?("/finance/charts")
+    is_order = curr_path.start_with?("/finance/orders")
+
     nav_items = [
-      { label: "系统管理", path: admin_path, active: true, icon: "cog-6-tooth" }
+      { label: "统计图表", path: path_draft, active: is_chart, icon: "chart-pie" },
+      { label: "订单管理", path: path_unsettled, active: is_order, icon: "shopping-cart" }
     ]
 
-    tabs = [{ :label => "控制台", :path => admin_path, :active => true, :closable => false }]
+    sidebars = { 
+      title: "业务订单", 
+      icon: "shopping-cart",
+      submenus: [{ 
+        label: "客户订单", 
+        icon: "clipboard-document-list", 
+        active: true,
+        items: [
+          { label: "未结算订单", path: path_unsettled, active: curr_path == path_unsettled },
+          { label: "已结算订单", path: path_settled, active: curr_path == path_settled }
+        ]
+      }]
+    } if is_order
+
+    sidebars = { 
+      title: "统计图表",
+      icon: "chart-bar-square", 
+      items: [
+        { label: "稿件统计", path: path_draft, active: request.path == path_draft, icon: "clipboard-document"},
+        { label: "订单统计", path: path_order, active: request.path == path_order, icon: "shopping-cart"}
+      ]
+    } if is_chart
+
+    sidebars = { 
+      title: "信息维护",
+      icon: "squares-2x2", 
+      items: [
+        { label: "个人中心", path: profile_path, active: request.path == profile_path, icon: "user"}
+      ]
+    } if is_profile
   %>
 
-  <%# 顶部导航 %>
+  <%# --- 顶部导航栏 --- %>
   <%= render Layout::NavbarComponent.new(
+        nav_items: nav_items, 
+        avatar: current_user.avatar,
         user_name: current_user.name, 
-        role: current_user.role.description,
-        nav_items: nav_items
+        role: current_user.role.description
       ) %>
 
   <main class="flex flex-1 overflow-hidden">
-    <%# 侧边栏 - 确保 items 里的链接触发 turbo_stream %>
+    <%# --- 侧边栏区域 --- %>
     <aside class="h-full shrink-0 relative z-20">
-      <%= render Layout::SidebarComponent.new(
-            title: "系统配置",
-            icon: "cog-6-tooth", 
-            items: [
-              { label: "用户管理", active: request.path == admin_users_path, path: admin_users_path, icon: "users"},
-              { label: "角色管理", active: request.path == admin_roles_path, path: admin_roles_path, icon: "users"},
-              { label: "邀请码管理", active: request.path == admin_invites_path, path: admin_invites_path, icon: "users"}
-            ]
-          ) %>
+      <%= render Layout::SidebarComponent.new(**sidebars) %>
     </aside>
 
+    <%# --- 右侧内容主区 --- %>
     <div class="flex-1 flex flex-col min-w-0 bg-slate-50 relative z-10">
-      <%# 标签切换栏 - 保持你原来的结构 %>
-      <div id="tabs" class="shrink-0 border-b border-slate-200 bg-white">
-        <%= render Layout::TabSwitcherComponent.new(tabs: @cookie_tabs.empty? ? tabs : @cookie_tabs) %>
+      
+      <%# 标签切换页签 %>
+      <div id="tabs" class="h-10 shrink-0 border-b border-slate-200 bg-white">
+        <%= render Layout::TabSwitcherComponent.new(tabs: @cookie_tabs) %>
       </div>
 
-      <%# 内容滚动区域 %>
+      <%# 业务内容动态加载区 %>
       <div class="flex-1 overflow-y-auto p-4 lg:p-6 shadow-inner">
+        <%# 这里的 main_content 是点击侧边栏/通知列表跳转的核心目标 %>
         <%= turbo_frame_tag "main_content" do %>
-        	<%= yield %>
+          <%= yield %>
         <% end %>
       </div>
     </div>
   </main>
 </div>
+
+  <% if user_signed_in? %>
+    <%= turbo_stream_from "finance_notifications" %>
+  <% end %>

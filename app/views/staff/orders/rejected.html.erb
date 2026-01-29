@@ -1,7 +1,7 @@
 <%# app/views/staff/orders/approved.html.erb %>
 <%= render layout: "staff/layout" do %>
   <div data-controller="layout--tab-init" 
-       data-layout--tab-init-label-value="已审核订单" 
+       data-layout--tab-init-label-value="已退回订单" 
        data-layout--tab-init-path-value="<%= request.path %>">
   <%# 这里的代码会注入到 layout 的 yield 位置，也就是 main_content 内部 %>
     <%= render Staff::OrderRejectedComponent.new(orders: @orders, pagy: @pagy) %>
