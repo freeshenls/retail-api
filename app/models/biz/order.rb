@@ -2,12 +2,15 @@
 class Biz::Order < ApplicationRecord
   attribute :status, :string
 
+  belongs_to :staff, class_name: "Biz::Staff", optional: true
   belongs_to :unit, class_name: "Biz::Unit", optional: true
   belongs_to :customer, class_name: "Biz::Customer", optional: true
   belongs_to :draft, class_name: "Biz::Draft", foreign_key: "draft_id"
   accepts_nested_attributes_for :draft
+  after_update_commit :broadcast_submitted_notifications
   after_update_commit :broadcast_approved_notifications
 
+  scope :for_staff, ->(user) { where(staff_id: user.id ) }
   scope :for_designer, ->(user) { joins(:draft).where(biz_draft: { user_id: user.id }) }
 
   enum :status, { 
@@ -24,11 +27,9 @@ class Biz::Order < ApplicationRecord
   private
 
   def broadcast_approved_notifications
-    # 找到受影响的设计师
     target_user = draft&.user
     return unless target_user
 
-    # 重新查询该设计师所有处于 approved 状态的单子
     approved_orders = Biz::Order.joins(:draft)
                                 .where(biz_draft: { user_id: target_user.id })
                                 .where(status: :approved, is_settled: false)
@@ -41,6 +42,26 @@ class Biz::Order < ApplicationRecord
       locals: { 
         orders: approved_orders, 
         count: approved_orders.count 
+      }
+  end
+
+  def broadcast_submitted_notifications
+    # 只有当状态变为 submitted 且还没有分配员工时，才触发抢单广播
+    return unless status == "submitted" && staff_id.nil?
+
+    # 获取所有待抢订单（已提交且未结算/未接单）
+    submitted_orders = Biz::Order.where(status: :submitted, staff_id: nil)
+                                 .order(updated_at: :desc)
+
+    puts "=====#{submitted_orders.count}======="
+
+    # 广播给所有订阅了 "staff_notifications" 的员工
+    broadcast_replace_to "staff_notifications",
+      target: "submitted_notification_wrapper", # 对应 Navbar 铃铛的 ID
+      partial: "staff/orders/submitted_notification",
+      locals: { 
+        orders: submitted_orders, 
+        count: submitted_orders.count 
       }
   end
 

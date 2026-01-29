@@ -54,7 +54,7 @@
                   <% end %>
 
                   <%# 结算状态 (一行展示，加一个中间的分隔点或直接靠间距) %>
-                  <% if order.respond_to?(:settled?) && order.settled? %>
+                  <% if order.is_settled %>
                     <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200">已结算</span>
                   <% else %>
                     <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-orange-50 text-orange-600 border border-orange-200">未结算</span>

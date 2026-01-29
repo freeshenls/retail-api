@@ -13,6 +13,11 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
+  authenticated :user do
+    get "profile", to: "base#profile", as: :profile
+    patch "profile", to: "base#profile_update"
+  end
+
   authenticated :user, ->(u) { u.role.name == "admin" } do
     get "admin", to: "admin#index", as: :admin
     root to: redirect("/admin"), as: :admin_root
@@ -24,16 +29,19 @@ Rails.application.routes.draw do
   end
 
   authenticated :user, ->(u) { u.role.name == "staff" } do
-    get "staff", to: "staff#index", as: :staff
-    root to: redirect("/staff"), as: :staff_root
+    root to: redirect("/staff/orders/approved"), as: :staff_root
     namespace :staff do
-      resources :orders, only: [:index, :new, :create, :show]
+      # 移除了 :index
+      resources :orders, only: [:edit, :update, :show] do
+        collection do
+          get :approved
+          get :rejected
+        end
+      end
     end
   end
   
   authenticated :user, ->(u) { u.role.name == "designer" } do
-    get "profile", to: "designer#profile", as: :profile
-    patch "profile", to: "designer#profile_update"
     root to: redirect("/designer/orders/new"), as: :designer_root
 
     namespace :designer do

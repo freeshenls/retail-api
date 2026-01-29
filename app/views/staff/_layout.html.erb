@@ -1,46 +1,26 @@
-<%# app/views/layouts/staff/layout.html.erb %>
 <div class="fixed inset-0 flex flex-col overflow-hidden bg-slate-100 select-none">
   <%
     # 1. 基础路径与状态计算
     curr_path = request.path
-    
-    # 路由 Helper 定义 (确保 routes.rb 已配置 collection)
-    path_new   = new_staff_order_path
-    path_pending   = pending_designer_orders_path
-    path_completed = completed_designer_orders_path
+    path_approved   = approved_staff_orders_path
+    path_rejected = rejected_staff_orders_path
 
-    # 模块激活逻辑判断
     is_order = curr_path.start_with?("/staff/orders")
 
-    # 2. Navbar 配置
     nav_items = [
-      { label: "订单管理", path: path_new, active: is_order, icon: "shopping-cart" }
+      { label: "订单管理", path: path_approved, active: is_order, icon: "shopping-cart" }
     ]
 
-    sidebars = { title: "业务订单", 
+    sidebars = { 
+      title: "业务订单", 
       icon: "shopping-cart",
       submenus: [{ 
         label: "我的订单", 
         icon: "clipboard-document-list", 
-        active: true, # 订单模块下默认展开
+        active: true,
         items: [
-          { 
-            label: "新增订单", 
-            path: path_new, 
-            active: curr_path == path_new 
-            # 不传 icon，组件内部会自动渲染您设计的小圆点
-          },
-          { 
-            label: "待提交订单", 
-            path: path_pending, 
-            active: curr_path == path_pending 
-            # 不传 icon，组件内部会自动渲染您设计的小圆点
-          },
-          { 
-            label: "已提交订单", 
-            path: path_completed, 
-            active: curr_path == path_completed 
-          }
+          { label: "已审核订单", path: path_approved, active: curr_path == path_approved },
+          { label: "已退回订单", path: path_rejected, active: curr_path == path_rejected }
         ]
       }]
     }
@@ -49,12 +29,25 @@
   <%# --- 顶部导航栏 --- %>
   <%= render Layout::NavbarComponent.new(
         nav_items: nav_items, 
+        avatar: current_user.avatar,
         user_name: current_user.name, 
         role: current_user.role.description
-      ) %>
+      ) do |navbar| %>
+
+    <%# 正确注入插槽内容 %>
+    <% navbar.with_notification do %>
+      <% 
+        # 实时获取该提交的订单
+        submitted_orders = Biz::Order.where(status: :submitted)
+                              .order(updated_at: :desc)
+      %>
+      <%= render "staff/orders/submitted_notification", 
+                 orders: submitted_orders, 
+                 count: submitted_orders.count %>
+    <% end %>
+  <% end %> <%# --- 确保 Navbar 组件在这里闭合 --- %>
 
   <main class="flex flex-1 overflow-hidden">
-    
     <%# --- 侧边栏区域 --- %>
     <aside class="h-full shrink-0 relative z-20">
       <%= render Layout::SidebarComponent.new(**sidebars) %>
@@ -70,11 +63,15 @@
 
       <%# 业务内容动态加载区 %>
       <div class="flex-1 overflow-y-auto p-4 lg:p-6 shadow-inner">
+        <%# 这里的 main_content 是点击侧边栏/通知列表跳转的核心目标 %>
         <%= turbo_frame_tag "main_content" do %>
           <%= yield %>
         <% end %>
       </div>
-      
     </div>
   </main>
 </div>
+
+  <% if user_signed_in? %>
+    <%= turbo_stream_from "staff_notifications" %>
+  <% end %>

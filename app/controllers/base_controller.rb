@@ -1,5 +1,5 @@
-class StaffController < ApplicationController
-  def profile
+class BaseController < ApplicationController
+	def profile
     @user = current_user
   end
 

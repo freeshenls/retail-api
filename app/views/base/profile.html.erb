@@ -1,5 +1,9 @@
-<%# app/views/designer/orders/edit.html.erb %>
-<%= render layout: "designer/layout" do %>
+<%# app/views/base/profile.html.erb %>
+<%
+  template = "designer/layout" if current_user.designer?
+  template = "staff/layout" if current_user.staff?
+%>
+<%= render layout: template do %>
   <div data-controller="layout--tab-init" 
        data-layout--tab-init-label-value="个人中心" 
        data-layout--tab-init-path-value="<%= request.path %>">
