@@ -62,10 +62,10 @@
                     <%# 确认按钮：直接执行，无需点击气泡内的取消 %>
                     <%= button_to designer_order_path(order), 
                                   method: :patch,
-                                  params: { biz_order: { is_settled: true } },
+                                  params: { biz_order: { status: "received" } },
                                   class: "flex items-center gap-1.5 px-4 py-1.5 bg-[#0066b3] text-white text-[11px] font-black rounded shadow-sm hover:bg-[#005596] cursor-pointer border-none transition-all" do %>
                       <%= heroicon "check", variant: :mini, options: { class: "h-4 w-4" } %>
-                      点击确定结算
+                      点击确定收货
                     <% end %>
                     
                     <%# 气泡三角箭头 %>

@@ -48,7 +48,11 @@
               <%# 4. 状态：已审核通过 %>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <% if order.approved? %>
                   审核通过
+                <% elsif order.received? %>
+                  确认收货
+                <% end %>
                 </span>
               </td>
 

@@ -18,7 +18,8 @@ class Biz::Order < ApplicationRecord
       pending: "pending",     # 待处理
       submitted: "submitted", # 已提交(待审核)
       approved: "approved",   # 审核通过
-      rejected: "rejected"    # 已退回
+      rejected: "rejected",    # 已退回
+      received: "received"    # 已收货
     }, default: :pending
   
   before_save :set_total_amount

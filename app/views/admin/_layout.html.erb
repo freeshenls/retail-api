@@ -1,46 +1,90 @@
 <div class="fixed inset-0 flex flex-col overflow-hidden bg-slate-100 select-none">
   <%
-    # 1. 固定 Navbar 逻辑：强制让“系统管理”高亮
+    # 1. 基础路径与状态计算
+    curr_path = request.path
+    is_profile = curr_path.start_with?("/profile")
+
+    path_submitted   = submitted_staff_orders_path
+    path_approved   = approved_staff_orders_path
+    path_rejected = rejected_staff_orders_path
+
+    is_order = curr_path.start_with?("/staff/orders")
+
     nav_items = [
-      { label: "系统管理", path: admin_path, active: true, icon: "cog-6-tooth" }
+      { label: "订单管理", path: path_approved, active: is_order, icon: "shopping-cart" }
     ]
 
-    tabs = [{ :label => "控制台", :path => admin_path, :active => true, :closable => false }]
+    sidebars = { 
+      title: "业务订单", 
+      icon: "shopping-cart",
+      submenus: [{ 
+        label: "我的订单", 
+        icon: "clipboard-document-list", 
+        active: true,
+        items: [
+          { label: "待审核订单", path: path_submitted, active: curr_path == path_submitted },
+          { label: "已审核订单", path: path_approved, active: curr_path == path_approved },
+          { label: "已退回订单", path: path_rejected, active: curr_path == path_rejected }
+        ]
+      }]
+    }
+
+    sidebars = { 
+      title: "信息维护",
+      icon: "squares-2x2", 
+      items: [
+        { label: "个人中心", path: profile_path, active: request.path == profile_path, icon: "user"}
+      ]
+    } if is_profile
   %>
 
-  <%# 顶部导航 %>
+  <%# --- 顶部导航栏 --- %>
   <%= render Layout::NavbarComponent.new(
+        nav_items: nav_items, 
+        avatar: current_user.avatar,
         user_name: current_user.name, 
-        role: current_user.role.description,
-        nav_items: nav_items
-      ) %>
+        role: current_user.role.description
+      ) do |navbar| %>
+
+    <%# 正确注入插槽内容 %>
+    <% navbar.with_notification do %>
+      <% 
+        # 实时获取该提交的订单
+        submitted_orders = Biz::Order.where(status: :submitted, staff_id: nil)
+                              .order(updated_at: :desc)
+      %>
+      <%= render "staff/orders/submitted_notification", 
+                 orders: submitted_orders, 
+                 count: submitted_orders.count %>
+    <% end %>
+  <% end %> <%# --- 确保 Navbar 组件在这里闭合 --- %>
 
   <main class="flex flex-1 overflow-hidden">
-    <%# 侧边栏 - 确保 items 里的链接触发 turbo_stream %>
+    <%# --- 侧边栏区域 --- %>
     <aside class="h-full shrink-0 relative z-20">
-      <%= render Layout::SidebarComponent.new(
-            title: "系统配置",
-            icon: "cog-6-tooth", 
-            items: [
-              { label: "用户管理", active: request.path == admin_users_path, path: admin_users_path, icon: "users"},
-              { label: "角色管理", active: request.path == admin_roles_path, path: admin_roles_path, icon: "users"},
-              { label: "邀请码管理", active: request.path == admin_invites_path, path: admin_invites_path, icon: "users"}
-            ]
-          ) %>
+      <%= render Layout::SidebarComponent.new(**sidebars) %>
     </aside>
 
+    <%# --- 右侧内容主区 --- %>
     <div class="flex-1 flex flex-col min-w-0 bg-slate-50 relative z-10">
-      <%# 标签切换栏 - 保持你原来的结构 %>
-      <div id="tabs" class="shrink-0 border-b border-slate-200 bg-white">
-        <%= render Layout::TabSwitcherComponent.new(tabs: @cookie_tabs.empty? ? tabs : @cookie_tabs) %>
+      
+      <%# 标签切换页签 %>
+      <div id="tabs" class="h-10 shrink-0 border-b border-slate-200 bg-white">
+        <%= render Layout::TabSwitcherComponent.new(tabs: @cookie_tabs) %>
       </div>
 
-      <%# 内容滚动区域 %>
+      <%# 业务内容动态加载区 %>
       <div class="flex-1 overflow-y-auto p-4 lg:p-6 shadow-inner">
+        <%# 这里的 main_content 是点击侧边栏/通知列表跳转的核心目标 %>
         <%= turbo_frame_tag "main_content" do %>
-        	<%= yield %>
+          <%= yield %>
         <% end %>
       </div>
     </div>
   </main>
 </div>
+
+  <% if user_signed_in? %>
+    <%= turbo_stream_from "staff_notifications" %>
+  <% end %>
+  

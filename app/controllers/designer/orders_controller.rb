@@ -80,7 +80,6 @@ class Designer::OrdersController < ApplicationController
       :payment_method, 
       :remark,
       :status,
-      :is_settled,
       draft_attributes: [:id, :file, :user_id] # update 动作建议加上 :id 以便更新现有附件
     )
   end

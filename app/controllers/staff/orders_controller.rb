@@ -19,7 +19,7 @@ module Staff
       # 使用 pagy 包裹查询
       @pagy, @orders = pagy(
         Biz::Order.for_staff(current_user)
-                  .where(status: :approved)
+                  .where(status: [:approved, :received])
                   .order(updated_at: :desc),
         items: 5 # 每页数量
       )

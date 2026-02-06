@@ -2,18 +2,13 @@
   <%
     # 1. 基础路径与状态计算
     curr_path = request.path
-    path_draft   = draft_finance_charts_path
-    path_order   = order_finance_charts_path
-
     path_unsettled   = unsettled_finance_orders_path
     path_settled   = settled_finance_orders_path
 
     is_profile = curr_path.start_with?("/profile")
-    is_chart = curr_path.start_with?("/finance/charts")
     is_order = curr_path.start_with?("/finance/orders")
 
     nav_items = [
-      { label: "统计图表", path: path_draft, active: is_chart, icon: "chart-pie" },
       { label: "订单管理", path: path_unsettled, active: is_order, icon: "shopping-cart" }
     ]
 
@@ -30,15 +25,6 @@
         ]
       }]
     } if is_order
-
-    sidebars = { 
-      title: "统计图表",
-      icon: "chart-bar-square", 
-      items: [
-        { label: "稿件统计", path: path_draft, active: request.path == path_draft, icon: "clipboard-document"},
-        { label: "订单统计", path: path_order, active: request.path == path_order, icon: "shopping-cart"}
-      ]
-    } if is_chart
 
     sidebars = { 
       title: "信息维护",

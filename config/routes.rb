@@ -21,8 +21,8 @@ Rails.application.routes.draw do
   end
 
   authenticated :user, ->(u) { u.role.name == "admin" } do
-    get "admin", to: "admin#index", as: :admin
-    root to: redirect("/admin"), as: :admin_root
+    root to: redirect("/staff/orders/submitted"), as: :admin_root
+
     namespace :admin do
       resources :users, only: [:index, :destroy, :edit, :update]
       resources :roles, only: [:index]
@@ -65,15 +65,9 @@ Rails.application.routes.draw do
   end
 
   authenticated :user, ->(u) { u.role.name == "finance" } do
-    root to: redirect("/finance/charts/draft"), as: :finance_root
+    root to: redirect("/finance/orders/unsettled"), as: :finance_root
 
     namespace :finance do
-      resources :charts, only: [:index] do
-        collection do
-          get :draft
-          get :order
-        end
-      end
       resources :orders, only: [:index, :show] do
         collection do
           get :unsettled
