@@ -1,0 +1,169 @@
+<%# app/components/admin/service_type_index_component.html.erb %>
+<div class="w-full space-y-4">
+  <%# 顶部标题栏 %>
+  <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+    <div class="bg-slate-50/50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+      <div class="flex items-center gap-2">
+        <span class="w-1.5 h-4 bg-[#0066b3] rounded-full"></span>
+        <h3 class="text-xs font-bold text-slate-500 tracking-wider">业务服务单价配置方案</h3>
+      </div>
+      
+      <%= link_to new_admin_service_type_path, 
+                  data: { turbo: false },
+                  class: "flex items-center gap-2 px-4 py-1.5 bg-[#0066b3] text-white text-[11px] font-bold rounded-lg hover:bg-[#005596] transition-all shadow-sm active:scale-95" do %>
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M12 4v16m8-8H4"></path></svg>
+        新增定价项
+      <% end %>
+    </div>
+
+    <%# 筛选表单区 %>
+    <div class="p-4 bg-white border-b border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
+      <%= form_with url: admin_service_types_path, method: :get, 
+                    data: { turbo: false }, 
+                    class: "flex flex-wrap items-center gap-4" do |f| %>
+        
+        <%# 搜索输入框 %>
+        <div class="relative group">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="w-3.5 h-3.5 text-slate-400 group-focus-within:text-[#0066b3]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-width="2.5"/></svg>
+          </div>
+          <%= f.text_field :service_type, value: params[:service_type], placeholder: "搜索服务项目...", 
+              class: "pl-9 pr-4 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[12px] font-bold text-slate-700 focus:bg-white focus:ring-4 focus:ring-[#0066b3]/5 focus:border-[#0066b3] transition-all outline-none w-48" %>
+        </div>
+
+        <%# 规格下拉筛选 %>
+        <div class="flex items-center gap-2">
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">所属规格</label>
+          
+          <div class="relative" data-controller="dropdown admin--service-type-index-component">
+            <%# 触发按钮 %>
+            <button type="button" 
+                    data-action="dropdown#toggle click@window->dropdown#hide" 
+                    class="flex items-center justify-between min-w-[130px] px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[12px] font-bold text-slate-700 hover:border-[#0066b3] transition-all cursor-pointer shadow-sm">
+              <span data-admin--service-type-index-component-target="labelName">
+                <%= params[:category_id].present? ? Biz::Category.find_by(id: params[:category_id])&.name : "全部规格" %>
+              </span>
+              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+
+            <%# 存储选中的 ID %>
+            <%= f.hidden_field :category_id, value: params[:category_id], data: { "admin--service-type-index-component-target": "hiddenInput" } %>
+
+            <%# 下拉菜单内容 %>
+            <div data-dropdown-target="menu" 
+                 class="hidden absolute left-0 mt-2 w-48 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 py-1.5 animate-in fade-in zoom-in-95 duration-100">
+              
+              <button type="button" 
+                      data-action="click->admin--service-type-index-component#selectCategory"
+                      data-admin--service-type-index-component-id-param=""
+                      data-admin--service-type-index-component-name-param="全部规格"
+                      class="w-full text-left px-4 py-2 text-[12px] font-bold text-slate-500 hover:bg-[#0066b3]/5 hover:text-[#0066b3] transition-colors">
+                全部规格
+              </button>
+
+              <% Biz::Category.order(:position).each do |cat| %>
+                <button type="button" 
+                        data-action="click->admin--service-type-index-component#selectCategory"
+                        data-admin--service-type-index-component-id-param="<%= cat.id %>"
+                        data-admin--service-type-index-component-name-param="<%= cat.name %>"
+                        class="w-full text-left px-4 py-2 text-[12px] font-bold text-slate-600 hover:bg-[#0066b3]/5 hover:text-[#0066b3] transition-colors flex items-center justify-between group border-t border-slate-50/50">
+                  <%= cat.name %>
+                  <% if params[:category_id] == cat.id.to_s %>
+                    <div class="w-1.5 h-1.5 bg-[#0066b3] rounded-full"></div>
+                  <% end %>
+                </button>
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <%# 筛选按钮 %>
+        <%= f.submit "筛选", class: "px-4 py-1.5 border-2 border-[#0066b3] text-[#0066b3] text-[11px] font-black rounded-lg hover:bg-blue-50 transition-all cursor-pointer shadow-sm" %>
+        
+        <% if params[:service_type].present? || params[:category_id].present? %>
+          <%= link_to "重置", admin_service_types_path, data: { turbo: false }, class: "text-[11px] font-bold text-slate-400 hover:text-red-500 transition-colors" %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <%# 表格内容 %>
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-200">
+        <thead class="bg-slate-50/50 text-left">
+          <tr class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+            <th class="px-6 py-3">服务项目</th>
+            <th class="px-6 py-3">适用规格</th>
+            <th class="px-6 py-3">基准单价 (CNY)</th>
+            <th class="px-6 py-3 text-center">当前状态</th>
+            <th class="px-6 py-3 text-right">管理操作</th>
+          </tr>
+        </thead>
+        <tbody id="service_type_list_body" class="divide-y divide-slate-100 bg-white">
+          <% @service_types.each do |unit| %>
+            <tr id="<%= dom_id(unit) %>" class="hover:bg-slate-50/50 transition-colors group">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center gap-2">
+                  <div class="w-1 h-3.5 bg-[#0066b3] rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <span class="text-slate-900 font-bold text-sm"><%= unit.service_type %></span>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-2 py-0.5 bg-blue-50 text-[#0066b3] rounded text-[11px] font-bold border border-blue-100">
+                  <%= unit.category&.name %>
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="text-orange-600 font-mono font-bold text-sm italic tracking-tight">
+                  ¥ <%= number_with_precision(unit.price, precision: 4) %>
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-center text-[10px] font-bold">
+                <% if unit.status == "1" %>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-100">
+                    <span class="w-1 h-1 bg-emerald-500 rounded-full mr-1.5 animate-pulse"></span>启用中
+                  </span>
+                <% else %>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-slate-50 text-slate-400 border border-slate-200">已禁用</span>
+                <% end %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                <div class="flex items-center justify-end gap-x-4">
+                  <%= link_to "编辑", edit_admin_service_type_path(unit), 
+                              data: { turbo: false }, 
+                              class: "text-[#0066b3] hover:text-[#005596] font-bold transition-colors" %>
+                  
+                  <div class="relative group/popover">
+                    <span class="text-red-400 group-hover/popover:text-red-600 font-bold cursor-help transition-colors">删除</span>
+                    <div class="invisible opacity-0 group-hover/popover:visible group-hover/popover:opacity-100 absolute bottom-full right-0 mb-3 z-[60] transition-all duration-200 translate-y-1 group-hover/popover:translate-y-0">
+                      <div class="bg-white border border-slate-200 shadow-xl rounded-xl p-2 flex items-center gap-1.5 whitespace-nowrap">
+                        <%= button_to admin_service_type_path(unit), method: :delete, data: { turbo: false }, class: "px-4 py-1.5 bg-red-500 text-white text-[11px] font-bold rounded shadow-sm hover:bg-red-600 border-none transition-all cursor-pointer" do %>
+                          确定删除
+                        <% end %>
+                        <div class="absolute top-[calc(100%-5px)] right-4 w-2.5 h-2.5 bg-white border-r border-b border-slate-200 rotate-45"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <%# 品牌化分页器 %>
+    <% if @pagy.pages > 1 %>
+      <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="text-xs text-slate-500 font-bold tracking-tight"><%== @pagy.info_tag %></div>
+        <div class="flex items-center
+                    [&_nav]:inline-flex [&_nav]:rounded-lg [&_nav]:shadow-sm [&_nav]:overflow-hidden [&_nav]:border [&_nav]:border-slate-300
+                    [&_a]:px-4 [&_a]:py-2 [&_a]:text-sm [&_a]:font-bold [&_a]:text-slate-600 [&_a]:bg-white [&_a:hover]:bg-[#0066b3] [&_a:hover]:text-white
+                    [&_.current]:px-4 [&_.current]:py-2 [&_.current]:text-sm [&_.current]:font-bold [&_.current]:bg-[#0066b3] [&_.current]:text-white [&_.current]:relative
+                    [&_.current]:after:content-[''] [&_.current]:after:absolute [&_.current]:after:bottom-0 [&_.current]:after:left-0 [&_.current]:after:w-full [&_.current]:after:h-[3.5px] [&_.current]:after:bg-orange-400
+                    [&_.disabled]:px-4 [&_.disabled]:py-2 [&_.disabled]:text-slate-300 [&_.disabled]:bg-slate-50">
+          <%== @pagy.series_nav %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

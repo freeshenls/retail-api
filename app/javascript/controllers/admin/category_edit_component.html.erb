@@ -1,0 +1,40 @@
+<div class="max-w-2xl mx-auto py-8">
+  <div class="mb-6 flex items-center gap-3 px-2">
+    <%= link_to admin_categories_path, data: { turbo_frame: "main_content" }, class: "text-slate-400 hover:text-[#0066b3] transition-colors" do %>
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+    <% end %>
+    <h2 class="text-sm font-bold text-slate-700">编辑规格属性</h2>
+  </div>
+
+  <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+    <div class="bg-slate-50/50 px-8 py-5 border-b border-slate-100 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="w-1.5 h-4 bg-orange-400 rounded-full"></span>
+        <h3 class="text-sm font-black text-slate-700">规格参数调整</h3>
+      </div>
+      <span class="text-[10px] font-bold text-slate-400 font-mono italic">ID: <%= @category.id %></span>
+    </div>
+
+    <%= form_with(model: [:admin, @category], url: admin_category_path(@category), method: :patch, class: "p-8 space-y-6") do |f| %>
+      <div class="grid grid-cols-1 gap-6">
+        <div class="space-y-2">
+          <label class="text-[11px] font-black text-slate-400 tracking-widest ml-1">规格名称</label>
+          <%= f.text_field :name, class: "block w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold text-slate-700 focus:bg-white focus:ring-4 focus:ring-[#0066b3]/5 focus:border-[#0066b3] outline-none transition-all" %>
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-[11px] font-black text-slate-400 tracking-widest ml-1">显示排序</label>
+          <%= f.number_field :position, class: "block w-64 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-mono font-bold text-slate-700 focus:bg-white focus:ring-4 focus:ring-[#0066b3]/5 focus:border-[#0066b3] outline-none transition-all" %>
+        </div>
+      </div>
+
+      <div class="pt-6 flex items-center justify-between border-t border-slate-50">
+        <p class="text-[10px] text-slate-400 italic">最后修改：<%= @category.updated_at.strftime("%Y-%m-%d %H:%M") %></p>
+        <div class="flex items-center gap-4">
+          <%= link_to "放弃修改", admin_categories_path, class: "text-xs font-bold text-slate-400 hover:text-slate-600" %>
+          <%= f.submit "保存变更", class: "px-10 py-2.5 bg-[#0066b3] text-white text-xs font-black rounded-lg shadow-md hover:bg-[#005596] active:scale-95 transition-all cursor-pointer tracking-widest" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

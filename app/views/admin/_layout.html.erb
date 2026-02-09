@@ -16,11 +16,16 @@
     path_settled   = settled_admin_orders_path
     is_order = curr_path.match?(/^\/admin\/(orders)/)
 
+    path_category = admin_categories_path
+    path_service_type = admin_service_types_path
+    is_param = curr_path.match?(/^\/admin\/(categories|service_types)/)
+
     # --- 顶部导航栏图标优化 ---
     nav_items = [
       { label: "系统配置", path: path_users, active: is_sys, icon: "wrench-screwdriver" },
       { label: "客户管理", path: path_customers, active: is_customer, icon: "user-group" },
-      { label: "订单管理", path: path_unsettled, active: is_order, icon: "clipboard-document-list" }
+      { label: "订单管理", path: path_unsettled, active: is_order, icon: "clipboard-document-list" },
+      { label: "参数配置", path: path_category, active: is_param, icon: "adjustments-horizontal" }      
     ]
 
     # --- 侧边栏图标优化 ---
@@ -54,6 +59,18 @@
         items: [
           { label: "未结算订单", path: path_unsettled, active: curr_path == path_unsettled, icon: "clock" },
           { label: "已结算订单", path: path_settled, active: curr_path == path_settled, icon: "check-badge" }
+        ]
+      }
+    end
+
+    # 订单管理侧边栏
+    if is_param
+      sidebars = { 
+        title: "参数配置", 
+        icon: "cpu-chip",
+        items: [
+          { label: "规格类型", path: path_category, active: curr_path == path_category, icon: "tag" },
+          { label: "服务定价", path: path_service_type, active: curr_path == path_service_type, icon: "currency-yen" }
         ]
       }
     end

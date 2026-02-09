@@ -36,6 +36,9 @@ Rails.application.routes.draw do
           get :settled
         end
       end
+
+      resources :categories
+      resources :service_types
     end
   end
 

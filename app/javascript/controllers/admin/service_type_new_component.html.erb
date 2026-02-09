@@ -1,0 +1,116 @@
+<%# app/components/admin/service_type_new_component.html.erb %>
+<div class="max-w-2xl mx-auto py-8">
+  <div class="mb-6 flex items-center gap-3 px-2">
+    <%= link_to admin_service_types_path, data: { turbo: false }, class: "text-slate-400 hover:text-[#0066b3] transition-colors" do %>
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+    <% end %>
+    <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wider">配置业务定价方案</h2>
+  </div>
+
+  <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+    <div class="bg-slate-50/50 px-8 py-5 border-b border-slate-100 flex items-center gap-3">
+      <span class="w-1.5 h-4 bg-[#0066b3] rounded-full"></span>
+      <h3 class="text-sm font-black text-slate-700">新建定价项目</h3>
+    </div>
+
+    <%= form_with(model: [:admin, @service_type], url: admin_service_types_path, data: { turbo: false }, class: "divide-y divide-slate-100") do |f| %>
+      <div class="p-8 space-y-8">
+        <% if @service_type.errors.any? %>
+          <div class="p-4 bg-red-50 border-l-4 border-red-500 rounded-r-xl mb-6">
+            <ul class="text-[11px] text-red-600 font-bold space-y-1">
+              <% @service_type.errors.full_messages.each do |msg| %>
+                <li>• <%= msg %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <%# 1. 服务类型名称 %>
+          <div class="space-y-2">
+            <label class="text-[11px] font-black text-slate-400 tracking-widest ml-1">服务项目名称</label>
+            <%= f.text_field :service_type, placeholder: "如：数码冲印", class: "block w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold text-slate-700 focus:bg-white focus:ring-4 focus:ring-[#0066b3]/5 focus:border-[#0066b3] transition-all outline-none shadow-sm" %>
+          </div>
+
+          <%# 2. 对应业务规格 - 使用专属 New 页面控制器 %>
+          <div class="space-y-2">
+            <label class="text-[11px] font-black text-slate-400 tracking-widest ml-1">对应业务规格</label>
+            <div class="relative group" data-controller="dropdown admin--service-type-new-component">
+              <button type="button" 
+                      data-action="dropdown#toggle click@window->dropdown#hide" 
+                      class="w-full flex items-center justify-between py-2.5 px-4 bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg font-bold hover:border-[#0066b3] transition-all shadow-sm">
+                <span data-admin--service-type-new-component-target="labelName">
+                  <%= @service_type.category&.name || "请选择规格..." %>
+                </span>
+                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+
+              <%= f.hidden_field :category_id, data: { "admin--service-type-new-component-target": "hiddenInput" } %>
+
+              <div data-dropdown-target="menu" class="hidden absolute z-50 mt-2 w-full bg-white border border-slate-200 rounded-xl shadow-xl py-1.5 ring-1 ring-black/5">
+                <% Biz::Category.order(:position).each do |cat| %>
+                  <button type="button" 
+                          data-action="click->admin--service-type-new-component#selectCategory dropdown#hide"
+                          data-admin--service-type-new-component-id-param="<%= cat.id %>"
+                          data-admin--service-type-new-component-name-param="<%= cat.name %>"
+                          class="w-full text-left px-4 py-2.5 text-sm font-bold text-slate-600 hover:bg-[#0066b3]/5 hover:text-[#0066b3] transition-colors border-b border-slate-50 last:border-0">
+                    <%= cat.name %>
+                  </button>
+                <% end %>
+              </div>
+            </div>
+          </div>
+
+          <%# 3. 价格 %>
+          <div class="space-y-2">
+            <label class="text-[11px] font-black text-slate-400 tracking-widest ml-1">基准单价 (￥)</label>
+            <div class="relative group">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-[#0066b3] font-bold">￥</div>
+              <%= f.number_field :price, step: 0.0001, class: "block w-full pl-8 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-mono font-bold text-slate-700 focus:bg-white focus:ring-4 focus:ring-[#0066b3]/5 focus:border-[#0066b3] transition-all outline-none" %>
+            </div>
+          </div>
+
+          <%# 4. 启用状态 %>
+          <div class="space-y-2">
+            <label class="text-[11px] font-black text-slate-400 tracking-widest ml-1">初始状态</label>
+            <div class="relative group" data-controller="dropdown admin--service-type-new-component">
+              <button type="button" 
+                      data-action="dropdown#toggle click@window->dropdown#hide" 
+                      class="w-full flex items-center justify-between py-2.5 px-4 bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg font-bold hover:border-[#0066b3] transition-all shadow-sm">
+                <span data-admin--service-type-new-component-target="labelName">
+                  <%= @service_type.status == "0" ? "已禁用" : "正常启用" %>
+                </span>
+                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+
+              <%= f.hidden_field :status, value: @service_type.status || "1", data: { "admin--service-type-new-component-target": "hiddenInput" } %>
+
+              <div data-dropdown-target="menu" class="hidden absolute z-50 mt-2 w-full bg-white border border-slate-200 rounded-xl shadow-xl py-1.5 ring-1 ring-black/5">
+                <button type="button" 
+                        data-action="click->admin--service-type-new-component#selectCategory dropdown#hide"
+                        data-admin--service-type-new-component-id-param="1"
+                        data-admin--service-type-new-component-name-param="正常启用"
+                        class="w-full text-left px-4 py-2.5 text-sm font-bold text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 transition-colors">
+                  正常启用
+                </button>
+                <button type="button" 
+                        data-action="click->admin--service-type-new-component#selectCategory dropdown#hide"
+                        data-admin--service-type-new-component-id-param="0"
+                        data-admin--service-type-new-component-name-param="已禁用"
+                        class="w-full text-left px-4 py-2.5 text-sm font-bold text-slate-600 hover:bg-red-50 hover:text-red-600 transition-colors">
+                  已禁用
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <%# 底部 %>
+      <div class="px-8 py-6 bg-slate-50/50 flex items-center justify-end gap-4">
+        <%= link_to "取消", admin_service_types_path, data: { turbo: false }, class: "text-xs font-bold text-slate-400 hover:text-slate-600" %>
+        <%= f.submit "保存方案", class: "px-10 py-2.5 bg-[#0066b3] text-white text-xs font-black rounded-lg shadow-md hover:bg-[#005596] active:scale-95 transition-all cursor-pointer tracking-widest shadow-[#0066b3]/20" %>
+      </div>
+    <% end %>
+  </div>
+</div>
