@@ -1,0 +1,99 @@
+<%# app/components/admin/customer_index_component.html.erb %>
+<div class="w-full space-y-4">
+  <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+    <%# 表格顶栏 %>
+    <div class="bg-slate-50/50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+      <div class="flex items-center gap-2">
+        <span class="w-1.5 h-4 bg-[#0066b3] rounded-full"></span>
+        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">客户档案管理</h3>
+      </div>
+      
+      <%= link_to new_admin_customer_path, 
+                  data: { turbo_frame: "main_content" },
+                  class: "flex items-center gap-2 px-4 py-1.5 bg-[#0066b3] text-white text-[11px] font-bold rounded-lg hover:bg-[#005596] transition-all shadow-sm active:scale-95" do %>
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+        登记新客户
+      <% end %>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-200">
+        <thead class="bg-slate-50/50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">客户基础信息 / 地址</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">财务证件信息</th>
+            <th scope="col" class="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">信用额度</th>
+            <th scope="col" class="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">操作</th>
+          </tr>
+        </thead>
+        <tbody id="customer_list_body" class="divide-y divide-slate-200 bg-white text-slate-700">
+          <% @customers.each do |customer| %>
+            <tr id="<%= dom_id(customer) %>" class="hover:bg-slate-50/50 transition-colors group">
+              <%# 1. 客户名称与地址 %>
+              <td class="px-6 py-4">
+                <div class="flex items-start">
+                  <div class="w-1 h-4 bg-[#0066b3] rounded-full mr-3 mt-1 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div class="flex flex-col">
+                    <span class="text-slate-900 font-bold text-sm tracking-tight"><%= customer.name %></span>
+                    <span class="text-[11px] text-slate-400 mt-0.5 line-clamp-1"><%= customer.address %></span>
+                  </div>
+                </div>
+              </td>
+
+              <%# 2. 财务证件 (Card Name & No) %>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex flex-col space-y-0.5">
+                  <span class="text-slate-600 font-bold text-[12px]"><%= customer.card_name %></span>
+                  <span class="text-slate-400 font-mono text-[10px] tracking-wider"><%= customer.card_no %></span>
+                </div>
+              </td>
+
+              <%# 3. 信用额度 (高亮展示数字) %>
+              <td class="px-6 py-4 whitespace-nowrap text-right">
+                <span class="text-slate-900 font-mono font-bold text-sm">
+                  <%= number_to_currency(customer.credit_limit, unit: "￥") %>
+                </span>
+              </td>
+
+              <%# 4. 操作按钮 %>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <div class="flex items-center justify-end gap-x-4">
+                  <%= link_to "档案", edit_admin_customer_path(customer), 
+                              data: { turbo_frame: "main_content" },
+                              class: "text-[#0066b3] hover:text-[#005596] font-bold transition-colors" %>
+                  
+                  <div class="relative group/popover">
+                    <span class="text-red-400 group-hover/popover:text-red-600 font-bold cursor-help transition-colors">注销</span>
+                    <div class="invisible opacity-0 group-hover/popover:visible group-hover/popover:opacity-100 absolute bottom-full right-0 mb-3 z-[60] transition-all duration-200 translate-y-1 group-hover/popover:translate-y-0">
+                      <div class="bg-white border border-slate-200 shadow-xl rounded-lg p-2 flex items-center gap-1.5 whitespace-nowrap">
+                        <%= button_to admin_customer_path(customer), method: :delete, data: { turbo_frame: "main_content" }, class: "px-4 py-1.5 bg-red-500 text-white text-[11px] font-bold rounded shadow-sm hover:bg-red-600 border-none transition-all cursor-pointer" do %>
+                          确认注销
+                        <% end %>
+                        <div class="absolute top-[calc(100%-5px)] right-4 w-2.5 h-2.5 bg-white border-r border-b border-slate-200 rotate-45"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <%# 分页器 %>
+    <% if @pagy.pages > 1 %>
+      <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="text-xs text-slate-500 font-medium"><%== @pagy.info_tag %></div>
+        <div class="flex items-center
+                    [&_nav]:inline-flex [&_nav]:rounded-lg [&_nav]:shadow-sm [&_nav]:overflow-hidden [&_nav]:border [&_nav]:border-slate-300
+                    [&_a]:px-4 [&_a]:py-2 [&_a]:text-sm [&_a]:font-bold [&_a]:text-slate-600 [&_a]:bg-white [&_a:hover]:bg-[#0066b3] [&_a:hover]:text-white
+                    [&_.current]:px-4 [&_.current]:py-2 [&_.current]:text-sm [&_.current]:font-bold [&_.current]:bg-[#0066b3] [&_.current]:text-white [&_.current]:relative
+                    [&_.current]:after:content-[''] [&_.current]:after:absolute [&_.current]:after:bottom-0 [&_.current]:after:left-0 [&_.current]:after:w-full [&_.current]:after:h-[3.5px] [&_.current]:after:bg-orange-400
+                    [&_.disabled]:px-4 [&_.disabled]:py-2 [&_.disabled]:text-slate-300 [&_.disabled]:bg-slate-50">
+          <%== @pagy.series_nav %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,9 @@
+<%# app/views/admin/customers/new.html.erb %>
+
+<%= render layout: "admin/layout" do %>
+  <div data-controller="layout--tab-init" 
+       data-layout--tab-init-label-value="新增客户" 
+       data-layout--tab-init-path-value="<%= request.path %>">
+    <%= render Admin::CustomerNewComponent.new(customer: @customer) %>
+  </div>
+<% end %>

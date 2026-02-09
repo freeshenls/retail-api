@@ -1,0 +1,96 @@
+<div class="max-w-4xl mx-auto space-y-6 py-8">
+  <%# 顶部返回区 %>
+  <div class="flex items-center justify-between px-2">
+    <div class="flex items-center gap-3">
+      <%= link_to admin_customers_path, 
+                  data: { turbo_frame: "main_content" }, 
+                  class: "group flex items-center text-slate-400 hover:text-[#0066b3] transition-all" do %>
+        <div class="p-2 rounded-lg group-hover:bg-blue-50 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        </div>
+        <span class="text-sm font-bold ml-1">返回客户列表</span>
+      <% end %>
+      <span class="text-slate-200">/</span>
+      <h2 class="text-sm font-bold text-slate-700 tracking-wider">登记新客户</h2>
+    </div>
+  </div>
+
+  <%# 主表单卡片 %>
+  <div class="bg-white border border-slate-200 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
+    <%# 装饰性页眉 %>
+    <div class="bg-slate-50/50 px-8 py-5 border-b border-slate-100 flex items-center gap-3">
+      <span class="w-1.5 h-5 bg-[#0066b3] rounded-full"></span>
+      <div>
+        <h3 class="text-sm font-black text-slate-700 leading-none">客户建档</h3>
+      </div>
+    </div>
+
+    <%= form_with(model: [:admin, @customer], url: admin_customers_path, class: "divide-y divide-slate-100") do |f| %>
+      <%# 1. 基础档案区 %>
+      <div class="p-8 space-y-8">
+        <div class="space-y-6">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="text-[11px] font-black text-[#0066b3] bg-blue-50 px-2 py-0.5 rounded">阶段一</span>
+            <span class="text-xs font-bold text-slate-500">基础身份信息</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <%# 客户名称 %>
+            <div class="space-y-2">
+              <label class="text-[11px] font-black text-slate-400 tracking-widest ml-1">客户全称</label>
+              <%= f.text_field :name, placeholder: "请输入企业或个人全称", class: "block w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold text-slate-700 focus:bg-white focus:ring-4 focus:ring-[#0066b3]/5 focus:border-[#0066b3] transition-all outline-none" %>
+            </div>
+
+            <%# 信用额度 %>
+            <div class="space-y-2">
+              <label class="text-[11px] font-black text-slate-400 tracking-widest ml-1">初始信用额度 (元)</label>
+              <div class="relative group">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                  <span class="text-sm font-bold text-slate-400 group-focus-within:text-[#0066b3]">￥</span>
+                </div>
+                <%= f.number_field :credit_limit, step: 0.01, placeholder: "0.00", class: "block w-full pl-8 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-mono font-bold text-slate-700 focus:bg-white focus:ring-4 focus:ring-[#0066b3]/5 focus:border-[#0066b3] transition-all outline-none" %>
+              </div>
+            </div>
+          </div>
+
+          <%# 详细地址 %>
+          <div class="space-y-2">
+            <label class="text-[11px] font-black text-slate-400 tracking-widest ml-1">办公或收货详细地址</label>
+            <%= f.text_area :address, rows: 2, placeholder: "请输入详细地址以便后续物流对接", class: "block w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold text-slate-700 focus:bg-white focus:ring-4 focus:ring-[#0066b3]/5 focus:border-[#0066b3] transition-all outline-none resize-none" %>
+          </div>
+        </div>
+
+        <%# 2. 财务/证件区 %>
+        <div class="space-y-6 pt-4">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="text-[11px] font-black text-[#0066b3] bg-blue-50 px-2 py-0.5 rounded">阶段二</span>
+            <span class="text-xs font-bold text-slate-500">财务结算凭证</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="space-y-2">
+              <label class="text-[11px] font-black text-slate-400 tracking-widest ml-1">结算卡号名称 (户名)</label>
+              <%= f.text_field :card_name, placeholder: "持卡人或单位开户名", class: "block w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold text-slate-700 focus:bg-white focus:ring-4 focus:ring-[#0066b3]/5 focus:border-[#0066b3] transition-all outline-none" %>
+            </div>
+
+            <div class="space-y-2">
+              <label class="text-[11px] font-black text-slate-400 tracking-widest ml-1">结算卡号或证件号</label>
+              <%= f.text_field :card_no, placeholder: "请输入银行卡号或社会统一信用代码", class: "block w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-mono font-bold text-slate-700 focus:bg-white focus:ring-4 focus:ring-[#0066b3]/5 focus:border-[#0066b3] transition-all outline-none" %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <%# 底部操作区 %>
+      <div class="px-8 py-6 bg-slate-50/50 flex items-center justify-between">
+        <p class="text-[10px] text-slate-400 font-bold italic tracking-tight">
+          * 请确保财务信息真实准确，这将影响后续的授信结算逻辑。
+        </p>
+        <div class="flex items-center gap-4">
+          <%= link_to "取消返回", admin_customers_path, data: { turbo_frame: "main_content" }, class: "px-6 py-2.5 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors" %>
+          <%= f.submit "确认登记并入库", class: "px-10 py-2.5 bg-[#0066b3] text-white text-xs font-black rounded-lg shadow-md hover:bg-[#005596] active:transform active:scale-95 transition-all cursor-pointer tracking-widest" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
