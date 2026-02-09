@@ -3,8 +3,18 @@
   <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
     <%# 表格顶栏 %>
     <div class="bg-slate-50/50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
-      <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">系统注册用户列表</span>
-      <span class="text-[10px] font-bold text-slate-400">共 <%= @users.count %> 名成员</span>
+      <div class="flex items-center gap-2">
+        <span class="w-1.5 h-4 bg-[#0066b3] rounded-full"></span>
+        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">系统注册用户列表</h3>
+      </div>
+      
+      <%# 改为 link_to 跳转到 new 页面 %>
+      <%= link_to new_admin_user_path, 
+                  data: { turbo: false }, 
+                  class: "flex items-center gap-2 px-4 py-1.5 bg-[#0066b3] text-white text-[11px] font-bold rounded-lg hover:bg-[#005596] transition-all shadow-sm active:scale-95" do %>
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+        新增用户
+      <% end %>
     </div>
 
     <div class="overflow-x-auto">

@@ -6,6 +6,17 @@ class Admin::UsersController < ApplicationController
     @pagy, @users = pagy(:offset, query, limit: 5)
   end
 
+  def new
+    @user = Sys::User.new
+    @roles = Sys::Role.all
+  end
+
+  def create
+    @user = Sys::User.new(user_params)
+    @user.save
+    redirect_to admin_users_path, notice: "用户创建成功"
+  end
+
   def edit
     @roles = Sys::Role.all
   end
@@ -30,6 +41,6 @@ class Admin::UsersController < ApplicationController
 
   def user_params
     # 根据你的业务需求允许修改的字段
-    params.require(:sys_user).permit(:name, :role_id)
+    params.require(:sys_user).permit(:name, :email, :password, :role_id)
   end
 end
