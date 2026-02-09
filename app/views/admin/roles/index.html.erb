@@ -1,5 +1,9 @@
 <%# app/views/admin/roles/index.html.erb %>
 
 <%= render layout: "admin/layout" do %>
-  <%= render Admin::RoleIndexComponent.new(roles: @roles) %>
+  <div data-controller="layout--tab-init" 
+       data-layout--tab-init-label-value="角色管理" 
+       data-layout--tab-init-path-value="<%= request.path %>">
+    <%= render Admin::RoleIndexComponent.new(roles: @roles) %>
+  </div>
 <% end %>

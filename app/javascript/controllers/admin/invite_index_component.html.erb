@@ -1,89 +1,148 @@
+<%# app/javascript/controllers/admin/invite_index_component.html.erb %>
 <div class="space-y-6">
-  <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-    <h3 class="text-sm font-bold text-gray-700 mb-4 flex items-center gap-2">
-      <span class="w-1 h-4 bg-blue-600 rounded-full"></span>
+  <%# --- 1. 生成区卡片：保持原样逻辑，仅升级外层容器圆角 --- %>
+  <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+    <h3 class="text-xs font-bold text-slate-700 mb-5 flex items-center gap-2 tracking-wider">
+      <span class="w-1 h-3.5 bg-[#0066b3] rounded-sm"></span>
       生成新邀请码
     </h3>
     
     <%= form_with(model: @new_invite_code, 
-                  url: "/admin/invite_codes", 
+                  url: admin_invites_path, 
                   method: :post, 
-                  class: "flex flex-wrap items-end gap-6") do |f| %>
+                  class: "flex flex-wrap items-end gap-4") do |f| %>
       
-      <div class="w-64 relative group">
-        <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 ml-1">
+      <div class="w-64 group" data-controller="dropdown admin--invite-index-component">
+        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1.5 ml-1">
           分配角色权限
         </label>
         
         <div class="relative">
-          <%# 使用 appearance-none 移除原生箭头 %>
-          <%= f.collection_select :role_id, @roles, :id, :name, {}, 
-                class: "appearance-none w-full bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg 
-                        focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white
-                        block p-2.5 pr-10 transition-all cursor-pointer" %>
-          
-          <%# 自定义右侧箭头图标 %>
-          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 group-hover:text-blue-500 transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
+          <button type="button" 
+                  data-action="dropdown#toggle click@window->dropdown#hide" 
+                  class="w-full flex items-center justify-between py-2 px-3 bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-md font-medium hover:border-[#0066b3] focus:ring-2 focus:ring-[#0066b3]/10 transition-all cursor-pointer shadow-sm">
+            <span data-admin--invite-index-component-target="roleName">请选择角色...</span>
+            <%= heroicon "chevron-down", variant: :mini, options: { class: "w-3.5 h-3.5 text-slate-400 group-hover:text-[#0066b3] transition-colors" } %>
+          </button>
+
+          <%= f.hidden_field :role_id, data: { "admin--invite-index-component-target": "hiddenInput" } %>
+
+          <div data-dropdown-target="menu" 
+               class="hidden absolute z-50 mt-1 w-full bg-white border border-slate-200 rounded-md shadow-xl py-1 animate-in fade-in zoom-in-95 duration-100">
+            <% @roles.each do |role| %>
+              <button type="button" 
+                      data-action="click->admin--invite-index-component#selectRole"
+                      data-admin--invite-index-component-id-param="<%= role.id %>"
+                      data-admin--invite-index-component-desc-param="<%= role.description %>"
+                      class="w-full text-left px-3 py-2 text-xs font-bold text-slate-600 hover:bg-[#0066b3]/5 hover:text-[#0066b3] transition-colors cursor-pointer">
+                <%= role.description %>
+              </button>
+            <% end %>
           </div>
         </div>
       </div>
 
       <%= f.submit "立即生成", 
-            class: "px-6 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-lg 
-                   hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200 
-                   active:transform active:scale-95 transition-all cursor-pointer shadow-md" %>
+            class: "px-5 py-2 bg-[#0066b3] text-white text-xs font-bold rounded-md
+                   hover:bg-[#005596] active:transform active:scale-95 
+                   transition-all cursor-pointer shadow-sm tracking-widest" %>
     <% end %>
   </div>
 
-  <%# 列表部分也进行了同步美化 %>
-  <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-    <table class="min-w-full divide-y divide-gray-100">
-      <thead class="bg-gray-50/50">
-        <tr>
-          <th class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">代码</th>
-          <th class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">角色</th>
-          <th class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">状态</th>
-          <th class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">使用者</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-gray-50 text-sm">
-        <% @invite_codes.each do |ic| %>
-          <tr class="hover:bg-blue-50/30 transition-colors">
-            <td class="px-6 py-4">
-              <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded font-mono font-bold border border-blue-100">
-                <%= ic.code %>
-              </span>
-            </td>
-            <td class="px-6 py-4 text-gray-600 font-medium"><%= ic.role&.name %></td>
-            <td class="px-6 py-4">
-              <% if ic.used_at %>
-                <span class="flex items-center gap-1.5 text-gray-400">
-                  <span class="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
-                  已使用
-                </span>
-              <% else %>
-                <span class="flex items-center gap-1.5 text-green-600 font-bold">
-                  <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-                  可使用
-                </span>
-              <% end %>
-            </td>
-            <td class="px-6 py-4">
-              <% if ic.user %>
-                <div class="flex flex-col">
-                  <span class="text-gray-900 font-medium"><%= ic.user.name %></span>
-                  <span class="text-xs text-gray-400"><%= ic.user.email %></span>
-                </div>
-              <% else %>
-                <span class="text-gray-300">-</span>
-              <% end %>
-            </td>
+  <%# --- 2. 列表展示区：完全复刻订单模板的大气感 --- %>
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+    <%# 页眉：px-6 py-4 大气间距 %>
+    <div class="bg-slate-50/50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+       <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">现有邀请码列表</span>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-200">
+        <thead class="bg-slate-50/50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">邀请代码</th>
+            <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">赋予角色</th>
+            <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">当前状态</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">使用详情</th>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody class="divide-y divide-slate-200 bg-white text-slate-700">
+          <% @invite_codes.each do |ic| %>
+            <tr class="hover:bg-slate-50/50 transition-colors group">
+              <%# 1. 邀请代码：左侧装饰条 %>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="w-1 h-4 bg-[#0066b3] rounded-full mr-3 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <span class="px-2 py-1 bg-white text-[#0066b3] rounded border border-slate-200 font-mono font-bold shadow-sm text-sm">
+                    <%= ic.code %>
+                  </span>
+                </div>
+              </td>
+
+              <%# 2. 赋予角色 %>
+              <td class="px-6 py-4 whitespace-nowrap text-center">
+                <div class="inline-flex items-center text-sm font-semibold text-slate-700">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-[#0066b3] border border-blue-100">
+                    <%= heroicon "shield-check", variant: :mini, options: { class: "w-3.5 h-3.5 mr-1" } %>
+                    <%= ic.role&.description %>
+                  </span>
+                </div>
+              </td>
+
+              <%# 3. 状态 %>
+              <td class="px-6 py-4 whitespace-nowrap text-center">
+                <% if ic.used_at %>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200">已占用</span>
+                <% else %>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-orange-50 text-orange-600 border border-orange-200">
+                    <span class="w-1 h-1 rounded-full bg-orange-500 mr-1 animate-pulse"></span>待激活
+                  </span>
+                <% end %>
+              </td>
+
+              <%# 4. 使用详情 %>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <% if ic.user %>
+                  <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-inner group-hover:border-blue-200">
+                      <% if ic.user.avatar.attached? %>
+                        <%= image_tag ic.user.avatar, class: "w-full h-full object-cover" %>
+                      <% else %>
+                        <%= heroicon "user", variant: :solid, options: { class: "w-4 h-4 text-slate-400" } %>
+                      <% end %>
+                    </div>
+                    <div class="flex flex-col">
+                      <span class="text-slate-900 font-bold text-sm leading-tight"><%= ic.user.name %></span>
+                      <span class="text-[10px] text-slate-400 font-mono tracking-tighter"><%= ic.user.email %></span>
+                    </div>
+                  </div>
+                <% else %>
+                  <span class="text-slate-300 italic text-xs pl-1">尚未分配</span>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <%# --- 分页器：完全复刻订单模板 --- %>
+    <% if defined?(@pagy) && @pagy.pages > 1 %>
+      <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="text-xs text-slate-500 font-medium">
+          <%== @pagy.info_tag %>
+        </div>
+        <div class="flex items-center
+                    [&_nav]:inline-flex [&_nav]:rounded-lg [&_nav]:shadow-sm [&_nav]:overflow-hidden [&_nav]:border [&_nav]:border-slate-300
+                    [&_a]:px-4 [&_a]:py-2 [&_a]:text-sm [&_a]:font-bold [&_a]:text-slate-600 [&_a]:bg-white [&_a]:transition-colors [&_a]:no-underline
+                    [&_a:hover]:bg-[#0066b3] [&_a:hover]:text-white
+                    [&_.current]:px-4 [&_.current]:py-2 [&_.current]:text-sm [&_.current]:font-bold [&_.current]:bg-[#0066b3] [&_.current]:text-white [&_.current]:relative
+                    [&_.current]:after:content-[''] [&_.current]:after:absolute [&_.current]:after:bottom-0 [&_.current]:after:left-0 [&_.current]:after:w-full [&_.current]:after:h-[3.5px] [&_.current]:after:bg-orange-400
+                    [&_.disabled]:px-4 [&_.disabled]:py-2 [&_.disabled]:text-slate-300 [&_.disabled]:bg-slate-50 [&_.disabled]:cursor-not-allowed
+                    [&_.gap]:px-4 [&_.gap]:py-2 [&_.gap]:text-slate-400 [&_.gap]:bg-slate-50">
+          <%== @pagy.series_nav %>
+        </div>
+      </div>
+    <% end %>
   </div>
 </div>

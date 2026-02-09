@@ -14,6 +14,11 @@ class Users::RegistrationsController < Devise::RegistrationsController
     code = params.dig(:user, :code)
     @invite = Sys::InviteCode.find_by(code: code)
 
+    # 1. 拦截逻辑：校验邀请码是否存在以及是否被占用
+    if @invite.user.present?
+      @invite.role_id = nil
+    end
+
     super do |resource|
       # 如果注册成功，可以标记邀请码已被使用（如果你的业务需要）
       @invite.update(used_at: Time.new, user: resource) if resource.persisted?

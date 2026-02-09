@@ -8,7 +8,7 @@ class Sys::User < ApplicationRecord
   has_one_attached :avatar
   
   belongs_to :role
-  has_one :invite_code
+  has_one :invite_code, dependent: :nullify
   has_many :customer_users, class_name: "Biz::CustomerUser"
   has_many :customers, through: :customer_users, class_name: "Biz::Customer"
 

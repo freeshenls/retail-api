@@ -84,6 +84,6 @@
   </main>
 </div>
 
-  <% if user_signed_in? %>
-    <%= turbo_stream_from "staff_notifications" %>
-  <% end %>
+<% if user_signed_in? %>
+  <%= turbo_stream_from "staff_notifications" %>
+<% end %>

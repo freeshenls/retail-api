@@ -1,29 +1,65 @@
-<div class="overflow-hidden shadow-sm rounded-xl border border-gray-100 bg-white">
-  <table class="min-w-full divide-y divide-gray-100">
-    <thead class="bg-gray-50/80">
-      <tr>
-        <th class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest text-nowrap">角色名称</th>
-        <th class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest text-nowrap">描述</th>
-        <th class="px-6 py-4 text-right text-xs font-bold text-gray-400 uppercase tracking-widest text-nowrap">创建时间</th>
-      </tr>
-    </thead>
-    <tbody class="divide-y divide-gray-50 text-sm">
-      <% @roles.each do |role| %>
-        <tr class="hover:bg-gray-50 transition-colors">
-          <td class="px-6 py-4 whitespace-nowrap">
-            <div class="flex items-center gap-2">
-              <div class="w-2 h-2 rounded-full bg-indigo-500 shadow-sm shadow-indigo-200"></div>
-              <span class="font-bold text-gray-700 font-medium"><%= role.name %></span>
-            </div>
-          </td>
-          <td class="px-6 py-4 text-gray-500 italic text-xs">
-            <%= role.description.presence || "暂无描述" %>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-right text-gray-400 font-mono text-xs">
-            <%= role.created_at.strftime("%Y-%m-%d") %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
+<%# app/components/admin/role_component.html.erb %>
+<div class="w-full space-y-4">
+  <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+    <%# 1. 表格顶栏 - 保持大气布局与背景色 %>
+    <div class="bg-slate-50/50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+      <div class="flex items-center gap-2">
+        <span class="w-1.5 h-4 bg-[#0066b3] rounded-full"></span>
+        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">系统角色定义</h3>
+      </div>
+      <span class="text-[10px] font-bold text-slate-400">共 <%= @roles.count %> 种角色</span>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-100">
+        <thead class="bg-slate-50/50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">角色标识</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">职责描述</th>
+            <th scope="col" class="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">创建日期</th>
+          </tr>
+        </thead>
+        
+        <tbody class="divide-y divide-slate-100">
+          <% @roles.each do |role| %>
+            <tr class="hover:bg-slate-50/50 transition-colors group">
+              <%# 1. 角色标识 - 恢复为您喜欢的带底色标签样式 %>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <%# 左侧 4px 装饰条 %>
+                  <div class="w-1 h-4 bg-[#0066b3] rounded-full mr-3 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  
+                  <%# 恢复带底色的标识标签 %>
+                  <span class="font-mono font-bold text-[#0066b3] bg-[#0066b3]/5 px-2.5 py-1 rounded border border-[#0066b3]/10 text-sm">
+                    <%= role.name %>
+                  </span>
+                </div>
+              </td>
+
+              <%# 2. 中文描述 %>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center text-sm font-semibold text-slate-700">
+                  <div class="p-1 bg-slate-100 rounded mr-2 group-hover:bg-[#0066b3]/10 transition-colors">
+                    <%= heroicon "shield-check", variant: :mini, options: { class: "w-4 h-4 text-slate-400 group-hover:text-[#0066b3]" } %>
+                  </div>
+                  <%= role.description.presence || "暂无描述" %>
+                </div>
+              </td>
+
+              <%# 3. 创建时间 %>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-slate-500 font-mono">
+                <%= role.created_at.strftime("%Y-%m-%d") %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <% if @roles.empty? %>
+      <div class="px-6 py-16 text-center text-slate-400 bg-white italic text-sm font-medium">
+        当前暂无角色定义数据
+      </div>
+    <% end %>
+  </div>
 </div>

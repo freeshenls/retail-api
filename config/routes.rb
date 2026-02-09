@@ -21,12 +21,21 @@ Rails.application.routes.draw do
   end
 
   authenticated :user, ->(u) { u.role.name == "admin" } do
-    root to: redirect("/staff/orders/submitted"), as: :admin_root
+    root to: redirect("/admin/users"), as: :admin_root
 
     namespace :admin do
       resources :users, only: [:index, :destroy, :edit, :update]
       resources :roles, only: [:index]
       resources :invites, only: [:index, :create]
+
+      resources :customers
+
+      resources :orders, only: [:index, :show] do
+        collection do
+          get :unsettled
+          get :settled
+        end
+      end
     end
   end
 

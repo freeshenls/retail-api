@@ -4,38 +4,70 @@
     curr_path = request.path
     is_profile = curr_path.start_with?("/profile")
 
-    path_submitted   = submitted_staff_orders_path
-    path_approved   = approved_staff_orders_path
-    path_rejected = rejected_staff_orders_path
+    path_users    = admin_users_path
+    path_roles    = admin_roles_path
+    path_invites  = admin_invites_path
+    is_sys = curr_path.match?(/^\/admin\/(users|roles|invites)/)
 
-    is_order = curr_path.start_with?("/staff/orders")
+    path_customers = admin_customers_path
+    is_customer = curr_path.match?(/^\/admin\/(customers)/)
 
+    path_unsettled = unsettled_admin_orders_path
+    path_settled   = settled_admin_orders_path
+    is_order = curr_path.match?(/^\/admin\/(orders)/)
+
+    # --- 顶部导航栏图标优化 ---
     nav_items = [
-      { label: "订单管理", path: path_approved, active: is_order, icon: "shopping-cart" }
+      { label: "系统配置", path: path_users, active: is_sys, icon: "wrench-screwdriver" },
+      { label: "客户管理", path: path_customers, active: is_customer, icon: "user-group" },
+      { label: "订单管理", path: path_unsettled, active: is_order, icon: "clipboard-document-list" }
     ]
 
+    # --- 侧边栏图标优化 ---
+    # 默认：系统管理
     sidebars = { 
-      title: "业务订单", 
-      icon: "shopping-cart",
-      submenus: [{ 
-        label: "我的订单", 
-        icon: "clipboard-document-list", 
-        active: true,
-        items: [
-          { label: "待审核订单", path: path_submitted, active: curr_path == path_submitted },
-          { label: "已审核订单", path: path_approved, active: curr_path == path_approved },
-          { label: "已退回订单", path: path_rejected, active: curr_path == path_rejected }
-        ]
-      }]
+      title: "系统管理", 
+      icon: "cog-8-tooth",
+      items: [
+        { label: "用户管理", path: path_users, active: curr_path == path_users, icon: "user-circle" },
+        { label: "角色管理", path: path_roles, active: curr_path == path_roles, icon: "shield-check" },
+        { label: "邀请码管理", path: path_invites, active: curr_path == path_invites, icon: "ticket" }
+      ]
     }
 
-    sidebars = { 
-      title: "信息维护",
-      icon: "squares-2x2", 
-      items: [
-        { label: "个人中心", path: profile_path, active: request.path == profile_path, icon: "user"}
-      ]
-    } if is_profile
+    # 客户管理侧边栏
+    if is_customer
+      sidebars = { 
+        title: "客户管理", 
+        icon: "user-group",
+        items: [
+          { label: "信息维护", path: path_customers, active: curr_path == path_customers, icon: "identification" }
+        ]
+      }
+    end
+
+    # 订单管理侧边栏
+    if is_order
+      sidebars = { 
+        title: "订单管理", 
+        icon: "shopping-bag",
+        items: [
+          { label: "未结算订单", path: path_unsettled, active: curr_path == path_unsettled, icon: "clock" },
+          { label: "已结算订单", path: path_settled, active: curr_path == path_settled, icon: "check-badge" }
+        ]
+      }
+    end
+
+    # 个人中心侧边栏
+    if is_profile
+      sidebars = { 
+        title: "账号信息",
+        icon: "fingerprint", 
+        items: [
+          { label: "个人中心", path: profile_path, active: curr_path == profile_path, icon: "user-gear"}
+        ]
+      }
+    end
   %>
 
   <%# --- 顶部导航栏 --- %>
@@ -44,20 +76,7 @@
         avatar: current_user.avatar,
         user_name: current_user.name, 
         role: current_user.role.description
-      ) do |navbar| %>
-
-    <%# 正确注入插槽内容 %>
-    <% navbar.with_notification do %>
-      <% 
-        # 实时获取该提交的订单
-        submitted_orders = Biz::Order.where(status: :submitted, staff_id: nil)
-                              .order(updated_at: :desc)
-      %>
-      <%= render "staff/orders/submitted_notification", 
-                 orders: submitted_orders, 
-                 count: submitted_orders.count %>
-    <% end %>
-  <% end %> <%# --- 确保 Navbar 组件在这里闭合 --- %>
+      ) %>
 
   <main class="flex flex-1 overflow-hidden">
     <%# --- 侧边栏区域 --- %>
@@ -83,8 +102,4 @@
     </div>
   </main>
 </div>
-
-  <% if user_signed_in? %>
-    <%= turbo_stream_from "staff_notifications" %>
-  <% end %>
   
