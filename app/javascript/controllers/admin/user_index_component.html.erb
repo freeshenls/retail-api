@@ -54,11 +54,9 @@
 
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <div class="flex items-center justify-end gap-x-4">
-                  <a href="/admin/users/<%= user.id %>/edit" 
-                     data-turbo-frame="main_content"
-                     class="text-[#0066b3] hover:text-[#005596] font-bold transition-colors">
-                    编辑
-                  </a>
+                  <%= link_to "编辑", edit_admin_user_path(user), 
+                            data: { turbo: false },
+                            class: "text-[#0066b3] hover:text-[#005596] font-bold transition-colors" %>
 
                   <% if user != helpers.current_user %>
                     <div class="relative group/popover">

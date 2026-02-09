@@ -1,0 +1,93 @@
+<div class="max-w-4xl mx-auto space-y-6 py-8">
+  <%# 顶部返回区 %>
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <h2 class="text-sm font-bold text-slate-700 tracking-wider">编辑用户信息</h2>
+    </div>
+  </div>
+
+  <%# 主表单卡片 %>
+  <div class="bg-white border border-slate-200 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
+    <%# 装饰性页眉 %>
+    <div class="bg-slate-50/50 px-8 py-5 border-b border-slate-100 flex items-center gap-3">
+      <span class="w-1.5 h-5 bg-[#0066b3] rounded-full"></span>
+      <div>
+        <h3 class="text-sm font-black text-slate-700 leading-none">账号核心设置</h3>
+      </div>
+    </div>
+
+    <%= form_with(model: @user, url: admin_user_path(@user), class: "divide-y divide-slate-100") do |f| %>
+      <%# 1. 基础信息区 %>
+      <div class="p-8 space-y-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <%# 用户名 %>
+          <div class="space-y-2">
+            <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">用户姓名</label>
+            <div class="relative group">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                <%= heroicon "user", variant: :mini, options: { class: "w-4 h-4 text-slate-300 group-focus-within:text-[#0066b3] transition-colors" } %>
+              </div>
+              <%= f.text_field :name, class: "block w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold text-slate-700 focus:bg-white focus:ring-4 focus:ring-[#0066b3]/5 focus:border-[#0066b3] transition-all outline-none" %>
+            </div>
+          </div>
+
+          <%# 角色选择 (改用 Dropdown 模式) %>
+          <div class="space-y-2">
+            <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">权限分配</label>
+            
+            <div class="relative group" data-controller="dropdown admin--user-edit-component">
+              <%# 触发按钮 %>
+              <button type="button" 
+                      data-action="dropdown#toggle click@window->dropdown#hide" 
+                      class="w-full flex items-center justify-between py-2.5 px-4 bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg font-bold hover:border-[#0066b3] focus:ring-4 focus:ring-[#0066b3]/5 transition-all cursor-pointer shadow-sm">
+                <span data-admin--user-edit-component-target="roleName">
+                  <%= @user.role&.description || "请选择角色..." %>
+                </span>
+                <%= heroicon "chevron-down", variant: :mini, options: { class: "w-4 h-4 text-slate-400 group-hover:text-[#0066b3]" } %>
+              </button>
+
+              <%# 存储选中的 ID %>
+              <%= f.hidden_field :role_id, data: { "admin--user-edit-component-target": "hiddenInput" } %>
+
+              <%# 下拉菜单 %>
+              <div data-dropdown-target="menu" 
+                   class="hidden absolute z-50 mt-2 w-full bg-white border border-slate-200 rounded-xl shadow-xl py-1.5 animate-in fade-in zoom-in-95 duration-100">
+                <% @roles.each do |role| %>
+                  <button type="button" 
+                          data-action="click->admin--user-edit-component#selectRole"
+                          data-admin--user-edit-component-id-param="<%= role.id %>"
+                          data-admin--user-edit-component-desc-param="<%= role.description %>"
+                          class="w-full text-left px-4 py-2.5 text-sm font-bold text-slate-600 hover:bg-[#0066b3]/5 hover:text-[#0066b3] transition-colors cursor-pointer">
+                    <%= role.description %>
+                  </button>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <%# 邮箱 (只读演示) %>
+        <div class="space-y-2">
+          <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">电子邮箱 (不可修改)</label>
+          <div class="flex items-center px-4 py-2.5 bg-slate-100/50 border border-slate-100 rounded-lg text-sm font-mono text-slate-400 italic shadow-inner">
+            <%= heroicon "envelope", variant: :mini, options: { class: "w-4 h-4 mr-2" } %>
+            <%= @user.email %>
+          </div>
+        </div>
+      </div>
+
+      <%# 2. 底部操作区 %>
+      <div class="px-8 py-6 bg-slate-50/50 flex items-center justify-between">
+        <p class="text-[10px] text-slate-400 font-bold italic">
+          * 修改将立即同步至系统所有关联模块
+        </p>
+        <div class="flex items-center gap-4">
+          <a href="/admin/users" data-turbo-frame="main_content" class="px-6 py-2.5 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors">
+            取消
+          </a>
+          <%= f.submit "保存更改", class: "px-8 py-2.5 bg-[#0066b3] text-white text-xs font-black rounded-lg shadow-md hover:bg-[#005596] hover:shadow-lg active:transform active:scale-95 transition-all cursor-pointer tracking-widest" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

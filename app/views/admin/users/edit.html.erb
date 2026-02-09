@@ -1,0 +1,9 @@
+<%# app/views/admin/users/edit.html.erb %>
+
+<%= render layout: "admin/layout" do %>
+  <div data-controller="layout--tab-init" 
+       data-layout--tab-init-label-value="用户<%= @user.name %>" 
+       data-layout--tab-init-path-value="<%= request.path %>">
+  <%# 这里的代码会注入到 layout 的 yield 位置，也就是 main_content 内部 %>
+    <%= render Admin::UserEditComponent.new(user: @user, roles: @roles) %>
+<% end %>

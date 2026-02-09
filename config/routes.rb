@@ -24,7 +24,7 @@ Rails.application.routes.draw do
     root to: redirect("/admin/users"), as: :admin_root
 
     namespace :admin do
-      resources :users, only: [:index, :destroy, :edit, :update]
+      resources :users
       resources :roles, only: [:index]
       resources :invites, only: [:index, :create]
 
