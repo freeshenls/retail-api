@@ -1,0 +1,106 @@
+<%# app/javascript/controllers/admin/order_show_component.html.erb %>
+<div class="max-w-5xl mx-auto py-8 px-4" data-controller="admin--order-show-component">
+  
+  <%# 1. 顶部导航与状态 - 统一蓝色调 %>
+  <div class="mb-6 flex justify-between items-center px-1 border-b border-slate-100 pb-5">
+    <div class="flex items-center gap-3">
+      <%= link_to unsettled_admin_orders_path, class: "p-2 bg-white border-2 border-slate-100 rounded-lg text-slate-400 hover:text-[#0066b3] hover:border-[#0066b3] transition-all shadow-sm" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+        </svg>
+      <% end %>
+      <div>
+        <h1 class="text-xl font-black text-slate-800 tracking-tight">订单账务审查</h1>
+        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">ORDER NO: <%= @order.order_no %></p>
+      </div>
+    </div>
+    
+    <div class="flex flex-col items-end">
+      <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 text-right">财务状态</span>
+      <%# 统一使用蓝色背景样式 %>
+      <div class="px-4 py-1.5 bg-blue-50 border border-blue-100 text-[#0066b3] text-[11px] font-black rounded-lg uppercase tracking-wider">
+        <%= status_label %>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <%# 左侧主内容区 %>
+    <div class="lg:col-span-2 space-y-6">
+      <%# 业务规格卡片 %>
+      <div class="bg-white border-2 border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+        <div class="p-6 border-b-2 border-slate-50 flex items-center justify-between">
+          <h3 class="text-sm font-black text-slate-800 flex items-center gap-2">
+            <div class="w-1.5 h-4 bg-[#0066b3] rounded-full"></div>
+            业务规格信息
+          </h3>
+        </div>
+        
+        <div class="p-8 grid grid-cols-1 md:grid-cols-3 gap-8 text-slate-700">
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">服务类型</label><p class="text-sm font-bold"><%= @order.service_type.presence || "标准服务" %></p></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">产品分类</label><p class="text-sm font-bold text-[#0066b3]"><%= @order.category_name %></p></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">生产数量</label><p class="text-sm font-bold font-mono"><%= @order.quantity.to_i %> PCS</p></div>
+          <div class="space-y-1 border-t border-slate-50 pt-4"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">单价</label><p class="text-sm font-bold font-mono text-orange-600">¥ <%= number_with_precision(@order.unit_price, precision: 4) %></p></div>
+          <div class="space-y-1 border-t border-slate-50 pt-4"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">运费</label><p class="text-sm font-bold font-mono">¥ <%= number_with_precision(@order.delivery_fee, precision: 2) %></p></div>
+          <div class="space-y-1 border-t border-slate-50 pt-4"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">付款方式</label><p class="text-sm font-bold uppercase"><%= @order.payment_method || "待定" %></p></div>
+        </div>
+      </div>
+
+      <%# 稿件资料卡片 %>
+      <div class="bg-white border-2 border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+        <div class="p-6 border-b-2 border-slate-50"><h3 class="text-sm font-black text-slate-800">关联稿件基础资料</h3></div>
+        <div class="p-8">
+          <div class="group flex items-center justify-between p-4 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-[#0066b3] shadow-sm border border-slate-100">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+              </div>
+              <div>
+                <p class="text-sm font-black text-slate-700"><%= @order.draft_name || @order.draft&.name %></p>
+                <p class="text-[9px] text-slate-400 font-bold uppercase tracking-tight">设计稿件详情 / DESIGN DRAFT DETAILS</p>
+              </div>
+            </div>
+            <% if @order.draft&.file&.attached? %>
+              <%= link_to rails_blob_path(@order.draft.file, disposition: "attachment"), class: "flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-[#0066b3] text-[10px] font-black rounded-lg hover:bg-[#0066b3] hover:text-white transition-all active:scale-95 shadow-sm" do %>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                下载稿件
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%# 右侧财务核算边栏 %>
+    <div class="space-y-6">
+      <div class="bg-slate-900 rounded-2xl p-6 text-white shadow-lg">
+        <label class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block text-slate-400/80">账目核算总计</label>
+        <div class="flex items-baseline gap-1 mb-6">
+          <span class="text-xl font-light text-slate-400">¥</span>
+          <span class="text-4xl font-black tracking-tighter text-white"><%= number_with_precision(@order.amount, precision: 2) %></span>
+        </div>
+        
+        <div class="space-y-3 pt-6 border-t border-white/10 text-[11px]">
+          <div class="flex justify-between font-black"><span class="text-slate-500 uppercase font-bold">归属客户</span><span><%= @order.customer_name %></span></div>
+          <div class="flex justify-between font-black"><span class="text-slate-500 uppercase font-bold">稿件设计师</span><span class="text-amber-400"><%= designer_name %></span></div>
+          <div class="flex justify-between font-black"><span class="text-slate-500 uppercase font-bold">制单负责人</span><span class="text-blue-400"><%= @order.staff&.name || "未分配" %></span></div>
+          
+          <%# 结算时间：完全复刻制单负责人的样式 %>
+          <% if @order.is_settled %>
+            <div class="flex justify-between font-black">
+              <span class="text-slate-500 uppercase font-bold">结算时间</span>
+              <span class="text-blue-400 font-mono"><%= @order.updated_at.strftime("%Y-%m-%d") %></span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <% unless @order.is_settled %>
+        <div class="bg-slate-50 border-2 border-slate-100 rounded-2xl p-5">
+          <p class="text-[10px] font-bold text-slate-400 leading-relaxed text-center italic tracking-tight">此账目目前为等待结算状态</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+

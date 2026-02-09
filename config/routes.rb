@@ -30,7 +30,7 @@ Rails.application.routes.draw do
 
       resources :customers
 
-      resources :orders, only: [:index, :show] do
+      resources :orders, only: [:index, :edit, :update, :show] do
         collection do
           get :unsettled
           get :settled

@@ -1,0 +1,71 @@
+<%# app/components/admin/order_settled_component.html.erb %>
+<div class="w-full space-y-4">
+  <div class="bg-white border-2 border-slate-200 rounded-[2rem] shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-200">
+        <thead class="bg-slate-50/50">
+          <tr>
+            <th scope="col" class="px-8 py-5 text-left text-xs font-black text-slate-500 uppercase tracking-widest">订单编号</th>
+            <th scope="col" class="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase tracking-widest">规格/类型</th>
+            <th scope="col" class="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase tracking-widest">客户</th>
+            <th scope="col" class="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase tracking-widest">结算时间</th>
+            <th scope="col" class="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase tracking-widest">状态</th>
+            <th scope="col" class="px-8 py-5 text-right text-xs font-black text-slate-500 uppercase tracking-widest">详情</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 bg-white text-slate-700">
+          <% @orders.each do |order| %>
+            <tr class="hover:bg-slate-50/50 transition-colors group">
+              <td class="px-8 py-6 whitespace-nowrap">
+                <div class="flex items-center text-slate-900 transition-colors">
+                  <div class="w-1.5 h-4 bg-emerald-500 rounded-full mr-3 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <span class="font-mono font-bold text-sm tracking-tight"><%= order.order_no %></span>
+                </div>
+              </td>
+
+              <td class="px-6 py-6 whitespace-nowrap text-sm font-black text-slate-700">
+                <%= order.category_name %>
+              </td>
+
+              <td class="px-6 py-6 whitespace-nowrap text-xs font-bold text-slate-500 uppercase tracking-tighter">
+                <%= order.customer_name %>
+              </td>
+
+              <td class="px-6 py-6 whitespace-nowrap text-[11px] font-bold text-slate-400 uppercase font-mono">
+                <%= order.updated_at.strftime("%Y/%m/%d %H:%M") %>
+              </td>
+
+              <td class="px-6 py-6 whitespace-nowrap">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm">
+                  <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1.5"></span>
+                  已结算
+                </span>
+              </td>
+
+              <td class="px-8 py-6 whitespace-nowrap text-right">
+                <%= link_to "查看", admin_order_path(order), 
+                            data: { turbo: false },
+                            class: "text-[#0066b3] hover:text-[#005596] font-black text-sm transition-colors" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <% if @pagy.pages > 1 %>
+      <div class="px-8 py-5 bg-slate-50/50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="text-[11px] font-black text-slate-400 uppercase tracking-widest"><%== pagy_info(@pagy) %></div>
+        <div class="flex items-center
+                    [&_nav]:inline-flex [&_nav]:rounded-xl [&_nav]:shadow-sm [&_nav]:overflow-hidden [&_nav]:border [&_nav]:border-slate-300
+                    [&_a]:px-4 [&_a]:py-2 [&_a]:text-xs [&_a]:font-black [&_a]:text-slate-500 [&_a]:bg-white [&_a]:transition-colors [&_a]:no-underline
+                    [&_a:hover]:bg-[#0066b3] [&_a:hover]:text-white
+                    [&_.current]:px-4 [&_.current]:py-2 [&_.current]:text-xs [&_.current]:font-black [&_.current]:bg-[#0066b3] [&_.current]:text-white [&_.current]:relative
+                    [&_.current]:after:content-[''] [&_.current]:after:absolute [&_.current]:after:bottom-0 [&_.current]:after:left-0 [&_.current]:after:w-full [&_.current]:after:h-[3.5px] [&_.current]:after:bg-orange-400
+                    [&_.disabled]:px-4 [&_.disabled]:py-2 [&_.disabled]:text-slate-300 [&_.disabled]:bg-slate-50 [&_.disabled]:cursor-not-allowed">
+          <%== pagy_nav(@pagy) %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
