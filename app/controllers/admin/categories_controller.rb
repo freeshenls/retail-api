@@ -3,7 +3,8 @@ class Admin::CategoriesController < ApplicationController
 
   def index
     # 按 position 排序
-    @pagy, @categories = pagy(Biz::Category.order(position: :asc), limit: 5)
+    query = Biz::Category.order(position: :asc)
+    @pagy, @categories = pagy(:offset, query, limit: 5)
   end
 
   def new

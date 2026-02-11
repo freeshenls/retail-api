@@ -35,6 +35,7 @@
         </span>
         <% if @order.draft&.file&.attached? %>
           <%= link_to rails_blob_path(@order.draft.file, disposition: "attachment"), 
+                      data: { turbo: false }, 
                       class: "inline-flex items-center mt-2 px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-[10px] font-bold rounded-lg transition-colors border border-slate-300 shadow-sm" do %>
             <%= heroicon "cloud-arrow-down", variant: :solid, options: { class: "h-3.5 w-3.5 mr-1 text-slate-500" } %>
             下载存档附件

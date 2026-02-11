@@ -29,3 +29,14 @@
 
 en:
   hello: "Hello world"
+  activerecord:
+    attributes:
+      biz/order: # 注意命名空间
+        amount: "订单金额"
+        service_type: "服务项目"
+        quantity: "数量"
+        unit_price: "单价"
+        payment_method: "付款方式"
+        category_name: "规格/幅面"
+        delivery_fee: "运费/额外"
+        remark: "说明备注"

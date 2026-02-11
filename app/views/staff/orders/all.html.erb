@@ -1,9 +1,9 @@
-<%# app/views/staff/orders/approved.html.erb %>
+<%# app/views/staff/orders/all.html.erb %>
 <%= render layout: "staff/layout" do %>
   <div data-controller="layout--tab-init" 
-       data-layout--tab-init-label-value="已发货订单" 
+       data-layout--tab-init-label-value="所有订单" 
        data-layout--tab-init-path-value="<%= request.path %>">
   <%# 这里的代码会注入到 layout 的 yield 位置，也就是 main_content 内部 %>
-    <%= render Staff::OrderApprovedComponent.new(orders: @orders, pagy: @pagy) %>
+    <%= render Staff::OrderAllComponent.new(orders: @orders, pagy: @pagy) %>
   </div>
 <% end %>

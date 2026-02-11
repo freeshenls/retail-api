@@ -1,0 +1,5 @@
+<%# app/views/staff/orders/show.html.erb %>
+<%= render layout: "staff/layout" do %>
+  <%# 这里的代码会注入到 layout 的 yield 位置，也就是 main_content 内部 %>
+  <%= render Staff::OrderEditComponent.new(order: @order) %>
+<% end %>

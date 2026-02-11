@@ -18,6 +18,10 @@ Rails.application.routes.draw do
   authenticated :user do
     get "profile", to: "base#profile", as: :profile
     patch "profile", to: "base#profile_update"
+
+    resources :notifications, only: [] do
+      patch :mark_as_read, on: :member, to: "base#mark_as_read", as: :mark_as_read
+    end
   end
 
   authenticated :user, ->(u) { u.role.name == "admin" } do
@@ -29,6 +33,7 @@ Rails.application.routes.draw do
       resources :invites, only: [:index, :create]
 
       resources :customers
+      resources :customer_users
 
       resources :orders, only: [:index, :edit, :update, :show] do
         collection do
@@ -43,20 +48,24 @@ Rails.application.routes.draw do
   end
 
   authenticated :user, ->(u) { u.role.name == "staff" } do
-    root to: redirect("/staff/orders/submitted"), as: :staff_root
+    root to: redirect("/staff/orders/ready"), as: :staff_root
 
     namespace :staff do
       # 移除了 :index
-      resources :orders, only: [:show] do
+      resources :orders, only: [:show, :edit, :update] do
         collection do
+          get :ready
           get :submitted
           get :approved
           get :rejected
+          get :all
         end
         member do
+          patch :ready
           patch :accept
           patch :approve
           patch :reject
+          patch :all
         end
       end
     end
@@ -80,7 +89,7 @@ Rails.application.routes.draw do
     root to: redirect("/finance/orders/unsettled"), as: :finance_root
 
     namespace :finance do
-      resources :orders, only: [:index, :show] do
+      resources :orders, only: [:index, :show, :update] do
         collection do
           get :unsettled
           get :settled

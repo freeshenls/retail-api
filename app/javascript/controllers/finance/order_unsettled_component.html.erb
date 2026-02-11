@@ -38,8 +38,8 @@
 
               <td class="px-6 py-6 whitespace-nowrap">
                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black bg-amber-50 text-amber-600 border border-amber-100 shadow-sm">
-                  <span class="w-1.5 h-1.5 bg-amber-400 rounded-full mr-1.5 animate-pulse"></span>
-                  待结算
+                  <span class="w-1.5 h-1.5 bg-amber-400 rounded-full mr-1.5"></span>
+                  <%= order.status == "checked" ? "已核实 / " : "" %>待结算
                 </span>
               </td>
 
@@ -54,17 +54,17 @@
       </table>
     </div>
 
+    <%# 品牌化分页器 %>
     <% if @pagy.pages > 1 %>
-      <div class="px-8 py-5 bg-slate-50/50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div class="text-[11px] font-black text-slate-400 uppercase tracking-widest"><%== pagy_info(@pagy) %></div>
+      <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="text-xs text-slate-500 font-bold tracking-tight"><%== @pagy.info_tag %></div>
         <div class="flex items-center
-                    [&_nav]:inline-flex [&_nav]:rounded-xl [&_nav]:shadow-sm [&_nav]:overflow-hidden [&_nav]:border [&_nav]:border-slate-300
-                    [&_a]:px-4 [&_a]:py-2 [&_a]:text-xs [&_a]:font-black [&_a]:text-slate-500 [&_a]:bg-white [&_a]:transition-colors [&_a]:no-underline
-                    [&_a:hover]:bg-[#0066b3] [&_a:hover]:text-white
-                    [&_.current]:px-4 [&_.current]:py-2 [&_.current]:text-xs [&_.current]:font-black [&_.current]:bg-[#0066b3] [&_.current]:text-white [&_.current]:relative
+                    [&_nav]:inline-flex [&_nav]:rounded-lg [&_nav]:shadow-sm [&_nav]:overflow-hidden [&_nav]:border [&_nav]:border-slate-300
+                    [&_a]:px-4 [&_a]:py-2 [&_a]:text-sm [&_a]:font-bold [&_a]:text-slate-600 [&_a]:bg-white [&_a:hover]:bg-[#0066b3] [&_a:hover]:text-white
+                    [&_.current]:px-4 [&_.current]:py-2 [&_.current]:text-sm [&_.current]:font-bold [&_.current]:bg-[#0066b3] [&_.current]:text-white [&_.current]:relative
                     [&_.current]:after:content-[''] [&_.current]:after:absolute [&_.current]:after:bottom-0 [&_.current]:after:left-0 [&_.current]:after:w-full [&_.current]:after:h-[3.5px] [&_.current]:after:bg-orange-400
-                    [&_.disabled]:px-4 [&_.disabled]:py-2 [&_.disabled]:text-slate-300 [&_.disabled]:bg-slate-50 [&_.disabled]:cursor-not-allowed">
-          <%== pagy_nav(@pagy) %>
+                    [&_.disabled]:px-4 [&_.disabled]:py-2 [&_.disabled]:text-slate-300 [&_.disabled]:bg-slate-50">
+          <%== @pagy.series_nav %>
         </div>
       </div>
     <% end %>

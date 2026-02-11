@@ -3,7 +3,10 @@
      data-controller="dropdown" 
      data-dropdown-active-class="animate-in fade-in slide-in-from-top-2 duration-200"
      data-dropdown-invisible-class="hidden">
-  
+  <% if play_sound %>
+    <audio src="/sounds/notification.mp3" autoplay class="hidden" data-turbo-cache="false"></audio>
+  <% end %>
+
   <%# 铃铛按钮 - 保持与设计师端一致的蓝色系 %>
   <button data-action="click->dropdown#toggle click@window->dropdown#hide" 
           class="cursor-pointer relative p-1.5 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-all group block">

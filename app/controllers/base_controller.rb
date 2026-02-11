@@ -3,6 +3,15 @@ class BaseController < ApplicationController
     @user = current_user
   end
 
+  def mark_as_read
+    @notification = current_user.notifications.find(params[:id])
+
+    @notification.mark_as_read!
+
+    @order = @notification.target
+    @order.broadcast_designer_notifications
+  end
+
   def profile_update
     @user = current_user
     if @user.update(profile_params)

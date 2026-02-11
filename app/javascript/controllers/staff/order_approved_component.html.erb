@@ -45,11 +45,11 @@
                 </span>
               </td>
 
-              <%# 4. 状态：已审核通过 %>
+              <%# 4. 状态：已发货 %>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
                 <% if order.approved? %>
-                  审核通过
+                  已发货
                 <% elsif order.received? %>
                   确认收货
                 <% end %>
@@ -92,7 +92,7 @@
 
     <% if @orders.empty? %>
       <div class="px-6 py-16 text-center text-slate-400 italic text-sm">
-        当前暂无已审核订单
+        当前暂无已发货订单
       </div>
     <% end %>
   </div>

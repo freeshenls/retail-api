@@ -1,0 +1,149 @@
+<%# app/components/admin/customer_users_index_component.html.erb %>
+<div class="flex h-[calc(100vh-148px)] gap-6 antialiased" data-controller="admin--customer-users-index-component">
+  
+  <%# --- 左侧：客户目录（找回紧凑的工具感） --- %>
+  <div class="w-80 flex flex-col bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+    <div class="bg-slate-50/50 px-5 py-4 border-b border-slate-200 shrink-0">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="w-1.5 h-4 bg-[#0066b3] rounded-full"></span>
+        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">客户目录</h3>
+      </div>
+      <div class="relative">
+        <input type="text" placeholder="快速过滤客户..." data-action="input->admin--customer-users-index-component#filter"
+               class="w-full py-1.5 pl-8 pr-3 bg-white border border-slate-200 text-xs rounded-lg font-bold outline-none focus:ring-2 focus:ring-[#0066b3]/10 focus:border-[#0066b3] transition-all shadow-sm">
+        <div class="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-300">
+          <%= heroicon "magnifying-glass", variant: :mini, options: { class: "w-3.5 h-3.5" } %>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex-1 overflow-y-auto p-2 space-y-1 bg-white" data-admin--customer-users-index-component-target="list">
+      <% @customers.each do |c| %>
+        <% active = (c == @selected_customer) %>
+        <%= link_to admin_customer_users_path(customer_id: c.id), 
+            data: { 
+              turbo_frame: "relation_detail_frame", 
+              filter_value: c.name, 
+              action: "click->admin--customer-users-index-component#setActive" 
+            },
+            class: "group flex items-center justify-between px-4 py-3 rounded-lg border transition-all #{active ? 'bg-[#0066b3]/5 border-[#0066b3]/20 shadow-sm' : 'border-transparent text-slate-600 hover:bg-slate-50'}" do %>
+          <div class="flex flex-col">
+            <span class="name-text font-bold text-sm tracking-tight <%= 'text-[#0066b3]' if active %>">
+              <%= c.name %>
+            </span>
+            <%# 只保留编号，去掉数量，保持单行简洁 %>
+            <span class="text-[10px] text-slate-400 font-mono tracking-tighter uppercase mt-0.5">ID: <%= c.id %></span>
+          </div>
+          <div class="chevron <%= 'hidden' unless active %>">
+            <%= heroicon "chevron-right", variant: :mini, options: { class: "w-4 h-4 text-[#0066b3]" } %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <%# --- 右侧：复刻邀请码页面布局 --- %>
+  <turbo-frame id="relation_detail_frame" class="flex-1 flex flex-col gap-6 overflow-hidden">
+    <% if @selected_customer %>
+      
+      <%# --- 右上：生成区卡片（完全还原邀请码页风格） --- %>
+      <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+        <h3 class="text-xs font-bold text-slate-700 mb-5 flex items-center gap-2 tracking-wider">
+          <span class="w-1 h-3.5 bg-[#0066b3] rounded-sm"></span>
+          指派新负责人至客户
+        </h3>
+        
+        <%= form_with url: admin_customer_users_path(customer_id: @selected_customer.id), method: :post, class: "flex flex-wrap items-end gap-4" do |f| %>
+          <div class="w-64 group" data-controller="dropdown">
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1.5 ml-1">选择系统员工</label>
+            <div class="relative">
+              <button type="button" 
+                      data-action="dropdown#toggle click@window->dropdown#hide" 
+                      class="w-full flex items-center justify-between py-2 px-3 bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-md font-bold hover:border-[#0066b3] focus:ring-2 focus:ring-[#0066b3]/10 transition-all cursor-pointer shadow-sm">
+                <span data-admin--customer-users-index-component-target="selectedUserName" class="text-slate-400">请选择员工...</span>
+                <%= heroicon "chevron-down", variant: :mini, options: { class: "w-3.5 h-3.5 text-slate-400 group-hover:text-[#0066b3]" } %>
+              </button>
+
+              <%= f.hidden_field :user_id, data: { "admin--customer-users-index-component-target": "userHiddenInput" } %>
+
+              <div data-dropdown-target="menu" class="hidden absolute z-50 mt-1 w-full bg-white border border-slate-200 rounded-md shadow-xl py-1 animate-in fade-in zoom-in-95 duration-100 max-h-60 overflow-y-auto">
+                <% @available_users.each do |user| %>
+                  <button type="button" 
+                          data-action="click->admin--customer-users-index-component#selectUser"
+                          data-admin--customer-users-index-component-id-param="<%= user.id %>"
+                          data-admin--customer-users-index-component-name-param="<%= user.name %>"
+                          class="w-full text-left px-3 py-2 text-xs font-bold text-slate-600 hover:bg-[#0066b3]/5 hover:text-[#0066b3] transition-colors cursor-pointer border-none">
+                    <%= user.name %>
+                  </button>
+                <% end %>
+              </div>
+            </div>
+          </div>
+          <%= f.submit "立即指派", class: "px-6 py-2 bg-[#0066b3] text-white text-xs font-black rounded-md hover:bg-[#005596] active:scale-95 transition-all cursor-pointer shadow-md tracking-widest" %>
+        <% end %>
+      </div>
+
+      <%# --- 右下：已关联列表 --- %>
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 flex-1 flex flex-col overflow-hidden">
+        <div class="bg-slate-50/50 px-6 py-4 border-b border-slate-200 flex justify-between items-center shrink-0">
+          <div class="flex items-center gap-2">
+            <span class="w-1.5 h-4 bg-[#0066b3] rounded-full"></span>
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">当前已关联负责人</span>
+          </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto">
+          <table class="min-w-full divide-y divide-slate-200 border-separate border-spacing-0">
+            <thead class="bg-slate-50/50 sticky top-0 z-10 shadow-sm">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">人员信息</th>
+                <th class="px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">职能角色</th>
+                <th class="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider pr-10">操作</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 bg-white text-slate-700">
+              <% @selected_customer.users.each do |user| %>
+                <tr class="hover:bg-slate-50/50 transition-colors group">
+                  <td class="px-6 py-4">
+                    <div class="flex items-center">
+                      <div class="w-1 h-4 bg-[#0066b3] rounded-full mr-3 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                      <div class="flex flex-col">
+                        <span class="text-slate-900 font-bold text-sm leading-tight tracking-tight"><%= user.name %></span>
+                        <span class="text-[10px] text-slate-400 font-mono mt-0.5"><%= user.email %></span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 text-center">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-[#0066b3] border border-blue-100 uppercase">
+                      <%= user.role&.description || '系统员工' %>
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-right pr-10">
+                    <div class="relative group/popover inline-block">
+                      <span class="text-slate-300 group-hover/popover:text-red-500 text-[10px] font-bold cursor-help transition-colors uppercase tracking-widest">移除</span>
+                      <div class="invisible opacity-0 group-hover/popover:visible group-hover/popover:opacity-100 absolute bottom-full right-0 mb-3 z-[60] transition-all duration-200">
+                        <div class="bg-white border border-slate-200 shadow-xl rounded-lg p-2 flex items-center gap-1.5 whitespace-nowrap">
+                          <%= button_to admin_customer_user_path(id: user.id, customer_id: @selected_customer.id), 
+                                        method: :delete, data: { turbo_frame: "relation_detail_frame" }, 
+                                        class: "px-4 py-1.5 bg-red-500 text-white text-[11px] font-bold rounded shadow-sm hover:bg-red-600 border-none transition-all cursor-pointer" do %>
+                            确认移除
+                          <% end %>
+                          <div class="absolute top-[calc(100%-5px)] right-4 w-2.5 h-2.5 bg-white border-r border-b border-slate-200 rotate-45"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    <% else %>
+      <div class="flex-1 flex flex-col items-center justify-center bg-white rounded-xl border border-slate-200">
+        <p class="text-slate-300 font-bold text-sm tracking-widest uppercase">请选择客户进行管理</p>
+      </div>
+    <% end %>
+  </turbo-frame>
+</div>

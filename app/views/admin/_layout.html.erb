@@ -10,7 +10,8 @@
     is_sys = curr_path.match?(/^\/admin\/(users|roles|invites)/)
 
     path_customers = admin_customers_path
-    is_customer = curr_path.match?(/^\/admin\/(customers)/)
+    path_customer_users = admin_customer_users_path
+    is_customer = curr_path.match?(/^\/admin\/(customers|customer_users)/)
 
     path_unsettled = unsettled_admin_orders_path
     path_settled   = settled_admin_orders_path
@@ -46,7 +47,8 @@
         title: "客户管理", 
         icon: "user-group",
         items: [
-          { label: "信息维护", path: path_customers, active: curr_path == path_customers, icon: "identification" }
+          { label: "基础信息", path: path_customers, active: curr_path == path_customers, icon: "identification" },
+          { label: "关系维护", path: path_customer_users, active: curr_path == path_customer_users, icon: "users" }
         ]
       }
     end

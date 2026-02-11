@@ -34,6 +34,7 @@
                     </span>
                     <% if order.draft.file.attached? %>
                       <%= link_to rails_blob_path(order.draft.file, disposition: "attachment"), 
+                                  data: { turbo: false },
                                   class: "flex items-center text-[10px] font-bold text-emerald-600 hover:text-emerald-700 transition-colors" do %>
                         <svg class="w-3.5 h-3.5 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                         附件下载
@@ -50,7 +51,7 @@
                   <% if order.submitted? %>
                     <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">已提交</span>
                   <% elsif order.approved? %>
-                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">审核通过</span>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">已发货</span>
                   <% elsif order.received? %>
                     <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">确认收货</span>
                   <% end %>

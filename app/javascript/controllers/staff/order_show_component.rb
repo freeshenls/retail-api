@@ -7,6 +7,6 @@ class Staff::OrderShowComponent < ViewComponent::Base
   private
 
   def status_label
-    @order.status == "submitted" ? "待审核" : "审核通过"
+    @order.status == "approved" ?  "已发货" : @order.staff.nil? ? "等待抢单" : "等待发货"
   end
 end

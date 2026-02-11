@@ -49,14 +49,14 @@
     <%# 正确注入插槽内容 %>
     <% navbar.with_notification do %>
       <% 
-        # 实时获取该设计师审核通过的订单
+        # 实时获取该设计师已发货的订单
         approved_orders = Biz::Order.for_designer(current_user)
                               .where(status: :approved, is_settled: false)
                               .order(updated_at: :desc)
       %>
-      <%= render "designer/orders/approved_notification", 
+      <%= render "designer/notification", 
                  orders: approved_orders, 
-                 count: approved_orders.count %>
+                 notifications: Biz::Notification.unread(current_user)%>
     <% end %>
   <% end %> <%# --- 确保 Navbar 组件在这里闭合 --- %>
 

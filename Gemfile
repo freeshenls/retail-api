@@ -67,3 +67,5 @@ gem "pagy", "~> 43.2"
 gem "redis", "~> 5.4"
 
 gem "groupdate", "~> 6.7"
+
+gem "rails-i18n", "~> 8.1"

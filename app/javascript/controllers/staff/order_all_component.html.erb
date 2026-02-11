@@ -1,5 +1,5 @@
-<%# app/components/staff/order_submitted_component.html.erb %>
-<div data-controller="staff--order-submitted-component" class="w-full space-y-4">
+<%# app/components/staff/order_approved_component.html.erb %>
+<div data-controller="staff--order-approved-component" class="w-full space-y-4">
   
   <%# 数据表格区域 %>
   <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
@@ -7,19 +7,17 @@
       <table class="min-w-full divide-y divide-slate-200">
         <thead class="bg-slate-50/50">
           <tr>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">订单编号</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">规格与业务类型</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">客户信息</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">金额</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">状态</th>
-            <th scope="col" class="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">操作</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-wider">订单编号</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-wider">规格/类型</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-wider">客户</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-wider">状态</th>
+            <th scope="col" class="px-6 py-3 text-right text-xs font-black text-slate-500 uppercase tracking-wider">操作</th>
           </tr>
         </thead>
-        
         <tbody class="divide-y divide-slate-200 bg-white text-slate-700">
           <% @orders.each do |order| %>
             <tr class="hover:bg-slate-50/50 transition-colors group">
-              <%# 1. 订单编号：左侧带有品牌色装饰条 %>
+              <%# 1. 订单编号 %>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <div class="flex items-center">
                   <div class="w-1 h-4 bg-[#0066b3] rounded-full mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -29,47 +27,54 @@
                 </div>
               </td>
 
-              <%# 2. 规格与业务类型：展示 category_name 和 service_type %>
+              <%# 2. 规格/类型 %>
               <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm font-black text-slate-700">
-                  <%= order.category_name || "未分类规格" %>
-                </div>
+                <div class="text-sm font-black text-slate-700"><%= order.category_name %></div>
                 <div class="mt-1 flex items-center gap-2">
-                  <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200 uppercase tracking-tight">
-                    <%= order.service_type || "标准服务" %>
+                  <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200 uppercase">
+                    <%= order.service_type %>
                   </span>
-                  <span class="text-[10px] font-bold text-slate-400">
-                    数量: <%= order.quantity.to_i %>
-                  </span>
+                  <span class="text-[10px] font-bold text-slate-400">× <%= order.quantity.to_i %></span>
                 </div>
               </td>
 
-              <%# 3. 客户信息 %>
+              <%# 3. 客户 %>
               <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-xs font-bold text-slate-600 uppercase tracking-tighter">
+                <span class="text-xs font-bold text-slate-500 uppercase tracking-tighter">
                   <%= order.customer_name %>
-                </div>
-              </td>
-
-              <%# 4. 金额：蓝色粗体，增强识别度 %>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span class="text-[13px] font-black text-[#0066b3] font-mono italic">
-                  ¥ <%= number_with_precision(order.amount, precision: 2) %>
                 </span>
               </td>
 
-              <%# 5. 状态标签 %>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-[#0066b3] border border-blue-100 uppercase">
-                  已接单 / 待发货
-                </span>
-              </td>
-
-              <%# 6. 操作链接 %>
+              <%# 4. 状态：所有 %>
+              <% if order.rejected? %>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="px-2.5 py-1 bg-red-50 text-red-600 border border-red-100 text-[10px] font-black rounded-lg uppercase tracking-wider">
+                    审核驳回
+                  </span>
+                </td>
+              <% elsif order.submitted? %>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-[#0066b3] border border-blue-100 uppercase">
+                    已接单 / 待发货
+                  </span>
+                </td>
+              <% else %>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <% if order.approved? %>
+                    已发货
+                  <% elsif order.received? %>
+                    确认收货
+                  <% end %>
+                  </span>
+                </td>
+              <% end %>
+              
+              <%# 5. 操作 %>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <%= link_to "详情", staff_order_path(order), 
                             data: { turbo: false },
-                            class: "text-[#0066b3] hover:text-[#005596] font-bold transition-colors" %>
+                            class: "text-[#0066b3] hover:text-[#005596] font-black transition-colors" %>
               </td>
             </tr>
           <% end %>
@@ -77,16 +82,13 @@
       </table>
     </div>
 
-    <%# Pagy 分页底栏 - 复刻设计师端的样式 %>
-    <% if @pagy.present? && @pagy.pages > 1 %>
+    <%# Pagy 分页底栏 - 复刻 Navbar 同款橙色装饰条样式 %>
+    <% if render_pagy? %>
       <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-        
-        <%# 左侧：分页计数信息 %>
         <div class="text-xs text-slate-500 font-medium">
           <%== @pagy.info_tag %>
         </div>
         
-        <%# 右侧：Pagy 导航 (带橙色横条装饰) %>
         <div class="flex items-center
                     [&_nav]:inline-flex [&_nav]:rounded-lg [&_nav]:shadow-sm [&_nav]:overflow-hidden [&_nav]:border [&_nav]:border-slate-300
                     [&_a]:px-4 [&_a]:py-2 [&_a]:text-sm [&_a]:font-bold [&_a]:text-slate-600 [&_a]:bg-white [&_a]:transition-colors [&_a]:no-underline
@@ -104,7 +106,7 @@
 
     <% if @orders.empty? %>
       <div class="px-6 py-16 text-center text-slate-400 italic text-sm">
-        当前暂无已接单订单，请从右上方铃铛处抢单
+        当前暂无已发货订单
       </div>
     <% end %>
   </div>

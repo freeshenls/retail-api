@@ -11,6 +11,7 @@ class Sys::User < ApplicationRecord
   has_one :invite_code, dependent: :nullify
   has_many :customer_users, class_name: "Biz::CustomerUser"
   has_many :customers, through: :customer_users, class_name: "Biz::Customer"
+  has_many :notifications, class_name: "Biz::Notification", foreign_key: :user_id, dependent: :destroy
 
   def staff?
     role&.name == "staff"

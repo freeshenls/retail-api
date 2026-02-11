@@ -19,15 +19,17 @@ class Admin::OrdersController < ApplicationController
 	  # 只需要 includes 稿件和稿件的设计师
 	  query = Biz::Order.includes(draft: :user) 
 	                    .where(is_settled: false)
+	                    .order(created_at: :desc)
 
-	  @pagy, @orders = pagy(query.order(created_at: :desc), items: 5)
+	  @pagy, @orders = pagy(:offset, query, limit: 5)
 	end
 
 	def settled
 	  query = Biz::Order.includes(draft: :user)
 	                    .where(is_settled: true)
-
-	  @pagy, @orders = pagy(query.order(created_at: :desc), items: 5)
+	                    .order(created_at: :desc)
+	                    
+	  @pagy, @orders = pagy(:offset, query, limit: 5)
 	end
 
 	private

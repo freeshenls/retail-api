@@ -81,11 +81,11 @@
         <label class="text-[10px] font-black text-slate-400 uppercase tracking-wider ml-1">结算客户</label>
         <div class="relative">
           <button type="button" data-action="dropdown#toggle click@window->dropdown#hide" 
-                  class="w-full flex items-center justify-between px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold hover:border-[#0066b3] transition-all shadow-sm cursor-pointer">
+                  class="pointer-events-none w-full flex items-center justify-between px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold hover:border-[#0066b3] transition-all shadow-sm cursor-pointer">
             <span data-designer--order-edit-component-target="customerNameText" class="truncate">
               <%= @order.customer_name %>
             </span>
-            <%= heroicon "chevron-down", variant: :mini, options: { class: "h-4 w-4 text-slate-300" } %>
+            <%= heroicon "lock-closed", variant: :mini, options: { class: "h-4 w-4 text-slate-300" } %>
           </button>
           <%= f.hidden_field :customer_id, data: { "designer--order-edit-component-target" => "customerIdInput" } %>
           <div data-dropdown-target="menu" class="hidden absolute z-50 mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-2xl py-1 max-h-48 overflow-y-auto">
@@ -147,7 +147,7 @@
     </div>
 
     <%# 第三区：详情数值卡片 (保持原样) %>
-    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden p-5 grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 grid grid-cols-1 md:grid-cols-3 gap-4">
       <div class="space-y-1">
         <%= f.label :quantity, "数量", class: "text-[10px] font-black text-slate-400 uppercase ml-1" %>
         <%= f.number_field :quantity, step: 0.01, 
@@ -209,7 +209,7 @@
       
       <button type="submit" name="biz_order[status]" value="submitted" 
               class="flex items-center gap-2 px-12 py-3 bg-[#0066b3] text-white text-xs font-black rounded-xl hover:bg-[#005596] shadow-md cursor-pointer active:scale-95 transition-all">
-        确认并提交审核
+        确认并提交
         <%= heroicon "paper-airplane", variant: :solid, options: { class: "h-3.5 w-3.5" } %>
       </button>
     </div>

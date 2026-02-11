@@ -1,0 +1,222 @@
+<%# app/components/designer/notification_component.html.erb %>
+<div id="notification_wrapper" class="relative" 
+     data-controller="designer--notification-component dropdown" 
+     data-dropdown-active-class="animate-in fade-in slide-in-from-top-2 duration-200"
+     data-dropdown-invisible-class="hidden">
+  
+  <%# 铃铛按钮 %>
+  <button data-action="click->dropdown#toggle click@window->dropdown#hide" 
+          class="cursor-pointer relative p-1.5 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-all group block">
+    <%= heroicon "bell", variant: :solid, options: { class: "h-6 w-6" } %>
+    <% if @count > 0 %>
+      <span class="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-orange-400 text-[10px] font-bold text-white ring-2 ring-[#0066b3]">
+        <%= @count %>
+      </span>
+    <% end %>
+  </button>
+
+  <%# 下拉面板 %>
+  <div id="notifications_content" 
+       data-dropdown-target="menu" 
+       class="hidden absolute right-0 mt-3 z-50 w-80 bg-white rounded-lg shadow-[0_10px_30px_rgba(0,0,0,0.15)] border border-slate-200 overflow-visible transition-all">
+
+    <%# --- 标头区域 --- %>
+    <div class="px-7 pt-6 pb-4 flex justify-between items-center">
+      <h3 class="text-sm font-black text-slate-900 tracking-widest transition-all duration-300" 
+          data-designer--notification-component-target="title">
+        待处理
+      </h3>
+
+      <%# 呼吸孔切换器 %>
+      <div class="flex gap-4 items-center">
+        <%# 呼吸孔 1：手动加入初始选中样式 (bg-slate-900 ring-4...) %>
+        <div class="group/hole relative flex flex-col items-center">
+          <div class="invisible opacity-0 group-hover/hole:visible group-hover/hole:opacity-100 absolute bottom-full mb-2 transition-all duration-200 translate-y-1 group-hover/hole:translate-y-0 z-[70]">
+            <div class="bg-slate-900 text-white text-[10px] font-black px-2.5 py-1.5 rounded-md shadow-2xl whitespace-nowrap">
+              待处理
+              <div class="absolute top-[calc(100%-4px)] left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-900 rotate-45"></div>
+            </div>
+          </div>
+          <button data-designer--notification-component-target="tab" data-action="click->designer--notification-component#change" 
+                  data-id="direct" data-count="<%= @orders.count %>" data-title="待处理(<%= @orders.count%>)"
+                  <%# 初始状态：第一个按钮手动加上激活类 %>
+                  class="w-2.5 h-2.5 rounded-full bg-slate-200 border-none cursor-pointer transition-all duration-300 active:scale-95">
+          </button>
+        </div>
+
+        <%# 呼吸孔 2 %>
+        <div class="group/hole relative flex flex-col items-center">
+          <div class="invisible opacity-0 group-hover/hole:visible group-hover/hole:opacity-100 absolute bottom-full mb-2 transition-all duration-200 translate-y-1 group-hover/hole:translate-y-0 z-[70]">
+            <div class="bg-slate-900 text-white text-[10px] font-black px-2.5 py-1.5 rounded-md shadow-2xl whitespace-nowrap">
+              新提醒
+              <div class="absolute top-[calc(100%-4px)] left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-900 rotate-45"></div>
+            </div>
+          </div>
+          <button data-designer--notification-component-target="tab" data-action="click->designer--notification-component#change" 
+                  data-id="watching" data-count="<%= @notifications.count %>" data-title="新提醒(<%= @notifications.count%>)"
+                  class="w-2.5 h-2.5 rounded-full bg-slate-200 border-none cursor-pointer transition-all duration-300 active:scale-95">
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <%# --- 关键：极简分隔线 --- %>
+    <div class="px-7">
+      <div class="h-[1px] w-full bg-slate-100"></div>
+    </div>
+    
+    <div data-designer--notification-component-target="panel" data-id="direct" data-count="<%= @orders.count %>" class="max-h-[420px] overflow-y-auto custom-scrollbar animate-in fade-in duration-300">
+      <% if @orders.any? %>
+        <% @orders.each do |order| %>
+          <div id="approved_<%= dom_id(order) %>" 
+               class="p-4 hover:bg-slate-50/50 border-b border-slate-100 last:border-none transition-all relative">
+            
+            <%# 订单基础信息 %>
+            <div class="space-y-1.5 mb-3">
+              <div class="flex items-center gap-2 text-[11px] font-black text-slate-400">
+                <div class="w-1 h-3 bg-[#0066b3] rounded-full"></div>
+                <span>订单：<%= order.order_no %></span>
+              </div>
+              <p class="text-[13px] font-bold text-slate-800 truncate pl-3.5"><%= order.draft&.name %></p>
+              <div class="pl-3.5 flex items-center justify-between text-[11px]">
+                <span class="font-black text-[#0066b3] italic font-mono text-[13px]">¥ <%= number_with_precision(order.amount, precision: 2) %></span>
+                <span class="font-bold text-slate-300 uppercase tracking-tighter"><%= order.customer_name %></span>
+              </div>
+            </div>
+
+            <%# 按钮与 Hover 气泡区 %>
+            <div class="flex justify-end gap-2 items-center relative">
+              <%= link_to designer_order_path(order), data: { turbo: false }, 
+                          class: "py-1 text-[11px] font-black text-slate-400 hover:text-[#0066b3] rounded transition-all" do %>
+                详情
+              <% end %>
+
+              <%# Hover 容器：鼠标悬停在这一块时，气泡显示 %>
+              <div class="relative group/popover">
+                <button type="button" 
+                        class="px-3 py-1 text-[#0066b3] bg-[#0066b3]/5 group-hover/popover:bg-[#0066b3]/10 text-[11px] font-black rounded transition-all cursor-pointer">
+                  确认收货
+                </button>
+
+                <%# 真正的 Popover 气泡：利用 group-hover 控制显示 %>
+                <div class="invisible opacity-0 group-hover/popover:visible group-hover/popover:opacity-100 
+                            absolute bottom-full right-0 mb-2 z-[60] transition-all duration-200 
+                            translate-y-1 group-hover/popover:translate-y-0">
+                  
+                  <div class="bg-white border border-slate-200 shadow-xl rounded-lg p-1.5 flex items-center gap-1.5 whitespace-nowrap">
+                    <%# 确认按钮：直接执行，无需点击气泡内的取消 %>
+                    <%= button_to designer_order_path(order), 
+                                  method: :patch,
+                                  params: { biz_order: { status: "received" } },
+                                  class: "flex items-center gap-1.5 px-4 py-1.5 bg-[#0066b3] text-white text-[11px] font-black rounded shadow-sm hover:bg-[#005596] cursor-pointer border-none transition-all" do %>
+                      <%= heroicon "check", variant: :mini, options: { class: "h-4 w-4" } %>
+                      点击确定收货
+                    <% end %>
+                    
+                    <%# 气泡三角箭头 %>
+                    <div class="absolute top-[calc(100%-5px)] right-6 w-2.5 h-2.5 bg-white border-r border-b border-slate-200 rotate-45"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="py-12 text-center text-[11px] font-bold text-slate-300 uppercase tracking-widest">暂无待处理订单</div>
+      <% end %>
+    </div>
+
+    <div data-designer--notification-component-target="panel" data-id="watching"
+         class="hidden max-h-[420px] overflow-y-auto custom-scrollbar animate-in fade-in duration-300">
+      
+      <% if @notifications.any? %>
+        <% @notifications.each do |notification| %>
+          <div id="<%= dom_id(notification) %>" 
+               class="p-4 hover:bg-slate-50/50 border-b border-slate-100 last:border-none transition-all relative group">
+            
+            <%# 1. 顶部状态流：操作人与动作 %>
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-2 text-[11px] font-black">
+                <div class="w-1 h-3 bg-amber-400 rounded-full"></div> <%# 提醒用黄色小柱区分 %>
+                <span class="text-slate-900"><%= notification.actor.respond_to?(:name) ? notification.actor.name : "管理员" %></span>
+                <span class="text-slate-400 font-bold"><%= t("biz.notifications.actions.#{notification.action}", default: "调整了订单") %></span>
+              </div>
+              <span class="text-[9px] font-bold text-slate-300 uppercase tracking-tighter">
+                <%= time_ago_in_words(notification.created_at, locale: :'zh-CN') %>前
+              </span>
+            </div>
+
+            <%# 2. 关联订单信息 %>
+            <div class="pl-3 mb-3">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-[10px] font-mono text-[#0066b3] font-bold bg-blue-50 px-1.5 py-0.5 rounded">
+                  订单：<%= notification.target.respond_to?(:order_no) ? notification.target.order_no : "N/A" %>
+                </span>
+                <p class="text-[12px] font-bold text-slate-600 truncate">
+                  <%= notification.target.respond_to?(:draft) ? notification.target.draft&.name : "相关订单详情" %>
+                </p>
+              </div>
+
+              <%# 3. 核心：变更对比区域 (渲染 metadata) %>
+              <div class="space-y-1 mt-2 bg-slate-50/80 p-2 rounded-lg border border-slate-100/50">
+                <%# 这里只挑选你想显示的字段，或者循环显示所有变化 %>
+                <% notification.metadata.except("updated_at").each do |field, values| %>
+                  <% if values.is_a?(Array) && values.size == 2 %>
+                    <div class="flex items-center gap-2 text-[10px]">
+                      <span class="text-slate-400 font-black min-w-[40px] tracking-tighter uppercase"><%= field %>:</span>
+                      <span class="text-slate-300 line-through">
+                        <%= field.include?('price') || field.include?('amount') ? "¥#{values.first}" : values.first %>
+                      </span>
+                      <span class="text-slate-400">→</span>
+                      <span class="text-[#0066b3] font-black">
+                        <%= field.include?('price') || field.include?('amount') ? "¥#{values.last}" : values.last %>
+                      </span>
+                    </div>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+
+            <%# 4. 操作按钮区 %>
+            <div class="flex justify-end gap-2 items-center relative">
+              <%= link_to designer_order_path(notification.target), data: { turbo: false },
+                          class: "py-1 text-[11px] font-black text-slate-400 hover:text-[#0066b3] rounded transition-all" do %>
+                详情
+              <% end %>
+
+              <%# Hover 容器：鼠标悬停在这一块时，气泡显示 %>
+              <div class="relative group/popover">
+                <button type="button" 
+                        class="px-3 py-1 text-[#0066b3] bg-[#0066b3]/5 group-hover/popover:bg-[#0066b3]/10 text-[11px] font-black rounded transition-all cursor-pointer">
+                  标记已读
+                </button>
+
+                <%# 真正的 Popover 气泡：利用 group-hover 控制显示 %>
+                <div class="invisible opacity-0 group-hover/popover:visible group-hover/popover:opacity-100 
+                            absolute bottom-full right-0 mb-2 z-[60] transition-all duration-200 
+                            translate-y-1 group-hover/popover:translate-y-0">
+                  
+                  <div class="bg-white border border-slate-200 shadow-xl rounded-lg p-1.5 flex items-center gap-1.5 whitespace-nowrap">
+                    <%# 确认按钮：直接执行，无需点击气泡内的取消 %>
+                    <%= button_to mark_as_read_notification_path(notification), 
+                                  method: :patch,
+                                  class: "flex items-center gap-1.5 px-4 py-1.5 bg-[#0066b3] text-white text-[11px] font-black rounded shadow-sm hover:bg-[#005596] cursor-pointer border-none transition-all" do %>
+                      <%= heroicon "check", variant: :mini, options: { class: "h-4 w-4" } %>
+                      确认
+                    <% end %>
+                    
+                    <%# 气泡三角箭头 %>
+                    <div class="absolute top-[calc(100%-5px)] right-6 w-2.5 h-2.5 bg-white border-r border-b border-slate-200 rotate-45"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        <% end %>
+      <% else %>
+        <div class="py-12 text-center text-[11px] font-bold text-slate-300 uppercase tracking-widest">暂无提醒动态</div>
+      <% end %>
+    </div>
+  </div>
+</div>

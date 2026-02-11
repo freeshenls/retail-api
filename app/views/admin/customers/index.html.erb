@@ -2,7 +2,7 @@
 
 <%= render layout: "admin/layout" do %>
   <div data-controller="layout--tab-init" 
-       data-layout--tab-init-label-value="客户管理" 
+       data-layout--tab-init-label-value="基础信息" 
        data-layout--tab-init-path-value="<%= request.path %>">
     <%= render Admin::CustomerIndexComponent.new(customers: @customers, pagy: @pagy) %>
   </div>
