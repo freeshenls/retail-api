@@ -30,22 +30,27 @@
     <%= f.hidden_field :order_no %>
     <%= f.hidden_field :unit_id, value: @order.unit_id, data: { "designer--order-new-component-target" => "unitIdInput" } %>
 
-    <%# 第一区：稿件上传 (文件名回显 + 只能传一个) %>
-    <div class="bg-white border-2 border-dashed border-slate-200 rounded-2xl p-6 transition-all hover:border-[#0066b3]/30 group cursor-pointer relative"
+    <%# 第一区：稿件上传 (仅增加进度条和状态显示埋点) %>
+    <div class="bg-white border-2 border-dashed border-slate-200 rounded-2xl p-6 transition-all hover:border-[#0066b3]/30 group cursor-pointer relative overflow-hidden"
          data-designer--order-new-component-target="uploadContainer">
       <%= f.fields_for :draft do |df| %>
         <%= df.hidden_field :user_id %>
-        <label for="order_draft_file" class="flex flex-col items-center justify-center space-y-2 cursor-pointer w-full h-full">
+        <label for="order_draft_file" class="flex flex-col items-center justify-center space-y-2 cursor-pointer w-full h-full relative z-10">
           <div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-blue-50 transition-colors">
             <%= heroicon "document-arrow-up", variant: :outline, options: { class: "h-5 w-5 text-slate-400 group-hover:text-[#0066b3]" } %>
           </div>
           <div class="text-center">
             <span class="text-xs font-black text-slate-600 block transition-all" data-designer--order-new-component-target="fileNameDisplay">点击上传设计原稿</span>
-            <%= df.file_field :file, required: true, id: "order_draft_file", class: "sr-only", data: { action: "change->designer--order-new-component#handleFileChange" } %>
+            <%= df.hidden_field :file, data: { "designer--order-new-component-target" => "fileHiddenInput" } %>
+            <%# 核心：必须开启 direct_upload: true %>
+            <%= df.file_field :file, direct_upload: true, required: true, id: "order_draft_file", class: "sr-only", 
+                data: { action: "change->designer--order-new-component#handleFileChange" } %>
             <p class="text-[9px] text-slate-400 mt-1 uppercase tracking-tighter" data-designer--order-new-component-target="uploadHint">支持文件: PDF, AI, JPG, PNG, ZIP</p>
           </div>
         </label>
       <% end %>
+      <%# 底部状态条：初始宽度 0 %>
+      <div class="absolute bottom-0 left-0 h-1 bg-[#0066b3] w-0 transition-all duration-300" data-designer--order-new-component-target="progressBar"></div>
     </div>
 
     <%# 第二区：核心选择区 (默认选中第一条) %>
@@ -174,15 +179,15 @@
       </div>
     </div>
 
-    <%# 底部：移除取消，强化跳转按钮对比度 %>
+    <%# 底部按钮：增加 target 用于禁用控制 %>
     <div class="flex justify-end items-center gap-4 pt-4 border-t border-slate-100">
-      <button type="submit" name="biz_order[status]" value="pending" 
-              class="px-8 py-3 bg-white border border-slate-200 text-slate-600 text-xs font-black rounded-xl hover:bg-slate-50 cursor-pointer shadow-sm active:scale-95 transition-all">
+      <button type="submit" name="biz_order[status]" value="pending" data-designer--order-new-component-target="submitBtn"
+              class="px-8 py-3 bg-white border border-slate-200 text-slate-600 text-xs font-black rounded-xl hover:bg-slate-50 cursor-pointer shadow-sm active:scale-95 transition-all disabled:opacity-50">
         保存待提交
       </button>
       
-      <button type="submit" name="biz_order[status]" value="submitted" 
-              class="flex items-center gap-2 px-12 py-3 bg-[#0066b3] text-white text-xs font-black rounded-xl hover:bg-[#005596] shadow-md cursor-pointer active:scale-95 transition-all">
+      <button type="submit" name="biz_order[status]" value="submitted" data-designer--order-new-component-target="submitBtn"
+              class="flex items-center gap-2 px-12 py-3 bg-[#0066b3] text-white text-xs font-black rounded-xl hover:bg-[#005596] shadow-md cursor-pointer active:scale-95 transition-all disabled:opacity-50">
         确认并提交
         <%= heroicon "paper-airplane", variant: :solid, options: { class: "h-3.5 w-3.5" } %>
       </button>

@@ -1,5 +1,6 @@
 // app/javascript/controllers/designer/order_new_component_controller.js
 import { Controller } from "@hotwired/stimulus"
+import { DirectUpload } from "@rails/activestorage"
 
 export default class extends Controller {
   static targets = [
@@ -7,7 +8,7 @@ export default class extends Controller {
     "serviceTypeText", "serviceTypeInput", "categoryText", "categoryIdInput",
     "quantity", "unitPrice", "deliveryFee", "amountDisplay", 
     "paymentMethodText", "paymentMethodInput",
-    "fileNameDisplay", "uploadHint", "uploadContainer"
+    "fileNameDisplay", "uploadHint", "uploadContainer", "fileHiddenInput", "progressBar", "submitBtn"
   ]
   
   static values = { units: Array }
@@ -65,14 +66,35 @@ export default class extends Controller {
   // --- 稿件上传回显 ---
   handleFileChange(event) {
     const file = event.target.files[0]
+    if (!file) return
+
     if (file) {
-      this.fileNameDisplayTarget.textContent = file.name
+      this.progressBarTarget.classList.replace("bg-green-500", "bg-[#0066b3]")
+      this.fileNameDisplayTarget.className = "text-xs font-black text-slate-600 block transition-all"
       this.fileNameDisplayTarget.classList.add("text-[#0066b3]", "font-bold")
       this.uploadContainerTarget.classList.add("border-[#0066b3]", "bg-blue-50/30")
       if (this.hasUploadHintTarget) {
-        this.uploadHintTarget.textContent = `文件大小: ${(file.size / 1024 / 1024).toFixed(2)} MB`
+        this.uploadHintTarget.textContent = `${file.name} · ${(file.size / 1024 / 1024).toFixed(2)} MB`
       }
     }
+
+    // 1. 获取 Rails 自动生成的上传地址 (在 HTML 里的 data 属性)
+    const url = event.target.dataset.directUploadUrl
+    
+    // 2. 手动创建上传实例 (参数：文件, 上传地址, 代理对象)
+    // 代理对象就是 this，因为我们在下面定义了回调方法
+    const upload = new DirectUpload(file, url, this)
+
+    // 3. 立即触发上传
+    this.lockSubmit(true, `🚀 正在上传...`)
+    
+    upload.create((error, blob) => {
+      if (error) {
+        this.handleError(error)
+      } else {
+        this.handleSuccess(blob, event.target)
+      }
+    }) 
   }
 
   // --- 下拉选择逻辑 ---
@@ -102,6 +124,45 @@ export default class extends Controller {
       this.matchUnitAndPrice()
     }
     this._closeDropdown(e)
+  }
+
+  // --- DirectUpload 代理回调方法 (必须按此名称定义) ---
+
+  // 上传过程中实时更新进度条
+  directUploadDidProgress(event) {
+    const progress = (event.loaded / event.total) * 100
+    this.progressBarTarget.style.width = `${progress}%`
+  }
+
+  // 上传开始前
+  directUploadWillStoreFileWithXHR(request) {
+    request.upload.addEventListener("progress", event => this.directUploadDidProgress(event))
+  }
+
+  // --- 业务逻辑状态控制 ---
+
+  handleSuccess(blob, fileInput) {
+    fileInput.disabled = true
+    this.fileNameDisplayTarget.textContent = "✅ 稿件上传成功"
+    this.fileNameDisplayTarget.className = "text-xs font-black text-green-600 block"
+    this.progressBarTarget.classList.replace("bg-[#0066b3]", "bg-green-500")
+    this.lockSubmit(false) // 上传成功，解锁提交按钮
+    
+    // 手动将上传成功后的 signed_id 存入表单，确保提交时后端能找到文件
+    if (this.hasFileHiddenInputTarget) {
+      this.fileHiddenInputTarget.value = blob.signed_id;
+    }
+  }
+
+  handleError(error) {
+    this.fileNameDisplayTarget.textContent = "❌ 上传失败，请检查网络或 CORS"
+    this.fileNameDisplayTarget.className = "text-xs font-black text-red-500 block"
+    this.lockSubmit(true) // 上传失败，保持锁定，不准提交
+  }
+
+  lockSubmit(disabled, text = null) {
+    this.submitBtnTargets.forEach(btn => btn.disabled = disabled)
+    if (text) this.fileNameDisplayTarget.textContent = text
   }
 
   selectPayment(e) {

@@ -69,3 +69,5 @@ gem "redis", "~> 5.4"
 gem "groupdate", "~> 6.7"
 
 gem "rails-i18n", "~> 8.1"
+
+gem "aws-sdk-s3", "~> 1.213"
