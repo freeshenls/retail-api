@@ -4,8 +4,8 @@ source "https://rubygems.org"
 gem "rails", "~> 8.1.2"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
-# Use sqlite3 as the database for Active Record
-gem "sqlite3", ">= 2.1"
+# Use postgresql as the database for Active Record
+gem "pg", "~> 1.1"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
@@ -42,9 +42,6 @@ group :development, :test do
 
   # Audits gems for known security defects (use config/bundler-audit.yml to ignore issues)
   gem "bundler-audit", require: false
-
-  # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
-  gem "brakeman", require: false
 end
 
 group :development do
@@ -58,16 +55,12 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "view_component", "~> 4.2"
-gem "seed_dump", "~> 3.4"
-gem "devise", "~> 4.9"
-gem "heroicons", "~> 2.2"
-gem "pagy", "~> 43.2"
-
-gem "redis", "~> 5.4"
-
-gem "groupdate", "~> 6.7"
-
+gem "view_component", "~> 4.4"
 gem "rails-i18n", "~> 8.1"
-
+gem "seed_dump", "~> 3.4"
+gem "devise", "~> 5.0"
+gem "heroicons", "~> 2.2"
+gem "pagy", "~> 43.3"
+gem "redis", "~> 5.4"
+gem "groupdate", "~> 6.7"
 gem "aws-sdk-s3", "~> 1.213"
