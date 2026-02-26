@@ -1,6 +1,31 @@
 class Admin::OrdersController < ApplicationController
   before_action :set_order, only: [:show, :edit]
 
+  def index
+    query = Biz::Order.order(created_at: :desc)
+
+    @customers = Biz::Customer.order(:name).select(:id, :name)
+    @users = Sys::User.where(role: Sys::Role.find_by(:name => :staff)).order(:name).select(:id, :name)
+
+    # 1. 客户/员工 过滤
+	  query = query.where(customer_id: params[:customer_id]) if params[:customer_id].present?
+	  query = query.where(staff_id: params[:staff_id]) if params[:staff_id].present?
+	  
+	  # 2. 时间范围 过滤
+	  query = query.where("created_at >= ?", params[:start_date].to_date.beginning_of_day) if params[:start_date].present?
+	  query = query.where("created_at <= ?", params[:end_date].to_date.end_of_day) if params[:end_date].present?
+
+	  @pagy, @orders = pagy(:offset, query, limit: 5)
+
+    respond_to do |format|
+	    format.html # 继续渲染 ViewComponent
+	    format.xlsx {
+	      # 这里调用你的导出逻辑，比如使用 axlsx_rails
+	      response.headers['Content-Disposition'] = 'attachment; filename="订单查询	.xlsx"'
+	    }
+	  end
+  end
+
 	def show
 	end
 

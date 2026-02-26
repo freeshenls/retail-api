@@ -4,10 +4,4 @@ class Staff::OrderApprovedComponent < ViewComponent::Base
     @orders = orders
     @pagy = pagy
   end
-
-  private
-
-  def render_pagy?
-    @pagy.present? && @pagy.pages > 1
-  end
 end

@@ -100,30 +100,7 @@
       </table>
     </div>
 
-    <%# --- 这里是新增的分页器部分 --- %>
-    <% if @pagy.pages > 1 %>
-      <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-        
-        <%# 分页信息 %>
-        <div class="text-xs text-slate-500 font-medium">
-          <%== @pagy.info_tag %>
-        </div>
-        
-        <%# Pagy 导航器 (包含橙色横条样式) %>
-        <div class="flex items-center
-                    [&_nav]:inline-flex [&_nav]:rounded-lg [&_nav]:shadow-sm [&_nav]:overflow-hidden [&_nav]:border [&_nav]:border-slate-300
-                    [&_a]:px-4 [&_a]:py-2 [&_a]:text-sm [&_a]:font-bold [&_a]:text-slate-600 [&_a]:bg-white [&_a]:transition-colors [&_a]:no-underline
-                    [&_a:hover]:bg-[#0066b3] [&_a:hover]:text-white
-                    
-                    [&_.current]:px-4 [&_.current]:py-2 [&_.current]:text-sm [&_.current]:font-bold [&_.current]:bg-[#0066b3] [&_.current]:text-white [&_.current]:relative
-                    [&_.current]:after:content-[''] [&_.current]:after:absolute [&_.current]:after:bottom-0 [&_.current]:after:left-0 [&_.current]:after:w-full [&_.current]:after:h-[3.5px] [&_.current]:after:bg-orange-400
-                    
-                    [&_.disabled]:px-4 [&_.disabled]:py-2 [&_.disabled]:text-slate-300 [&_.disabled]:bg-slate-50 [&_.disabled]:cursor-not-allowed
-                    [&_.gap]:px-4 [&_.gap]:py-2 [&_.gap]:text-slate-400 [&_.gap]:bg-slate-50">
-          <%== @pagy.series_nav %>
-        </div>
-      </div>
-    <% end %>
+    <%= render Common::PagyComponent.new(pagy: @pagy) %>
 
     <% if @users.empty? %>
       <div class="px-6 py-16 text-center text-slate-400 italic text-sm">

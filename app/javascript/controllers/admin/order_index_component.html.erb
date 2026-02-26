@@ -1,0 +1,154 @@
+<%# app/components/admin/order_index_component.html.erb %>
+<div class="space-y-6 p-6 bg-slate-50 min-h-screen no-italic font-sans" data-controller="admin--order-index-component">
+  
+  <%# --- 1. 搜索与筛选卡片：紧凑型设计 --- %>
+  <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+    <h3 class="text-xs font-bold text-slate-700 mb-5 flex items-center gap-2 tracking-wider">
+      <span class="w-1 h-3.5 bg-[#0066b3] rounded-sm"></span>
+      订单综合查询
+    </h3>
+
+    <%= form_with url: admin_orders_path, method: :get, class: "flex flex-wrap items-end gap-4", data: { admin__order_index_component_target: "form" } do |f| %>
+      
+      <%# 万能搜索下拉 %>
+      <div class="w-80 group" data-controller="dropdown">
+        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1.5 ml-1">
+          查询主体 (客户/员工)
+        </label>
+        
+        <div class="relative">
+          <button type="button" 
+                  data-action="dropdown#toggle click@window->dropdown#hide" 
+                  class="w-full flex items-center justify-between py-2 px-3 bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-md font-bold hover:border-[#0066b3] focus:ring-2 focus:ring-[#0066b3]/10 transition-all cursor-pointer shadow-sm">
+            <span data-admin--order-index-component-target="searchDisplay">
+              <%= 
+                if params[:customer_id].present?
+                  "👤 客户: #{@customers.find_by(id: params[:customer_id])&.name}"
+                elsif params[:staff_id].present?
+                  "👔 员工: #{@users.find_by(id: params[:staff_id])&.name}"
+                else
+                  "请选择或点击搜索..."
+                end 
+              %>
+            </span>
+            <span class="text-slate-400 text-[10px]">▼</span>
+          </button>
+
+          <%# 存储 ID 的隐藏域 %>
+          <%= f.hidden_field :customer_id, value: params[:customer_id], data: { "admin--order-index-component-target": "customerInput" } %>
+          <%= f.hidden_field :staff_id, value: params[:staff_id], data: { "admin--order-index-component-target": "userInput" } %>
+
+          <div data-dropdown-target="menu" 
+               class="hidden absolute z-50 mt-1 w-full bg-white border border-slate-200 rounded-md shadow-xl py-1 animate-in fade-in zoom-in-95 duration-100 max-h-64 overflow-y-auto">
+            
+            <div class="px-3 py-1.5 bg-slate-50 text-[9px] font-bold text-slate-400 border-b border-slate-100 uppercase">客户列表</div>
+            <% @customers.each do |c| %>
+              <button type="button" 
+                      data-action="click->admin--order-index-component#quickSelect dropdown#toggle"
+                      data-admin--order-index-component-type-param="customer"
+                      data-admin--order-index-component-id-param="<%= c.id %>"
+                      data-admin--order-index-component-name-param="<%= c.name %>"
+                      class="w-full text-left px-3 py-2 text-xs font-bold text-slate-600 hover:bg-[#0066b3]/5 hover:text-[#0066b3] transition-colors cursor-pointer">
+                👤 <%= c.name %>
+              </button>
+            <% end %>
+
+            <div class="px-3 py-1.5 bg-slate-50 text-[9px] font-bold text-slate-400 border-y border-slate-100 uppercase">员工列表</div>
+            <% @users.each do |u| %>
+              <button type="button" 
+                      data-action="click->admin--order-index-component#quickSelect dropdown#toggle"
+                      data-admin--order-index-component-type-param="user"
+                      data-admin--order-index-component-id-param="<%= u.id %>"
+                      data-admin--order-index-component-name-param="<%= u.name %>"
+                      class="w-full text-left px-3 py-2 text-xs font-bold text-slate-600 hover:bg-[#0066b3]/5 hover:text-[#0066b3] transition-colors cursor-pointer">
+                👔 <%= u.name %>
+              </button>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <%# 时间选择 %>
+      <div class="flex items-end gap-2">
+        <div class="w-36">
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1.5 ml-1">开始日期</label>
+          <%= f.date_field :start_date, value: params[:start_date], onkeydown: "return false;", class: "w-full py-2 px-3 bg-slate-50 border border-slate-200 text-xs rounded-md font-bold text-slate-700 cursor-pointer shadow-sm" %>
+        </div>
+        <div class="w-36">
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-tight mb-1.5 ml-1">结束日期</label>
+          <%= f.date_field :end_date, value: params[:end_date], onkeydown: "return false;", class: "w-full py-2 px-3 bg-slate-50 border border-slate-200 text-xs rounded-md font-bold text-slate-700 cursor-pointer shadow-sm" %>
+        </div>
+      </div>
+
+      <%# 按钮组 %>
+      <div class="flex items-center gap-3 ml-2">
+        <%= f.submit "查询", class: "px-5 py-2 bg-[#0066b3] text-white text-xs font-bold rounded-md hover:bg-[#005596] active:scale-95 transition-all cursor-pointer shadow-sm tracking-widest" %>
+        <%= link_to "重置", admin_orders_path, class: "text-[10px] font-bold text-slate-400 hover:text-slate-600 px-1 uppercase" %>
+        
+        <div class="w-px h-4 bg-slate-200 mx-1"></div>
+        
+        <%= link_to admin_orders_path(format: :xlsx, params: request.query_parameters), class: "text-[10px] font-bold text-slate-400 hover:text-[#0066b3] uppercase tracking-wider" do %>
+          导出
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <%# --- 2. 列表展示区 --- %>
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="bg-slate-50/50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+       <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">订单交易明细</span>
+       <span class="text-[10px] font-bold text-slate-400">共计 <%= @orders.count %> 笔订单, 总金额 ¥<%= @orders.map{|item| item.amounnt}.sum %></span>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-200">
+        <thead class="bg-slate-50/50 text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em]">
+          <tr>
+            <th class="px-6 py-4 text-left">单号</th>
+            <th class="px-6 py-4 text-left">客户</th>
+            <th class="px-6 py-4 text-left">经办人</th>
+            <th class="px-6 py-4 text-center">当前状态</th>
+            <th class="px-6 py-4 text-right">交易金额</th>
+            <th class="px-6 py-4 text-right">下单时间</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200 bg-white text-slate-700 font-bold">
+          <% @orders.each do |order| %>
+            <tr class="hover:bg-slate-50/50 transition-colors group">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="w-1 h-4 bg-[#0066b3] rounded-full mr-3 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <span class="text-sm text-[#0066b3]">#<%= order.order_no %></span>
+                </div>
+              </td>
+              <td class="px-6 py-4 text-center">
+                <div class="flex flex-col">
+                  <span class="text-sm font-bold"><%= order.customer&.name %></span>
+                </div>
+              </td>
+              <td class="px-6 py-4 text-center">
+                <div class="flex flex-col">
+                  <span class="text-[10px] text-slate-400 font-medium"><%= order.staff&.name %></span>
+                </div>
+              </td>
+              <td class="px-6 py-4 text-center">
+                <span class="inline-flex px-2 py-0.5 rounded text-[10px] font-bold border <%= order.is_settled ? 'bg-green-50 text-green-700 border-green-100' : 'bg-orange-50 text-orange-600 border-orange-100' %>">
+                  <%= order.is_settled ? '已结算' : '待处理' %>
+                </span>
+              </td>
+              <td class="px-6 py-4 text-right text-sm font-mono text-slate-900">
+                ¥<%= number_with_precision(order.amount, precision: 2) %>
+              </td>
+              <td class="px-6 py-4 text-right text-[11px] text-slate-400 font-mono">
+                <%= order.created_at.strftime("%Y-%m-%d %H:%M") %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <%= render Common::PagyComponent.new(pagy: @pagy) %>
+  </div>
+</div>

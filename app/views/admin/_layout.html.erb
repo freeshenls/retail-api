@@ -15,6 +15,7 @@
 
     path_unsettled = unsettled_admin_orders_path
     path_settled   = settled_admin_orders_path
+    path_orders   = admin_orders_path
     is_order = curr_path.match?(/^\/admin\/(orders)/)
 
     path_category = admin_categories_path
@@ -60,7 +61,8 @@
         icon: "shopping-bag",
         items: [
           { label: "未结算订单", path: path_unsettled, active: curr_path == path_unsettled, icon: "clock" },
-          { label: "已结算订单", path: path_settled, active: curr_path == path_settled, icon: "check-badge" }
+          { label: "已结算订单", path: path_settled, active: curr_path == path_settled, icon: "check-badge" },
+          { label: "订单信息查询", path: path_orders, active: curr_path == path_orders, icon: "magnifying-glass-plus" }
         ]
       }
     end

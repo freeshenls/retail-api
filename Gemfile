@@ -64,3 +64,6 @@ gem "pagy", "~> 43.3"
 gem "redis", "~> 5.4"
 gem "groupdate", "~> 6.7"
 gem "aws-sdk-s3", "~> 1.213"
+
+
+gem "caxlsx_rails", "~> 0.6.4"

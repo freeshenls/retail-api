@@ -1,0 +1,23 @@
+# app/views/admin/orders/index.xlsx.axlsx
+wb = xlsx_package.workbook
+
+wb.add_worksheet(name: "订单列表") do |sheet|
+  # 定义一些基本样式
+  header = sheet.styles.add_style(bg_color: "0066b3", fg_color: "FF", b: true)
+  date_cell = sheet.styles.add_style(format_code: "yyyy-mm-dd hh:mm")
+
+  # 1. 写入标题行
+  sheet.add_row ["订单号", "客户名", "经办人", "金额", "状态", "创建时间"], style: header
+
+  # 2. 遍历数据写入行
+  @orders.each do |order|
+    sheet.add_row [
+      order.order_no,
+      order.customer&.name,
+      order.user&.name,
+      order.amount,
+      order.is_settled ? "已结" : "待结",
+      order.created_at
+    ], style: [nil, nil, nil, nil, nil, date_cell]
+  end
+end
