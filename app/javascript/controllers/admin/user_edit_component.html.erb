@@ -66,12 +66,19 @@
           </div>
         </div>
 
-        <%# 邮箱 (只读演示) %>
-        <div class="space-y-2">
-          <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">电子邮箱 (不可修改)</label>
-          <div class="flex items-center px-4 py-2.5 bg-slate-100/50 border border-slate-100 rounded-lg text-sm font-mono text-slate-400 italic shadow-inner">
-            <%= heroicon "envelope", variant: :mini, options: { class: "w-4 h-4 mr-2" } %>
-            <%= @user.email %>
+        <%# 核心账号信息 %>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
+          <div class="space-y-2">
+            <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">电子邮箱 (不可修改)</label>
+            <div class="flex items-center px-4 py-2.5 bg-slate-100/50 border border-slate-100 rounded-lg text-sm font-mono text-slate-400 italic shadow-inner">
+              <%= heroicon "envelope", variant: :mini, options: { class: "w-4 h-4 mr-2" } %>
+              <%= @user.email %>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">更新密码(可选)</label>
+            <%= f.password_field :password, placeholder: "设置至少 6 位密码", class: "block w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold text-slate-700 focus:bg-white focus:ring-4 focus:ring-[#0066b3]/5 focus:border-[#0066b3] transition-all outline-none" %>
           </div>
         </div>
       </div>
@@ -82,10 +89,10 @@
           * 修改将立即同步至系统所有关联模块
         </p>
         <div class="flex items-center gap-4">
-          <a href="/admin/users" data-turbo-frame="main_content" class="px-6 py-2.5 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors">
+          <a href="<%= request.referer%>" data-turbo-frame="main_content" class="px-6 py-2.5 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors">
             取消
           </a>
-          <%= f.submit "保存更改", class: "px-8 py-2.5 bg-[#0066b3] text-white text-xs font-black rounded-lg shadow-md hover:bg-[#005596] hover:shadow-lg active:transform active:scale-95 transition-all cursor-pointer tracking-widest" %>
+          <%= f.submit "保存更改", data: { turbo: false }, class: "px-8 py-2.5 bg-[#0066b3] text-white text-xs font-black rounded-lg shadow-md hover:bg-[#005596] hover:shadow-lg active:transform active:scale-95 transition-all cursor-pointer tracking-widest" %>
         </div>
       </div>
     <% end %>
