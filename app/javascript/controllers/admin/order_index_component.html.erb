@@ -1,5 +1,5 @@
 <%# app/components/admin/order_index_component.html.erb %>
-<div class="space-y-6 p-6 bg-slate-50 min-h-screen no-italic font-sans" data-controller="admin--order-index-component">
+<div class="space-y-6 bg-slate-50 min-h-screen no-italic font-sans" data-controller="admin--order-index-component">
   
   <%# --- 1. 搜索与筛选卡片：紧凑型设计 --- %>
   <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
@@ -98,7 +98,7 @@
   <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
     <div class="bg-slate-50/50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">订单交易明细</span>
-       <span class="text-[10px] font-bold text-slate-400">共计 <%= @orders.count %> 笔订单, 总金额 ¥<%= @orders.map{|item| item.amounnt}.sum %></span>
+       <span class="text-[10px] font-bold text-slate-400">共计 <%= @orders.count %> 笔订单, 总金额 ¥<%= @orders.map{|item| item.amount}.sum %></span>
     </div>
 
     <div class="overflow-x-auto">
@@ -107,10 +107,15 @@
           <tr>
             <th class="px-6 py-4 text-left">单号</th>
             <th class="px-6 py-4 text-left">客户</th>
-            <th class="px-6 py-4 text-left">经办人</th>
+            <th class="px-6 py-4 text-left">服务类型</th>
+            <th class="px-6 py-4 text-left">产品分类</th>
+            <th class="px-6 py-4 text-left">制作员</th>
             <th class="px-6 py-4 text-center">当前状态</th>
+            <th class="px-6 py-4 text-right">支付方式</th>
             <th class="px-6 py-4 text-right">交易金额</th>
+            <th class="px-6 py-4 text-right">运费</th>
             <th class="px-6 py-4 text-right">下单时间</th>
+            <th class="px-6 py-4 text-right">操作</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-200 bg-white text-slate-700 font-bold">
@@ -118,30 +123,69 @@
             <tr class="hover:bg-slate-50/50 transition-colors group">
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
-                  <div class="w-1 h-4 bg-[#0066b3] rounded-full mr-3 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  <span class="text-sm text-[#0066b3]">#<%= order.order_no %></span>
+                  <%= link_to order.order_no , admin_order_path(order), 
+                            data: { turbo: false },
+                            class: "text-[#0066b3] hover:text-[#005596] font-black text-sm transition-colors" %>
                 </div>
               </td>
-              <td class="px-6 py-4 text-center">
+              <td class="px-6 py-4">
                 <div class="flex flex-col">
                   <span class="text-sm font-bold"><%= order.customer&.name %></span>
                 </div>
               </td>
-              <td class="px-6 py-4 text-center">
+              <td class="px-6 py-4">
                 <div class="flex flex-col">
-                  <span class="text-[10px] text-slate-400 font-medium"><%= order.staff&.name %></span>
+                  <span class="text-sm font-mono text-slate-900"><%= order.service_type %></span>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex flex-col">
+                  <span class="text-sm font-mono text-slate-900"><%= order.category_name %></span>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex flex-col">
+                  <span class="text-sm font-mono text-slate-900"><%= order.staff&.name %></span>
                 </div>
               </td>
               <td class="px-6 py-4 text-center">
                 <span class="inline-flex px-2 py-0.5 rounded text-[10px] font-bold border <%= order.is_settled ? 'bg-green-50 text-green-700 border-green-100' : 'bg-orange-50 text-orange-600 border-orange-100' %>">
-                  <%= order.is_settled ? '已结算' : '待处理' %>
+                  <%= order.is_settled ? '已结算' : '未结算' %>
                 </span>
+              </td>
+              <td class="px-6 py-4 text-right text-sm font-mono text-slate-900">
+                <%= order.payment_method %>
               </td>
               <td class="px-6 py-4 text-right text-sm font-mono text-slate-900">
                 ¥<%= number_with_precision(order.amount, precision: 2) %>
               </td>
+              <td class="px-6 py-4 text-right text-sm font-mono text-slate-900">
+                <%= order.delivery_fee %>
+              </td>
               <td class="px-6 py-4 text-right text-[11px] text-slate-400 font-mono">
                 <%= order.created_at.strftime("%Y-%m-%d %H:%M") %>
+              </td>
+              <td class="px-6 py-4 text-right text-[11px] text-slate-400 font-mono">
+                <div class="relative group/popover">
+                  <span class="text-red-400 group-hover/popover:text-red-600 font-bold cursor-help transition-colors">
+                    删除
+                  </span>
+
+                  <div class="invisible opacity-0 group-hover/popover:visible group-hover/popover:opacity-100 
+                              absolute bottom-full right-0 mb-3 z-[60] transition-all duration-200 
+                              translate-y-1 group-hover/popover:translate-y-0">
+                    <div class="bg-white border border-slate-200 shadow-xl rounded-lg p-2 flex items-center gap-1.5 whitespace-nowrap">
+                      <%= button_to "/admin/orders/#{order.id}", 
+                                    method: :delete,
+                                    data: { turbo_frame: "main_content" },
+                                    class: "flex items-center gap-2 px-4 py-1.5 bg-red-500 text-white text-[11px] font-bold rounded shadow-sm hover:bg-red-600 cursor-pointer border-none transition-all" do %>
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        确认删除
+                      <% end %>
+                      <div class="absolute top-[calc(100%-5px)] right-4 w-2.5 h-2.5 bg-white border-r border-b border-slate-200 rotate-45"></div>
+                    </div>
+                  </div>
+                </div>
               </td>
             </tr>
           <% end %>

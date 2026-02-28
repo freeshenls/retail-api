@@ -1,5 +1,5 @@
 class Admin::OrdersController < ApplicationController
-  before_action :set_order, only: [:show, :edit]
+  before_action :set_order, only: [:show, :edit, :destroy]
 
   def index
     query = Biz::Order.order(created_at: :desc)
@@ -15,11 +15,12 @@ class Admin::OrdersController < ApplicationController
 	  query = query.where("created_at >= ?", params[:start_date].to_date.beginning_of_day) if params[:start_date].present?
 	  query = query.where("created_at <= ?", params[:end_date].to_date.end_of_day) if params[:end_date].present?
 
-	  @pagy, @orders = pagy(:offset, query, limit: 5)
-
     respond_to do |format|
-	    format.html # 继续渲染 ViewComponent
+	    format.html {
+	    	@pagy, @orders = pagy(:offset, query, limit: 5)
+	    }
 	    format.xlsx {
+	    	@orders = query
 	      # 这里调用你的导出逻辑，比如使用 axlsx_rails
 	      response.headers['Content-Disposition'] = 'attachment; filename="订单查询	.xlsx"'
 	    }
@@ -39,6 +40,12 @@ class Admin::OrdersController < ApplicationController
     # 成功后重定向回详情页
     redirect_to admin_order_path(@order), notice: "账务信息已同步"
 	end
+
+	def destroy
+    if @order.destroy
+      redirect_to admin_orders_path
+    end
+  end
 
 	def unsettled
 	  # 只需要 includes 稿件和稿件的设计师

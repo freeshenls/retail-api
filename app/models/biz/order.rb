@@ -25,7 +25,7 @@ class Biz::Order < ApplicationRecord
   
   before_save :set_total_amount
   before_save :calculate_amount
-  before_validation :sync_names_from_associations
+  after_save :sync_names_to_database
 
   def broadcast_designer_notifications
     target_user = draft&.user
@@ -71,18 +71,25 @@ class Biz::Order < ApplicationRecord
     self.amount = (quantity.to_f * unit_price.to_f) + delivery_fee.to_f
   end
 
-  def sync_names_from_associations
-    # 同步客户名称
-    self.customer_name = customer.name if customer_id_changed? && customer.present?
-    
-    # 同步稿件名称
-    self.draft_name = draft.name if draft_id_changed? && draft.present?
-    
-    # 同步规格名称 (如果 unit 存在)
-    if unit_id_changed? && unit.present?
-      self.category_name = unit.category&.name
-      self.service_type = unit.service_type
+  def sync_names_to_database
+    # 此时 draft 肯定已经存在且有了 ID
+    updates = {}
+
+    if draft.present? && draft_name != draft.name
+      updates[:draft_name] = draft.name
     end
+
+    if customer.present? && customer_name != customer.name
+      updates[:customer_name] = customer.name
+    end
+
+    if unit.present?
+      updates[:category_name] = unit.category&.name
+      updates[:service_type] = unit.service_type
+    end
+
+    # 使用 update_columns 直接更新数据库字段，不会再次触发 save 回调，避免死循环
+    self.update_columns(updates) if updates.any?
   end
 
   def set_total_amount
