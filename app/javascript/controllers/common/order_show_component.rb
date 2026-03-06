@@ -30,8 +30,12 @@ class Common::OrderShowComponent < ViewComponent::Base
   end
 
   def can_settle?(user:, order:)
-    if order.received? || order.checked?
+    if order.checked?
       user.admin? && !order.is_settled
     end
+  end
+
+  def can_check?(user:, order:)
+    user.finance? && user.customers.include?(order.customer) && order.received?
   end
 end
