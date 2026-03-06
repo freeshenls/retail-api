@@ -56,7 +56,7 @@ export default class extends Controller {
     // 我们找到触发点击的按钮所属的 dropdown 控制器并隐藏它
     const dropdownElement = e.target.closest('[data-controller="dropdown"]')
     if (dropdownElement) {
-      // 触发一个自定义事件，或者如果你的 dropdown 控制器支持，直接操作 DOM
+      // 触发一个自定价事件，或者如果你的 dropdown 控制器支持，直接操作 DOM
       // 最通用的做法是给 document 发一个点击信号，触发 dropdown 的 click@window->dropdown#hide
       document.dispatchEvent(new MouseEvent('click', {
         view: window,

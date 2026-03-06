@@ -60,7 +60,7 @@
             <label class="text-[11px] font-black text-slate-400 tracking-widest ml-1 uppercase">基准价格 (￥)</label>
             <div class="relative group">
               <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-[#0066b3] font-black italic">￥</div>
-              <%= f.number_field :price, step: 0.0001, class: "block w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-mono font-black text-slate-700 focus:bg-white focus:ring-4 focus:ring-[#0066b3]/5 focus:border-[#0066b3] transition-all outline-none shadow-sm" %>
+              <%= f.number_field :price, step: 0.01, class: "block w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-mono font-black text-slate-700 focus:bg-white focus:ring-4 focus:ring-[#0066b3]/5 focus:border-[#0066b3] transition-all outline-none shadow-sm" %>
             </div>
           </div>
 

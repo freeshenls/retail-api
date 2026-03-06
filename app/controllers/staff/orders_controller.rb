@@ -100,6 +100,7 @@ module Staff
         :quantity, 
         :unit_price, 
         :delivery_fee, 
+        :delivery_method, 
         :payment_method, 
         :remark,
         :status,

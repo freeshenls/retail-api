@@ -27,6 +27,7 @@
   <div class="hidden print:block border-b-4 border-slate-900 pb-6 mb-8">
     <div class="flex justify-between items-end">
       <div>
+        <%= image_tag asset_path('logo.svg'), class: 'w-auto max-h-[36px] block', alt: '共点科技' %>
         <h1 class="text-3xl font-black tracking-tighter uppercase text-slate-900">生产任务指令单</h1>
         <p class="text-xs font-bold text-slate-500 mt-1">PRODUCTION TASK ORDER</p>
       </div>
@@ -93,7 +94,7 @@
               </div>
             </div>
             <% if @order.draft&.file&.attached? %>
-              <%= link_to rails_blob_path(@order.draft.file, disposition: "attachment"), data: { turbo: false }, class: "no-print flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-[#0066b3] text-[10px] font-black rounded-lg hover:bg-[#0066b3] hover:text-white transition-all active:scale-95 shadow-sm" do %>
+              <%= link_to @order.draft.file.url(disposition: "attachment"), data: { turbo: false }, class: "no-print flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-[#0066b3] text-[10px] font-black rounded-lg hover:bg-[#0066b3] hover:text-white transition-all active:scale-95 shadow-sm" do %>
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                 下载稿件
               <% end %>
@@ -110,10 +111,9 @@
           <p class="text-[8px] text-slate-400 mt-1 font-bold">客户: <%= @order.customer_name %></p>
         </div>
         <div class="p-4 min-h-[80px]">
-          <p class="text-[9px] font-black text-slate-500 uppercase mb-8">制单负责人</p>
-          <p class="text-xs font-bold text-slate-900"><%= @order.staff&.name %></p>
+          <p class="text-[9px] font-black text-slate-500 uppercase mb-8">下单负责人</p>
         </div>
-        <div class="p-4"><p class="text-[9px] font-black text-slate-500 uppercase mb-8">生产审核</p></div>
+        <div class="p-4"><p class="text-[9px] font-black text-slate-500 uppercase mb-8">生产负责人</p></div>
         <div class="p-4"><p class="text-[9px] font-black text-slate-500 uppercase mb-8">成品签收</p></div>
       </div>
     </div>

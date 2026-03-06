@@ -1,54 +1,39 @@
-// app/javascript/controllers/designer/order_new_component_controller.js
+// app/javascript/controllers/common/order_edit_component_controller.js
 import { Controller } from "@hotwired/stimulus"
 import { DirectUpload } from "@rails/activestorage"
 
 export default class extends Controller {
   static targets = [
     "unitIdInput", "customerNameText", "customerIdInput",
-    "serviceTypeText", "serviceTypeInput", "categoryText", "categoryIdInput",
+    "serviceTypeText", "serviceTypeInput", "categoryText", "categoryIdInput", "serviceTypeOption", "categoryOption",
     "quantity", "unitPrice", "deliveryFee", "amountDisplay", 
-    "paymentMethodText", "paymentMethodInput",
+    "paymentMethodText", "paymentMethodInput", "deliveryMethodText", "deliveryMethodInput",
     "fileNameDisplay", "uploadHint", "uploadContainer", "fileHiddenInput", "progressBar", "submitBtn"
   ]
-  
+
   static values = { units: Array }
 
   connect() {
-    // 页面加载瞬间，执行初始化默认值和计算
-    this._setInitialDefaults()
+    // 1. 获取初始值
+    const initialService = this.serviceTypeInputTarget.value
+    const initialCategoryId = this.categoryIdInputTarget.value
+
+    // 2. 执行双向初始化过滤
+    // 用初始服务去禁用不支持的规格
+    if (initialService) this.filterOptions('service', initialService)
+    // 用初始规格去禁用不支持的服务
+    if (initialCategoryId) this.filterOptions('category', initialCategoryId)
+      
+    // 页面加载时，立即根据当前 Input 的值进行一次全量计算
     this.calculate()
   }
 
-  // --- 初始化：根据后端预设的 ID 同步 UI 文本 ---
-  _setInitialDefaults() {
-    // 1. 同步客户名称显示
-    const selectedCustomer = this.element.querySelector(`[data-action*="selectCustomer"][data-id="${this.customerIdInputTarget.value}"]`)
-    if (selectedCustomer) {
-      this.customerNameTextTarget.textContent = selectedCustomer.dataset.name
-    }
-
-    // 2. 同步分类名称显示
-    const selectedCategory = this.element.querySelector(`[data-action*="selectCategory"][data-id="${this.categoryIdInputTarget.value}"]`)
-    if (selectedCategory) {
-      this.categoryTextTarget.textContent = selectedCategory.dataset.name
-    }
-
-    // 3. 同步服务项目文本
-    if (this.serviceTypeInputTarget.value) {
-      this.serviceTypeTextTarget.textContent = this.serviceTypeInputTarget.value
-    }
-
-    // 4. 执行一次匹配，带出预设单价（如果有的话）
-    this.matchUnitAndPrice()
-  }
-
-  // --- 核心：手动改价实时触发“自定价”条目的 ID 选择 ---
+  // --- 核心联动：手动改价触发“自定价”锁定 ---
   handlePriceManualChange() {
-    // 1. UI 瞬间切换为“自定价”
     this.serviceTypeTextTarget.textContent = "自定价"
     this.serviceTypeInputTarget.value = "自定价"
     
-    // 2. 根据当前选中的“规格/幅面”，匹配对应的自定价 Unit ID
+    // 自动寻找当前分类下的“自定价”Unit ID 并同步
     const currentCategoryId = this.categoryIdInputTarget.value
     if (currentCategoryId) {
       const customUnit = this.unitsValue.find(u => 
@@ -58,12 +43,10 @@ export default class extends Controller {
         this.unitIdInputTarget.value = customUnit.unit_id
       }
     }
-    
-    // 3. 计算金额
     this.calculate()
   }
 
-  // --- 稿件上传回显 ---
+  // --- 稿件回显：显示新选择的文件名 ---
   handleFileChange(event) {
     const file = event.target.files[0]
     if (!file) return
@@ -87,43 +70,16 @@ export default class extends Controller {
 
     // 3. 立即触发上传
     this.lockSubmit(true, `🚀 正在上传...`)
-    
+    event.target.disabled = true
+
     upload.create((error, blob) => {
       if (error) {
         this.handleError(error)
       } else {
-        this.handleSuccess(blob, event.target)
+        this.handleSuccess(blob)
       }
+      event.target.disabled = false
     }) 
-  }
-
-  // --- 下拉选择逻辑 ---
-  selectCustomer(e) {
-    const { id, name } = e.currentTarget.dataset
-    this.customerIdInputTarget.value = id
-    this.customerNameTextTarget.textContent = name
-    this._closeDropdown(e)
-  }
-
-  selectService(e) {
-    const value = e.currentTarget.dataset.value
-    this.serviceTypeInputTarget.value = value
-    this.serviceTypeTextTarget.textContent = value
-    this.matchUnitAndPrice()
-    this._closeDropdown(e)
-  }
-
-  selectCategory(e) {
-    const { id, name } = e.currentTarget.dataset
-    this.categoryIdInputTarget.value = id
-    this.categoryTextTarget.textContent = name
-    // 即使是自定价模式，切分类也要切到对应的自定价ID
-    if (this.serviceTypeInputTarget.value === "自定价") {
-      this.handlePriceManualChange() 
-    } else {
-      this.matchUnitAndPrice()
-    }
-    this._closeDropdown(e)
   }
 
   // --- DirectUpload 代理回调方法 (必须按此名称定义) ---
@@ -141,8 +97,7 @@ export default class extends Controller {
 
   // --- 业务逻辑状态控制 ---
 
-  handleSuccess(blob, fileInput) {
-    fileInput.disabled = true
+  handleSuccess(blob) {
     this.fileNameDisplayTarget.textContent = "✅ 稿件上传成功"
     this.fileNameDisplayTarget.className = "text-xs font-black text-green-600 block"
     this.progressBarTarget.classList.replace("bg-[#0066b3]", "bg-green-500")
@@ -161,18 +116,99 @@ export default class extends Controller {
   }
 
   lockSubmit(disabled, text = null) {
-    this.submitBtnTargets.forEach(btn => btn.disabled = disabled)
+    this.submitBtnTargets.forEach(btn => {
+      if (btn.tagName == "A") {
+        btn.classList.toggle("pointer-events-none", disabled)
+      } else {
+        btn.disabled = disabled
+      }
+    })
     if (text) this.fileNameDisplayTarget.textContent = text
+  }
+
+  // --- 下拉选择逻辑 (Update 版) ---
+  selectCustomer(e) {
+    const { id, name } = e.currentTarget.dataset
+    this.customerIdInputTarget.value = id
+    this.customerNameTextTarget.textContent = name
+  }
+
+  filterOptions(type, filterValue) {
+    if (!filterValue) return
+
+    // 1. 确定我们要操作哪一组按钮
+    const options = type === 'service' ? this.categoryOptionTargets : this.serviceTypeOptionTargets
+    
+    // 2. 确定匹配逻辑
+    const filterKey = type === 'service' ? 'service_type' : 'category_id'
+    const otherKey = type === 'service' ? 'category_id' : 'service_type'
+    
+    // 3. 找出所有合法的“另一方”的值
+    const validUnits = this.unitsValue.filter(u => u[filterKey] == filterValue)
+    const allowedValues = validUnits.map(u => String(u[otherKey]))
+
+    // 4. 遍历并禁用
+    options.forEach(btn => {
+      const btnValue = String(btn.dataset.id || btn.dataset.value)
+      const isAllowed = allowedValues.includes(btnValue) || btnValue === "自定价"
+      
+      // 设置原生属性
+      btn.disabled = !isAllowed
+      
+      // 切换视觉样式
+      if (isAllowed) {
+        btn.classList.remove('opacity-30', 'cursor-not-allowed', 'bg-slate-50')
+        btn.classList.add('text-slate-600', 'hover:bg-blue-50', 'cursor-pointer')
+      } else {
+        btn.classList.add('opacity-30', 'cursor-not-allowed', 'bg-slate-50')
+        btn.classList.remove('text-slate-600', 'hover:bg-blue-50', 'cursor-pointer')
+      }
+    })
+  }
+
+  selectService(e) {
+    const value = e.currentTarget.dataset.value
+    this.serviceTypeInputTarget.value = value
+    this.serviceTypeTextTarget.textContent = value
+    this.filterOptions('service', value)
+    this.matchUnitAndPrice()
+  }
+
+  selectCategory(e) {
+    const { id, name } = e.currentTarget.dataset
+    this.categoryIdInputTarget.value = id
+    this.categoryTextTarget.textContent = name
+    
+    this.filterOptions('category', id)
+    // 如果当前是自定价模式，切分类也要切到对应分类的自定价 ID
+    if (this.serviceTypeInputTarget.value === "自定价") {
+      this.handlePriceManualChange() 
+    } else {
+      this.matchUnitAndPrice()
+    }
   }
 
   selectPayment(e) {
     const value = e.currentTarget.dataset.value
     this.paymentMethodInputTarget.value = value
     this.paymentMethodTextTarget.textContent = value
-    this._closeDropdown(e)
   }
 
-  // --- 核心匹配逻辑 ---
+  selectDelivery(e) {
+    const value = e.currentTarget.dataset.value
+    this.deliveryMethodInputTarget.value = value
+    this.deliveryMethodTextTarget.textContent = value
+
+    if (value !== "快递") {
+      this.deliveryFeeTarget.value = 0.0
+      this.deliveryFeeTarget.disabled = true
+    } else {
+      this.deliveryFeeTarget.disabled = false
+    }
+    this.calculate()
+  }
+
+  // --- 逻辑匹配：根据服务类型+分类 寻找 UnitID 和 价格 ---
   matchUnitAndPrice() {
     const serviceType = this.serviceTypeInputTarget.value
     const categoryId = this.categoryIdInputTarget.value
@@ -184,7 +220,7 @@ export default class extends Controller {
       
       if (unit) {
         this.unitIdInputTarget.value = unit.unit_id
-        // 只有非“自定价”才覆盖单价
+        // 只有非“自定价”模式下才覆盖单价框
         if (serviceType !== "自定价") {
           this.unitPriceTarget.value = unit.price
         }
@@ -193,10 +229,15 @@ export default class extends Controller {
     }
   }
 
+  // --- 核心计算 ---
   calculate() {
+    // 增加健壮性检查，防止 missing target 报错
+    if (!this.hasQuantityTarget || !this.hasUnitPriceTarget) return
+
     const q = parseFloat(this.quantityTarget.value || 0)
     const p = parseFloat(this.unitPriceTarget.value || 0)
-    const f = parseFloat(this.deliveryFeeTarget.value || 0)
+    const f = this.hasDeliveryFeeTarget ? parseFloat(this.deliveryFeeTarget.value || 0) : 0
+    
     const total = (q * p) + f
     
     if (this.hasAmountDisplayTarget) {
@@ -204,16 +245,6 @@ export default class extends Controller {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
       })
-    }
-  }
-
-  // --- 自动关闭下拉 ---
-  _closeDropdown(event) {
-    const container = event.currentTarget.closest('[data-controller="dropdown"]')
-    if (container) {
-      container.setAttribute("data-dropdown-open-value", "false")
-      const menu = container.querySelector('[data-dropdown-target="menu"]')
-      if (menu) menu.classList.add('hidden')
     }
   }
 }

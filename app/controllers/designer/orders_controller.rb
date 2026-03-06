@@ -3,7 +3,29 @@ class Designer::OrdersController < ApplicationController
   before_action :set_order, only: [:edit, :update, :show]
 
   def new
-    # 此处由 OrderNewComponent 接管渲染
+    @user = current_user
+    @units = Biz::Unit.all.includes(:category)
+
+    # 1. 找到默认值
+    default_customer = @user.customers.first
+    default_category = Biz::Category.order(:position).first
+    # 寻找第一个分类对应的第一个服务项目（规格）
+    default_unit = @units.find { |u| u.category_id == default_category&.id }
+
+    # 2. 预设订单数据
+    @order = Biz::Order.new(
+      order_no: Biz::Sequence.generate_next_no,
+      status: :pending,
+      customer_id: default_customer&.id,
+      customer_name: default_customer&.name,
+      unit_id: default_unit&.id,
+      unit_price: default_unit&.price,
+      category_name: default_unit&.category.name,
+      service_type: default_unit&.service_type,
+      payment_method: "微信",
+      delivery_method: "快递"
+    )
+    @order.build_draft(user: @user)
   end
 
   def create
@@ -77,6 +99,7 @@ class Designer::OrdersController < ApplicationController
       :quantity, 
       :unit_price, 
       :delivery_fee, 
+      :delivery_method, 
       :payment_method, 
       :remark,
       :status,

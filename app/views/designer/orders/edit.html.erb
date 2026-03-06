@@ -3,8 +3,26 @@
   <div data-controller="layout--tab-init" 
        data-layout--tab-init-label-value="订单<%= @order.order_no%>" 
        data-layout--tab-init-path-value="<%= request.path %>">
+       
   <%# 这里的代码会注入到 layout 的 yield 位置，也就是 main_content 内部 %>
-  <%= render Designer::OrderEditComponent.new(order: @order) %>
+  <%= render Common::OrderEditComponent.new(user: current_user, order: @order, url: designer_order_path(@order)) do |component| %>
+    <% component.with_action do %>
+      <div class="flex justify-end items-center gap-4 pt-4 border-t border-slate-100">
+        <button type="submit" name="biz_order[status]" value="pending" 
+                data-common--order-edit-component-target="submitBtn"
+                class="px-8 py-3 bg-white border border-slate-200 text-slate-600 text-xs font-black rounded-xl hover:bg-slate-50 cursor-pointer shadow-sm active:scale-95 transition-all disabled:opacity-50">
+          更新并暂存
+        </button>
+        
+        <button type="submit" name="biz_order[status]" value="submitted" 
+                data-common--order-edit-component-target="submitBtn"
+                class="flex items-center gap-2 px-12 py-3 bg-[#0066b3] text-white text-xs font-black rounded-xl hover:bg-[#005596] shadow-md cursor-pointer active:scale-95 transition-all disabled:opacity-50">
+          确认并提交
+          <%= heroicon "paper-airplane", variant: :solid, options: { class: "h-3.5 w-3.5" } %>
+        </button>
+      </div>
+    <% end %>
+  <% end %>
 
   </div>
 <% end %>

@@ -10,7 +10,7 @@ class Biz::Draft < ApplicationRecord
   before_save :sync_file_info, if: -> { attachment_changes.key?("file") }
 
   # 校验
-  validates :file, presence: true
+  validates :file, presence: true, on: :create
 
   def sync_file_info
     # 关键点：从 attachment_changes 中直接抓取即将保存的 blob 对象
