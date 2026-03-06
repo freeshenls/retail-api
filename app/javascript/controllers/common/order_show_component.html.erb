@@ -438,7 +438,10 @@
           <% if @order.checked? %>
           	<%= amber_normal(@order, "已发货", false) %>
           	<%= amber_normal(@order, "确认收货", false) %>
-          	<%= amber_normal(@order, "财务已核实", true) %>
+          	<%= amber_normal(@order, "财务已核实", !@order.is_settled?) %>
+            <% if @order.is_settled? %>
+              <%= amber_normal(@order, "已结算", true) %>
+            <% end %>
           <% end %>
         </div>
       </div>
