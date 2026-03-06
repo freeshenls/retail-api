@@ -205,7 +205,7 @@
       
       <div class="space-y-1">
         <%= f.label :delivery_fee, "运费/额外", class: "text-[10px] font-black text-slate-400 ml-1" %>
-        <%= f.number_field :delivery_fee, step: 0.01, disabled: @order.delivery_method != "快递",
+        <%= f.number_field :delivery_fee, step: 0.1, disabled: @order.delivery_method != "快递",
             data: { 
               "common--order-edit-component-target" => "deliveryFee", 
               "action" => "input->common--order-edit-component#calculate" 

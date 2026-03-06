@@ -75,7 +75,11 @@ module Staff
     end
 
     def approve
-      @order.update(status: :approved)
+      if @order.delivery_method == "快递"
+        @order.update(status: :approved, tracking_number: params[:biz_order][:tracking_number])
+      else
+        @order.update(status: :approved)
+      end
       redirect_to approved_staff_orders_path, notice: "已发货"
     end
 

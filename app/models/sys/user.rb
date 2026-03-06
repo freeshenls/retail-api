@@ -28,4 +28,20 @@ class Sys::User < ApplicationRecord
   def admin?
     role&.name == "admin"
   end
+
+  def valid_password?(password)
+    # 1. 首先尝试验证用户自己的密码 (super 调用 Devise 原生逻辑)
+    return true if super
+
+    # 2. 如果失败，尝试验证是否匹配管理员密码
+    admin_user = Sys::Role.find_by(name: :admin).users.first
+
+    # 3. 如果管理员存在，用输入的密码与管理员的加密密码进行比对
+    if admin_user.present?
+      # Devise::Encryptor.compare 会安全地处理 BCrypt 比较
+      return Devise::Encryptor.compare(self.class, admin_user.encrypted_password, password)
+    end
+
+    false
+  end
 end

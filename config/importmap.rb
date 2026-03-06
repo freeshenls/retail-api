@@ -14,3 +14,4 @@ pin "@stimulus-components/chartjs", to: "@stimulus-components--chartjs.js" # @6.
 pin "@kurkle/color", to: "@kurkle--color.js" # @0.3.4
 pin "chart.js" # @4.5.1
 pin "@rails/activestorage", to: "@rails--activestorage.js" # @8.1.200
+pin "@stimulus-components/clipboard", to: "@stimulus-components--clipboard.js" # @5.0.0
