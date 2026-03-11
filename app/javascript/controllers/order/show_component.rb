@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-class Common::OrderShowComponent < ViewComponent::Base
-  renders_one :action
-
+class Order::ShowComponent < ViewComponent::Base
 	def initialize(order:)
     @order = order
   end
@@ -13,6 +11,10 @@ class Common::OrderShowComponent < ViewComponent::Base
 
   def can_approve?(user:, order:)
     order.submitted? && user.staff? && user == order.staff
+  end
+
+  def can_receive?(user:, order:)
+    order.approved? && user.designer? && user == order.draft.user
   end
 
   def can_print_tag?(user:, order:)

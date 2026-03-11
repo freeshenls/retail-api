@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-class Common::OrderEditComponent < ViewComponent::Base
-  renders_one :action
+class Order::EditComponent < ViewComponent::Base
+	renders_one :action
 
 	def initialize(user:, order:, url:)
     @url = url

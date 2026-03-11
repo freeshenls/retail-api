@@ -1,8 +1,7 @@
 # app/components/designer/order_completed_component.rb
 class Designer::OrderCompletedComponent < ViewComponent::Base
 
-  def initialize(orders:, pagy:)
+  def initialize(orders:)
     @orders = orders
-    @pagy = pagy
   end
 end

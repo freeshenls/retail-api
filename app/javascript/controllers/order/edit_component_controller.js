@@ -1,4 +1,4 @@
-// app/javascript/controllers/common/order_edit_component_controller.js
+// app/javascript/controllers/order/edit_component_controller.js
 import { Controller } from "@hotwired/stimulus"
 import { DirectUpload } from "@rails/activestorage"
 

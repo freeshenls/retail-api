@@ -3,10 +3,7 @@ class Admin::OrdersController < ApplicationController
 
   def index
     query = Biz::Order.order(created_at: :desc)
-
-    @customers = Biz::Customer.order(:name).select(:id, :name)
-    @users = Sys::User.where(role: Sys::Role.find_by(:name => :staff)).order(:name).select(:id, :name)
-
+    
     # 1. 客户/员工 过滤
 	  query = query.where(customer_id: params[:customer_id]) if params[:customer_id].present?
 	  query = query.where(staff_id: params[:staff_id]) if params[:staff_id].present?

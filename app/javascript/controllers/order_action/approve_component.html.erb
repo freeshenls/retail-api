@@ -1,0 +1,41 @@
+<div class="flex" data-controller="dialog">
+	<button type="button" 
+          data-action="click->dialog#open"
+          class="w-full flex items-center justify-center gap-2 px-12 py-3 bg-[#0066b3] text-white text-xs font-black rounded-xl hover:bg-[#005596] shadow-md cursor-pointer active:scale-95 transition-all border-none">
+    核实并发货
+  </button>
+  <%# --- 发货弹窗 --- %>
+  <dialog data-dialog-target="dialog" 
+          class="backdrop:bg-slate-900/50 rounded-2xl border-none shadow-2xl p-0 w-full max-w-md fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    <div class="p-8 bg-white">
+      <div class="flex items-center gap-3 mb-6 text-[#0066b3]">
+        <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
+          <%= heroicon "truck", variant: :outline, options: { class: "h-5 w-5" } %>
+        </div>
+        <h3 class="text-lg font-black text-slate-800 tracking-tight">物流信息</h3>
+      </div>
+      
+      <%= form_with model: @order, url: approve_staff_order_path(@order), method: :patch, data: { turbo: false } do |f| %>
+        <div class="space-y-5">
+          <div>
+            <label class="text-left text-[10px] font-black text-slate-400 tracking-widest mb-2 block">上传运单号</label>
+            <%= f.text_field :tracking_number, 
+                class: "w-full rounded-xl border-slate-400 text-sm focus:ring-[#0066b3] focus:border-[#0066b3] p-4 shadow-sm transition-all",
+                placeholder: "SF...",
+                required: true %>
+          </div>
+          
+          <div class="flex gap-3">
+            <%# 这里统一风格：蓝色背景 + 阴影 + 缩放反馈 %>
+            <%= f.submit "确认发货", class: "flex-1 py-3 bg-[#0066b3] text-white text-xs font-black rounded-xl cursor-pointer hover:bg-[#005596] active:scale-95 transition-all shadow-md border-none" %>
+            <button type="button" 
+                    data-action="click->dialog#close" 
+                    class="flex-1 py-3 bg-white border border-slate-200 text-slate-500 text-xs font-bold rounded-xl cursor-pointer hover:bg-slate-50 active:scale-95 transition-all">
+              取消返回
+            </button>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </dialog>
+</div>

@@ -14,7 +14,6 @@ class Designer::OrdersController < ApplicationController
 
     # 2. 预设订单数据
     @order = Biz::Order.new(
-      order_no: Biz::Sequence.generate_next_no,
       status: :pending,
       customer_id: default_customer&.id,
       customer_name: default_customer&.name,
@@ -22,15 +21,17 @@ class Designer::OrdersController < ApplicationController
       unit_price: default_unit&.price,
       category_name: default_unit&.category.name,
       service_type: default_unit&.service_type,
-      payment_method: "微信",
-      delivery_method: "快递"
+      created_at: Time.now,
+      payment_method: "记账",
+      delivery_method: "送货"
     )
     @order.build_draft(user: @user)
   end
 
   def create
     @order = Biz::Order.new(order_params)
-  
+    @order.order_no = Biz::Sequence.generate_next_no
+    
     if @order.save
       respond_to do |format|
         # 方案 A：由 JS 处理跳转（保持你之前要求的“由 JS 跳”）
@@ -52,7 +53,11 @@ class Designer::OrdersController < ApplicationController
                       .includes(draft: :user)
                       .where(status: [:pending, :rejected], is_settled: false)
                       .order(created_at: :desc)
-    
+
+    query = query.where(order_no: params[:order_no]) if params[:order_no].present?
+    query = query.where("biz_order.created_at >= ?", params[:start_date].to_date.beginning_of_day) if params[:start_date].present?
+    query = query.where("biz_order.created_at <= ?", params[:end_date].to_date.end_of_day) if params[:end_date].present?
+
     @pagy, @orders = pagy(:offset, query, limit: 5)
   end
 
@@ -62,7 +67,11 @@ class Designer::OrdersController < ApplicationController
                       .includes(draft: :user)
                       .where.not(status: [:pending, :rejected])
                       .order(updated_at: :desc)
-    
+
+    query = query.where(order_no: params[:order_no]) if params[:order_no].present?
+    query = query.where("biz_order.created_at >= ?", params[:start_date].to_date.beginning_of_day) if params[:start_date].present?
+    query = query.where("biz_order.created_at <= ?", params[:end_date].to_date.end_of_day) if params[:end_date].present?
+
     @pagy, @orders = pagy(:offset, query, limit: 5)
   end
 

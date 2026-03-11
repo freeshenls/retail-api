@@ -1,6 +1,6 @@
-<%# app/components/common/order_edit_component.html.erb %>
-<div data-controller="common--order-edit-component" 
-     data-common--order-edit-component-units-value="<%= Biz::Unit.all.map { |u| { service_type: u.service_type, category_id: u.category_id, price: u.price.to_f, unit_id: u.id } }.to_json %>"
+<%# app/components/order/edit_component.html.erb %>
+<div data-controller="order--edit-component" 
+     data-order--edit-component-units-value="<%= Biz::Unit.all.map { |u| { service_type: u.service_type, category_id: u.category_id, price: u.price.to_f, unit_id: u.id } }.to_json %>"
      class="w-full max-w-4xl mx-auto space-y-4 pb-12 text-slate-700">
 
   <%# 顶部：标题与实时金额预览 %>
@@ -11,7 +11,7 @@
       </div>
       <div>
         <h2 class="text-lg font-black text-slate-900 tracking-tight"><%= @title%></h2>
-        <p class="text-[10px] text-slate-400 font-mono tracking-tighter">单号: <%= @order.order_no %></p>
+        <p class="text-[10px] text-slate-400 font-mono tracking-tighter">下单时间: <%= @order.created_at.strftime("%Y-%m-%d %H:%M") %></p>
       </div>
     </div>
     
@@ -20,7 +20,7 @@
       <div class="text-[9px] font-bold text-blue-100 tracking-widest text-right opacity-80"><%= @amount_title%></div>
       <div class="text-xl font-mono font-black text-white leading-none">
         <span class="text-xs mr-0.5 italic">¥</span>
-        <span data-common--order-edit-component-target="amountDisplay"><%= @amount %></span>
+        <span data-order--edit-component-target="amountDisplay"><%= @amount %></span>
       </div>
     </div>
   </div>
@@ -48,11 +48,11 @@
 
   <%= form_with model: @order, url: @url, method: @method, data: { turbo: false }, class: "space-y-4" do |f| %>
     <%= f.hidden_field :order_no %>
-    <%= f.hidden_field :unit_id, data: { "common--order-edit-component-target" => "unitIdInput" } %>
+    <%= f.hidden_field :unit_id, data: { "order--edit-component-target" => "unitIdInput" } %>
 
     <%# 第一区：稿件区 %>
     <div class="bg-white border-2 border-dashed border-slate-200 rounded-2xl p-6 transition-all hover:border-[#0066b3]/30 group cursor-pointer relative"
-         data-common--order-edit-component-target="uploadContainer">
+         data-order--edit-component-target="uploadContainer">
       <%= f.fields_for :draft do |df| %>
         <%= df.hidden_field :user_id %>
         <label for="order_draft_file" class="flex flex-col items-center justify-center space-y-2 cursor-pointer w-full h-full">
@@ -60,17 +60,17 @@
             <%= heroicon "document-arrow-up", variant: :outline, options: { class: "h-5 w-5" } %>
           </div>
           <div class="text-center">
-            <span class="text-xs font-black <%= @display_cls %> block transition-all" data-common--order-edit-component-target="fileNameDisplay">
+            <span class="text-xs font-black <%= @display_cls %> block transition-all" data-order--edit-component-target="fileNameDisplay">
               <%= @display %>
             </span>
             <%# 核心：必须开启 direct_upload: true %>
-            <%= df.file_field :file, direct_upload: true, required: @need_file, id: "order_draft_file", class: "sr-only", data: { action: "change->common--order-edit-component#handleFileChange" } %>
-            <p class="text-[9px] text-slate-400 mt-1 tracking-tighter" data-common--order-edit-component-target="uploadHint"><%= @upload_hint%></p>
+            <%= df.file_field :file, direct_upload: true, required: @need_file, id: "order_draft_file", class: "sr-only", data: { action: "change->order--edit-component#handleFileChange" } %>
+            <p class="text-[9px] text-slate-400 mt-1 tracking-tighter" data-order--edit-component-target="uploadHint"><%= @upload_hint%></p>
           </div>
         </label>
       <% end %>
       <%# 底部状态条：初始宽度 0 %>
-      <div class="absolute bottom-0 left-0 h-1 bg-[#0066b3] w-0 transition-all duration-300" data-common--order-edit-component-target="progressBar"></div>
+      <div class="absolute bottom-0 left-0 h-1 bg-[#0066b3] w-0 transition-all duration-300" data-order--edit-component-target="progressBar"></div>
     </div>
 
     <%# 第二区：选择区 (保持原样) %>
@@ -81,15 +81,15 @@
         <div class="relative">
           <button type="button" data-action="dropdown#toggle click@window->dropdown#hide" 
                   class="<%= @customer_cls %> w-full flex items-center justify-between px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold hover:border-[#0066b3] transition-all shadow-sm cursor-pointer">
-            <span data-common--order-edit-component-target="customerNameText" class="truncate">
+            <span data-order--edit-component-target="customerNameText" class="truncate">
               <%= @order.customer_name %>
             </span>
             <%= heroicon @customer_icon, variant: :mini, options: { class: "h-4 w-4 text-slate-300" } %>
           </button>
-          <%= f.hidden_field :customer_id, data: { "common--order-edit-component-target" => "customerIdInput" } %>
+          <%= f.hidden_field :customer_id, data: { "order--edit-component-target" => "customerIdInput" } %>
           <div data-dropdown-target="menu" class="hidden absolute z-50 mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-2xl py-1 max-h-48 overflow-y-auto">
             <% @customers.each do |c| %>
-              <button type="button" data-action="click->common--order-edit-component#selectCustomer click->dropdown#toggle" data-id="<%= c.id %>" data-name="<%= c.name %>" 
+              <button type="button" data-action="click->order--edit-component#selectCustomer click->dropdown#toggle" data-id="<%= c.id %>" data-name="<%= c.name %>" 
                       class="w-full text-left px-4 py-2 text-xs font-bold text-slate-600 hover:bg-blue-50 cursor-pointer">
                 <%= c.name %>
               </button>
@@ -104,17 +104,17 @@
         <div class="relative">
           <button type="button" data-action="dropdown#toggle click@window->dropdown#hide" 
                   class="w-full flex items-center justify-between px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold hover:border-[#0066b3] transition-all shadow-sm cursor-pointer">
-            <span data-common--order-edit-component-target="serviceTypeText">
+            <span data-order--edit-component-target="serviceTypeText">
               <%= @order.service_type %>
             </span>
             <%= heroicon "chevron-down", variant: :mini, options: { class: "h-4 w-4 text-slate-300" } %>
           </button>
-          <input type="hidden" value="<%= @order.service_type %>" data-common--order-edit-component-target="serviceTypeInput">
+          <input type="hidden" value="<%= @order.service_type %>" data-order--edit-component-target="serviceTypeInput">
           <div data-dropdown-target="menu" class="hidden absolute z-50 mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-2xl py-1">
             <% Biz::Unit.pluck(:service_type).uniq.each do |type| %>
               <button type="button"
-                      data-common--order-edit-component-target="serviceTypeOption"
-                      data-action="click->common--order-edit-component#selectService click->dropdown#toggle" data-value="<%= type %>" 
+                      data-order--edit-component-target="serviceTypeOption"
+                      data-action="click->order--edit-component#selectService click->dropdown#toggle" data-value="<%= type %>" 
                       class="w-full text-left px-4 py-2 text-xs font-bold text-slate-600 hover:bg-blue-50 cursor-pointer">
                 <%= type %>
               </button>
@@ -129,17 +129,17 @@
         <div class="relative">
           <button type="button" data-action="dropdown#toggle click@window->dropdown#hide" 
                   class="w-full flex items-center justify-between px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold hover:border-[#0066b3] transition-all shadow-sm cursor-pointer">
-            <span data-common--order-edit-component-target="categoryText">
+            <span data-order--edit-component-target="categoryText">
               <%= @order.category_name %>
             </span>
             <%= heroicon "chevron-down", variant: :mini, options: { class: "h-4 w-4 text-slate-300" } %>
           </button>
-          <input type="hidden" value="<%= @order.unit&.category_id %>" data-common--order-edit-component-target="categoryIdInput">
+          <input type="hidden" value="<%= @order.unit&.category_id %>" data-order--edit-component-target="categoryIdInput">
           <div data-dropdown-target="menu" class="hidden absolute z-50 mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-2xl py-1 max-h-48 overflow-y-auto">
             <% @categories.each do |cat| %>
               <button type="button" 
-                      data-common--order-edit-component-target="categoryOption"
-                      data-action="click->common--order-edit-component#selectCategory click->dropdown#toggle" data-id="<%= cat.id %>" data-name="<%= cat.name %>" 
+                      data-order--edit-component-target="categoryOption"
+                      data-action="click->order--edit-component#selectCategory click->dropdown#toggle" data-id="<%= cat.id %>" data-name="<%= cat.name %>" 
                       class="w-full text-left px-4 py-2 text-xs font-bold text-slate-600 hover:bg-blue-50 cursor-pointer">
                 <%= cat.name %>
               </button>
@@ -155,8 +155,8 @@
         <%= f.label :quantity, "数量", class: "text-[10px] font-black text-slate-400 ml-1" %>
         <%= f.number_field :quantity, step: 0.01, 
             data: { 
-              "common--order-edit-component-target" => "quantity", 
-              action: "input->common--order-edit-component#calculate" 
+              "order--edit-component-target" => "quantity", 
+              action: "input->order--edit-component#calculate" 
             }, 
             class: "block w-full px-4 py-2.5 bg-slate-50 border-none rounded-xl font-mono font-bold" %>
       </div>
@@ -165,8 +165,8 @@
         <%= f.label :unit_price, "单价", class: "text-[10px] font-black text-slate-400 ml-1" %>
         <%= f.number_field :unit_price, step: 0.01, 
             data: { 
-              "common--order-edit-component-target" => "unitPrice", 
-              action: "input->common--order-edit-component#handlePriceManualChange" 
+              "order--edit-component-target" => "unitPrice", 
+              action: "input->order--edit-component#handlePriceManualChange" 
             }, 
             class: "block w-full px-4 py-2.5 bg-slate-50 border-none rounded-xl font-mono font-bold text-orange-600" %>
       </div>
@@ -174,13 +174,13 @@
       <div class="space-y-1 relative" data-controller="dropdown">
         <label class="text-[10px] font-black text-slate-400 ml-1">付款方式</label>
         <button type="button" data-action="dropdown#toggle click@window->dropdown#hide" class="w-full flex items-center justify-between px-4 py-2.5 bg-slate-50 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 cursor-pointer">
-          <span data-common--order-edit-component-target="paymentMethodText"><%= @order.payment_method %></span>
+          <span data-order--edit-component-target="paymentMethodText"><%= @order.payment_method %></span>
           <%= heroicon "credit-card", variant: :mini, options: { class: "h-4 w-4 text-slate-400" } %>
         </button>
-        <%= f.hidden_field :payment_method, data: { "common--order-edit-component-target" => "paymentMethodInput" } %>
+        <%= f.hidden_field :payment_method, data: { "order--edit-component-target" => "paymentMethodInput" } %>
         <div data-dropdown-target="menu" class="hidden absolute z-50 mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-2xl py-1">
           <% ["微信", "支付宝", "现金", "对公", "记账"].each do |m| %>
-            <button type="button" data-action="click->common--order-edit-component#selectPayment click->dropdown#toggle" data-value="<%= m %>" class="w-full text-left px-4 py-2 text-xs font-bold text-slate-600 hover:bg-blue-50 cursor-pointer">
+            <button type="button" data-action="click->order--edit-component#selectPayment click->dropdown#toggle" data-value="<%= m %>" class="w-full text-left px-4 py-2 text-xs font-bold text-slate-600 hover:bg-blue-50 cursor-pointer">
               <%= m %>
             </button>
           <% end %>
@@ -190,13 +190,13 @@
       <div class="space-y-1 relative" data-controller="dropdown">
         <label class="text-[10px] font-black text-slate-400 ml-1">运输方式</label>
         <button type="button" data-action="dropdown#toggle click@window->dropdown#hide" class="w-full flex items-center justify-between px-4 py-2.5 bg-slate-50 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 cursor-pointer">
-          <span data-common--order-edit-component-target="deliveryMethodText"><%= @order.delivery_method %></span>
+          <span data-order--edit-component-target="deliveryMethodText"><%= @order.delivery_method %></span>
           <%= heroicon "truck", variant: :mini, options: { class: "h-4 w-4 text-slate-400" } %>
         </button>
-        <%= f.hidden_field :delivery_method, data: { "common--order-edit-component-target" => "deliveryMethodInput" } %>
+        <%= f.hidden_field :delivery_method, data: { "order--edit-component-target" => "deliveryMethodInput" } %>
         <div data-dropdown-target="menu" class="hidden absolute z-50 mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-2xl py-1 transition transform">
           <% ["快递", "到付", "自取", "送货"].each do |m| %>
-            <button type="button" data-action="click->common--order-edit-component#selectDelivery click->dropdown#toggle" data-value="<%= m %>" class="w-full text-left px-4 py-2 text-xs font-bold text-slate-600 hover:bg-blue-50 cursor-pointer">
+            <button type="button" data-action="click->order--edit-component#selectDelivery click->dropdown#toggle" data-value="<%= m %>" class="w-full text-left px-4 py-2 text-xs font-bold text-slate-600 hover:bg-blue-50 cursor-pointer">
               <%= m %>
             </button>
           <% end %>
@@ -207,20 +207,19 @@
         <%= f.label :delivery_fee, "运费/额外", class: "text-[10px] font-black text-slate-400 ml-1" %>
         <%= f.number_field :delivery_fee, step: 0.1, disabled: @order.delivery_method != "快递",
             data: { 
-              "common--order-edit-component-target" => "deliveryFee", 
-              "action" => "input->common--order-edit-component#calculate" 
+              "order--edit-component-target" => "deliveryFee", 
+              "action" => "input->order--edit-component#calculate" 
             }, 
             class: "block w-full px-4 py-2.5 bg-slate-50 border-none rounded-xl font-mono text-sm" %>
       </div>
 
       <div class="space-y-1">
         <%= f.label :remark, "说明备注", class: "text-[10px] font-black text-slate-400 ml-1" %>
-        <%= f.text_field :remark, placeholder: "备注...", class: "block w-full px-4 py-2.5 bg-slate-50 border-none rounded-xl text-xs" %>
+        <%= f.text_field :remark, placeholder: "暂无", class: "block w-full px-4 py-2.5 bg-slate-50 border-none rounded-xl text-xs" %>
       </div>
     </div>
 
     <%# 底部操作栏 %>
-    <%= action%>
+    <%= action %>
   <% end %>
 </div>
-

@@ -9,6 +9,7 @@ class Biz::Order < ApplicationRecord
   accepts_nested_attributes_for :draft
   after_commit :broadcast_submitted_notifications, on: [:create, :update]
   after_update_commit :broadcast_designer_notifications
+  has_many :notifications, as: :target, dependent: :destroy
 
   scope :for_staff, ->(user) { where(staff_id: user.id ) }
   scope :for_designer, ->(user) { joins(:draft).where(biz_draft: { user_id: user.id }) }
