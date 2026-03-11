@@ -223,7 +223,7 @@
               sub_hint: "确认结算？") %>
         <% end %>
 
-      	<%# <% if can_print_tag?(user: helpers.current_user, order: @order) %> %>
+      	<% if can_print_tag?(user: helpers.current_user, order: @order) %>
           <button data-order="<%= @order.order_no %>" 
                   data-draft="<%= @order.draft_name %>" 
                   data-quantity="<%= @order.quantity %>" 
@@ -232,7 +232,7 @@
             <%= heroicon "printer", variant: :outline, options: { class: "h-4 w-4" } %>
             打印标签
           </button>
-        <%# <% end %> %>
+        <% end %>
         <% if can_print_task?(user: helpers.current_user, order: @order) %>
           <button onclick="window.print()" class="w-full flex items-center justify-center gap-2 px-8 py-3 bg-white border border-slate-200 text-slate-600 text-xs font-black rounded-xl hover:bg-slate-50 cursor-pointer shadow-sm active:scale-95 transition-all">
             <%= heroicon "printer", variant: :outline, options: { class: "h-4 w-4" } %>
