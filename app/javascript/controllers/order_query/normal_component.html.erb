@@ -9,11 +9,11 @@
     <%# 查询框 %>
     <div class="w-80 group">
       <label class="block text-[10px] font-bold text-slate-400 tracking-tight mb-1.5 ml-1">
-        查询订单号
+        查询订单号/稿件名
       </label>
       
       <div class="relative">
-        <%= f.text_field :order_no, placeholder: "请输入订单号", value: params[:order_no], class: "w-full flex items-center justify-between py-2 px-3 bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-md font-bold hover:border-[#0066b3] focus:ring-2 focus:ring-[#0066b3]/10 transition-all cursor-pointer shadow-sm" %>
+        <%= f.text_field :order_no_or_draft_name, placeholder: "请输入订单号/稿件名", value: params[:order_no_or_draft_name], class: "w-full flex items-center justify-between py-2 px-3 bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-md font-bold hover:border-[#0066b3] focus:ring-2 focus:ring-[#0066b3]/10 transition-all cursor-pointer shadow-sm" %>
       </div>
     </div>
 

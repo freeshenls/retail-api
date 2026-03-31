@@ -60,17 +60,17 @@
       <table class="min-w-full divide-y divide-slate-200">
         <thead class="bg-slate-50/50">
           <tr>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">邀请代码</th>
-            <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">赋予角色</th>
-            <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">当前状态</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">使用详情</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">邀请代码</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">赋予角色</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">当前状态</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">使用详情</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-200 bg-white text-slate-700">
           <% @invite_codes.each do |ic| %>
             <tr class="hover:bg-slate-50/50 transition-colors group">
               <%# 1. 邀请代码：左侧装饰条 %>
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
                   <div class="w-1 h-4 bg-[#0066b3] rounded-full mr-3 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <span class="px-2 py-1 bg-white text-[#0066b3] rounded border border-slate-200 font-mono font-bold shadow-sm text-sm">
@@ -80,7 +80,7 @@
               </td>
 
               <%# 2. 赋予角色 %>
-              <td class="px-6 py-4 whitespace-nowrap text-center">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap text-center">
                 <div class="inline-flex items-center text-sm font-semibold text-slate-700">
                   <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-[#0066b3] border border-blue-100">
                     <%= heroicon "shield-check", variant: :mini, options: { class: "w-3.5 h-3.5 mr-1" } %>
@@ -90,7 +90,7 @@
               </td>
 
               <%# 3. 状态 %>
-              <td class="px-6 py-4 whitespace-nowrap text-center">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap text-center">
                 <% if ic.used_at %>
                   <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200">已占用</span>
                 <% else %>
@@ -101,7 +101,7 @@
               </td>
 
               <%# 4. 使用详情 %>
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
                 <% if ic.user %>
                   <div class="flex items-center space-x-3">
                     <div class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-inner group-hover:border-blue-200">

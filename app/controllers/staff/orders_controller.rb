@@ -2,7 +2,7 @@
 module Staff
   class OrdersController < ApplicationController
     before_action :authenticate_user!
-    before_action :set_order, only: [:accept, :approve, :reject, :show, :edit, :update]
+    before_action :set_order, only: [:accept, :approve, :reject, :show, :edit, :update, :destroy]
 
     def ready
       query = Biz::Order.where(staff_id: nil)
@@ -38,6 +38,17 @@ module Staff
     def all
       query = Biz::Order.for_staff(current_user)
                   .order(updated_at: :desc)
+
+      list query
+    end
+
+    def list(query)
+      if params[:order_no_or_draft_name].present?
+        keyword = params[:order_no_or_draft_name]
+        query = query.where("order_no = ? OR draft_name LIKE ?", keyword, "%#{keyword}%")
+      end
+      query = query.where("biz_order.created_at >= ?", params[:start_date].to_date.beginning_of_day) if params[:start_date].present?
+      query = query.where("biz_order.created_at <= ?", params[:end_date].to_date.end_of_day) if params[:end_date].present?
 
       @pagy, @orders = pagy(:offset, query, limit: 5)
     end
@@ -87,6 +98,12 @@ module Staff
       @order.update(status: :rejected, reject_reason: params[:biz_order][:reject_reason])
       # 退回后跳转到待处理列表或已驳回列表
       redirect_to all_staff_orders_path, notice: "订单已成功退回"
+    end
+
+    def destroy
+      if @order.destroy
+        redirect_to submitted_staff_orders_path
+      end
     end
 
     private

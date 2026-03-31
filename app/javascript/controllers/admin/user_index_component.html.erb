@@ -21,16 +21,16 @@
       <table class="min-w-full divide-y divide-slate-200">
         <thead class="bg-slate-50/50">
           <tr>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">用户信息</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">角色权限</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">注册时间</th>
-            <th scope="col" class="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">操作</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">用户信息</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">角色权限</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">注册时间</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">操作</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-200 bg-white text-slate-700">
           <% @users.each do |user| %>
             <tr class="hover:bg-slate-50/50 transition-colors group">
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
                   <div class="w-1 h-4 bg-[#0066b3] rounded-full mr-3 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   
@@ -49,7 +49,7 @@
                 </div>
               </td>
 
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
                   <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold 
                                <%= user.admin? ? 'bg-orange-50 text-orange-600 border border-orange-100' : 'bg-blue-50 text-[#0066b3] border border-blue-100' %> uppercase">
@@ -58,11 +58,11 @@
                 </div>
               </td>
 
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 font-mono">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap text-sm text-slate-500 font-mono">
                 <%= user.created_at.strftime("%Y-%m-%d %H:%M") %>
               </td>
 
-              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <div class="flex items-center justify-end gap-x-4">
                   <%= link_to "编辑", edit_admin_user_path(user), 
                             data: { turbo: false },
@@ -82,7 +82,7 @@
                                         method: :delete,
                                         data: { turbo_frame: "main_content" },
                                         class: "flex items-center gap-2 px-4 py-1.5 bg-red-500 text-white text-[11px] font-bold rounded shadow-sm hover:bg-red-600 cursor-pointer border-none transition-all" do %>
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            <%= heroicon "trash", variant: :outline, options: { class: "w-3.5 h-3.5", stroke_width: 2 } %>
                             确认注销
                           <% end %>
                           <div class="absolute top-[calc(100%-5px)] right-4 w-2.5 h-2.5 bg-white border-r border-b border-slate-200 rotate-45"></div>

@@ -1,7 +1,7 @@
 # app/components/staff/order_approved_component.rb
 class Staff::OrderAllComponent < ViewComponent::Base
-  def initialize(orders:, pagy:)
+  
+  def initialize(orders:)
     @orders = orders
-    @pagy = pagy
   end
 end

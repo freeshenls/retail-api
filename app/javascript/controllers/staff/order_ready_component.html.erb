@@ -5,12 +5,13 @@
       <table class="min-w-full divide-y divide-slate-200">
         <thead class="bg-slate-50/50">
           <tr>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">订单编号</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">业务详情</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">客户</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">预估金额</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">当前状态</th>
-            <th scope="col" class="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">操作</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">订单编号</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">稿件详情</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">业务详情</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">客户</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">预估金额</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">当前状态</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">操作</th>
           </tr>
         </thead>
         
@@ -18,15 +19,35 @@
           <% @orders.each do |order| %>
             <tr class="hover:bg-slate-50/50 transition-colors group">
               <%# 1. 订单编号 %>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <div class="flex items-center">
                   <div class="w-1 h-4 bg-[#0066b3] rounded-full mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <span class="text-slate-900 font-mono font-bold tracking-tight"><%= order.order_no %></span>
                 </div>
               </td>
 
+              <%# 1.1. 稿件名 %>
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
+                <% if order.draft %>
+                  <div class="text-sm font-semibold text-slate-700"><%= order.draft.name %></div>
+                  <div class="mt-1 flex items-center gap-2">
+                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-orange-50 text-orange-600 border border-orange-100 uppercase">
+                      BY: <%= order.draft.user&.name %>
+                    </span>
+                    <% if order.draft.file.attached? %>
+                      <%= link_to order.draft.file.url(disposition: "attachment"), 
+                                  data: { turbo: false },
+                                  class: "flex items-center text-[10px] font-bold text-emerald-600 hover:text-emerald-700 transition-colors" do %>
+                        <%= heroicon "arrow-down-tray", variant: :mini, options: { class: "w-3.5 h-3.5", stroke_width: 2.5 } %>
+                        附件下载
+                      <% end %>
+                    <% end %>
+                  </div>
+                <% end %>
+              </td>
+
               <%# 2. 业务详情 %>
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
                 <div class="text-sm font-black text-slate-700"><%= order.category_name %></div>
                 <div class="mt-1 flex items-center gap-2">
                   <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200 uppercase"><%= order.service_type %></span>
@@ -35,24 +56,24 @@
               </td>
 
               <%# 3. 客户信息 %>
-              <td class="px-6 py-4 whitespace-nowrap text-xs font-bold text-slate-500 uppercase italic">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap text-xs font-bold text-slate-500 uppercase italic">
                 <%= order.customer_name %>
               </td>
 
               <%# 4. 金额 %>
-              <td class="px-6 py-4 whitespace-nowrap text-[13px] font-black text-[#0066b3] font-mono italic">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap text-[13px] font-black text-[#0066b3] font-mono italic">
                 ¥ <%= number_with_precision(order.amount, precision: 2) %>
               </td>
 
               <%# 5. 状态标签 %>
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
                 <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-100 uppercase">
                   等待接单
                 </span>
               </td>
 
               <%# 6. 操作链接：包含详情和气泡抢单 %>
-              <td class="px-6 py-4 whitespace-nowrap text-right">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap text-right">
                 <div class="flex justify-end items-center gap-3">
                   <%= link_to "详情", staff_order_path(order), 
                             data: { turbo: false },

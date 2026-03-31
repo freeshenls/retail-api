@@ -3,8 +3,8 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   printTag(event) {
-    const { order, draft, quantity } = event.target.dataset
-    const limit_draft = draft.length > 7 ? draft.substring(0, 7) + "..." : draft
+    const { order, customer, draft, quantity } = event.target.dataset
+    const limit_draft = draft.length > 30 ? draft.substring(0, 30) + "..." : draft
 
     const iframe = document.createElement('iframe');
     Object.assign(iframe.style, {
@@ -38,7 +38,7 @@ export default class extends Controller {
 
             .header {
               /* 小五号是 9pt，这里标题加粗并稍微加大一点点 */
-              font-size: 10pt; 
+              font-size: 8pt; 
               font-weight: bold;
               border-bottom: 0.5pt solid #000;
               padding-bottom: 0.5mm;
@@ -53,12 +53,12 @@ export default class extends Controller {
               display: flex; 
               flex-direction: column; 
               justify-content: flex-start; 
-              gap: 0.2mm; 
+              gap: 0.1mm; 
             }
 
             .item { 
               /* 核心：标准小五号字体 (9pt) */
-              font-size: 9pt; 
+              font-size: 8pt; 
               line-height: 1.2;
               margin-bottom: 0.2mm;
               display: flex; 
@@ -73,16 +73,17 @@ export default class extends Controller {
               display: inline-block;
             }
 
+            .label-small { 
+              font-size: 4pt;
+              font-weight: bold;
+              min-width: 13mm; /* 稍微加宽 label 确保对齐 */
+              display: inline-block;
+            }
+
             .value { 
               text-overflow: ellipsis; 
               overflow: hidden; 
               flex: 1;
-            }
-
-            /* 单号建议使用等宽字体确保数字清晰 */
-            .order-no { 
-              font-family: "Consolas", "Monaco", monospace; 
-              font-size: 8.5pt;
             }
 
             .footer-time {
@@ -98,11 +99,15 @@ export default class extends Controller {
           <div class="content">
             <div class="item">
               <span class="label">订单号:</span>
-              <span class="label order-no">${order}</span>
+              <span class="label">${order}</span>
+            </div>
+            <div class="item">
+              <span class="label">客户名:</span>
+              <span class="label">${customer}</span>
             </div>
             <div class="item">
               <span class="label">稿件名:</span>
-              <span class="label">${limit_draft}</span>
+              <span class="label-small">${limit_draft}</span>
             </div>
             <div class="item">
               <span class="label">数&nbsp;&nbsp;&nbsp;量:</span>

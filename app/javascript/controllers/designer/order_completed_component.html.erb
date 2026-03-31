@@ -8,18 +8,18 @@
   <table class="min-w-full divide-y divide-slate-200">
     <thead class="bg-slate-50/50">
       <tr>
-        <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">订单编号</th>
-        <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">稿件详情</th>
-        <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">状态</th>
-        <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">下单时间</th>
-        <th scope="col" class="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">操作</th>
+        <th scope="col" class="whitespace-nowrap px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">订单编号</th>
+        <th scope="col" class="whitespace-nowrap px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">稿件详情</th>
+        <th scope="col" class="whitespace-nowrap px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">状态</th>
+        <th scope="col" class="whitespace-nowrap px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">下单时间</th>
+        <th scope="col" class="whitespace-nowrap px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">操作</th>
       </tr>
     </thead>
     <tbody class="divide-y divide-slate-200 bg-white text-slate-700">
       <% @orders.each do |order| %>
         <tr class="hover:bg-slate-50/50 transition-colors group">
           <%# 1. 订单编号 %>
-          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+          <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap text-sm font-medium">
             <div class="flex items-center">
               <div class="w-1 h-4 bg-[#0066b3] rounded-full mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></div>
               <span class="text-slate-900 font-mono font-bold tracking-tight">
@@ -29,7 +29,7 @@
           </td>
 
           <%# 2. 稿件详情 %>
-          <td class="px-6 py-4 whitespace-nowrap">
+          <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
             <% if order.draft %>
               <div class="text-sm font-semibold text-slate-700"><%= order.draft.name %></div>
               <div class="mt-1 flex items-center gap-2">
@@ -49,7 +49,7 @@
           </td>
 
           <%# 3. 状态：单行展示 %>
-          <td class="px-6 py-4 whitespace-nowrap">
+          <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
             <div class="flex items-center gap-x-2">
               <%# 流程状态 %>
               <% if order.submitted? %>
@@ -70,7 +70,7 @@
           </td>
 
           <%# 4. 下单时间 %>
-          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+          <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap text-sm font-medium">
             <div class="flex items-center">
               <span class="font-bold text-[11px] text-slate-400 font-mono">
                 <%= order.created_at.strftime("%Y-%m-%d %H:%M") %>
@@ -79,7 +79,7 @@
           </td>
 
           <%# 5. 操作 %>
-          <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+          <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
             <%= link_to "查看", designer_order_path(order), 
                         data: { turbo: false },
                         class: "text-[#0066b3] hover:text-[#005596] font-bold transition-colors" %>

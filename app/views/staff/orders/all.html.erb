@@ -3,7 +3,18 @@
   <div data-controller="layout--tab-init" 
        data-layout--tab-init-label-value="所有订单" 
        data-layout--tab-init-path-value="<%= request.path %>">
-  <%# 这里的代码会注入到 layout 的 yield 位置，也就是 main_content 内部 %>
-    <%= render Staff::OrderAllComponent.new(orders: @orders, pagy: @pagy) %>
+
+    <%# 这里的代码会注入到 layout 的 yield 位置，也就是 main_content 内部 %>
+    <%= render Order::IndexComponent.new do |c| %>
+      <% c.with_query do %>
+        <%= render OrderQuery::NormalComponent.new(url: all_staff_orders_path) %>
+      <% end %>
+      <% c.with_table do %>
+        <%= render Staff::OrderAllComponent.new(orders: @orders) %>
+      <% end %>
+      <% c.with_pagy do %>
+        <%= render Common::PagyComponent.new(pagy: @pagy) %>
+      <% end %>
+    <% end %>
   </div>
 <% end %>

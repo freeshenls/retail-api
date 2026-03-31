@@ -16,7 +16,7 @@ class CreateBizOrder < ActiveRecord::Migration[8.1]
       t.string :payment_method
       t.text :remark
 
-      t.decimal :quantity, precision: 10, scale: 2, default: 0
+      t.integer :quantity, default: 0
       t.decimal :unit_price, precision: 10, scale: 2, default: 0
       t.decimal :amount, precision: 10, scale: 2, default: 0
       t.decimal :delivery_fee, precision: 10, scale: 2, default: 0

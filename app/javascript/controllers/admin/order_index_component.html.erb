@@ -8,67 +8,86 @@
   <table class="min-w-full divide-y divide-slate-200">
     <thead class="bg-slate-50/50 text-[10px] font-bold text-slate-400 tracking-[0.1em]">
       <tr>
-        <th class="px-6 py-4 text-left">单号</th>
-        <th class="px-6 py-4 text-left">客户</th>
-        <th class="px-6 py-4 text-left">服务类型</th>
-        <th class="px-6 py-4 text-left">产品分类</th>
-        <th class="px-6 py-4 text-left">制作员</th>
-        <th class="px-6 py-4 text-center">当前状态</th>
-        <th class="px-6 py-4 text-right">支付方式</th>
-        <th class="px-6 py-4 text-right">交易金额</th>
-        <th class="px-6 py-4 text-right">运费</th>
-        <th class="px-6 py-4 text-right">下单时间</th>
-        <th class="px-6 py-4 text-right">操作</th>
+        <th class="whitespace-nowrap px-6 py-4 text-left">单号</th>
+        <th class="whitespace-nowrap px-6 py-4 text-left">稿件详情</th>
+        <th class="whitespace-nowrap px-6 py-4 text-left">客户</th>
+        <th class="whitespace-nowrap px-6 py-4 text-left">服务类型</th>
+        <th class="whitespace-nowrap px-6 py-4 text-left">产品分类</th>
+        <th class="whitespace-nowrap px-6 py-4 text-left">制作员</th>
+        <th class="whitespace-nowrap px-6 py-4 text-center">当前状态</th>
+        <th class="whitespace-nowrap px-6 py-4 text-right">支付方式</th>
+        <th class="whitespace-nowrap px-6 py-4 text-right">交易金额</th>
+        <th class="whitespace-nowrap px-6 py-4 text-right">运费</th>
+        <th class="whitespace-nowrap px-6 py-4 text-right">下单时间</th>
+        <th class="whitespace-nowrap px-6 py-4 text-right">操作</th>
       </tr>
     </thead>
     <tbody class="divide-y divide-slate-200 bg-white text-slate-700 font-bold">
       <% @orders.each do |order| %>
         <tr class="hover:bg-slate-50/50 transition-colors group">
-          <td class="px-6 py-4 whitespace-nowrap">
+          <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
             <div class="flex items-center">
-              <%= link_to order.order_no , admin_order_path(order), 
+              <%= link_to order.order_no , admin_order_path(order, request.query_parameters), 
                         data: { turbo: false },
                         class: "text-[#0066b3] hover:text-[#005596] font-black text-sm transition-colors" %>
             </div>
           </td>
-          <td class="px-6 py-4">
+          <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
+            <% if order.draft %>
+              <div class="text-sm font-semibold text-slate-700"><%= order.draft.name %></div>
+              <div class="mt-1 flex items-center gap-2">
+                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-orange-50 text-orange-600 border border-orange-100 uppercase">
+                  BY: <%= order.draft.user&.name %>
+                </span>
+                <% if order.draft.file.attached? %>
+                  <%= link_to order.draft.file.url(disposition: "attachment"), 
+                              data: { turbo: false },
+                              class: "flex items-center text-[10px] font-bold text-emerald-600 hover:text-emerald-700 transition-colors" do %>
+                    <%= heroicon "arrow-down-tray", variant: :mini, options: { class: "w-3.5 h-3.5", stroke_width: 2.5 } %>
+                    附件下载
+                  <% end %>
+                <% end %>
+              </div>
+            <% end %>
+          </td>
+          <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
             <div class="flex flex-col">
               <span class="text-sm font-bold"><%= order.customer&.name %></span>
             </div>
           </td>
-          <td class="px-6 py-4">
+          <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
             <div class="flex flex-col">
               <span class="text-sm font-mono text-slate-900"><%= order.service_type %></span>
             </div>
           </td>
-          <td class="px-6 py-4">
+          <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
             <div class="flex flex-col">
               <span class="text-sm font-mono text-slate-900"><%= order.category_name %></span>
             </div>
           </td>
-          <td class="px-6 py-4">
+          <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
             <div class="flex flex-col">
               <span class="text-sm font-mono text-slate-900"><%= order.staff&.name %></span>
             </div>
           </td>
-          <td class="px-6 py-4 text-center">
+          <td class="whitespace-nowrap px-6 py-4 text-center whitespace-nowrap">
             <span class="inline-flex px-2 py-0.5 rounded text-[10px] font-bold border <%= order.is_settled ? 'bg-green-50 text-green-700 border-green-100' : 'bg-orange-50 text-orange-600 border-orange-100' %>">
               <%= order.is_settled ? '已结算' : '未结算' %>
             </span>
           </td>
-          <td class="px-6 py-4 text-right text-sm font-mono text-slate-900">
+          <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-mono text-slate-900">
             <%= order.payment_method %>
           </td>
-          <td class="px-6 py-4 text-right text-sm font-mono text-slate-900">
+          <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-mono text-slate-900">
             ¥<%= number_with_precision(order.amount, precision: 2) %>
           </td>
-          <td class="px-6 py-4 text-right text-sm font-mono text-slate-900">
+          <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-mono text-slate-900">
             <%= order.delivery_fee %>
           </td>
-          <td class="px-6 py-4 text-right text-[11px] text-slate-400 font-mono">
+          <td class="whitespace-nowrap px-6 py-4 text-right text-[11px] text-slate-400 font-mono">
             <%= order.created_at.strftime("%Y-%m-%d %H:%M") %>
           </td>
-          <td class="px-6 py-4 text-right text-[11px] text-slate-400 font-mono">
+          <td class="whitespace-nowrap px-6 py-4 text-right text-[11px] text-slate-400 font-mono">
             <div class="relative group/popover">
               <span class="text-red-400 group-hover/popover:text-red-600 font-bold cursor-help transition-colors">
                 删除
@@ -82,7 +101,7 @@
                                 method: :delete,
                                 data: { turbo_frame: "main_content" },
                                 class: "flex items-center gap-2 px-4 py-1.5 bg-red-500 text-white text-[11px] font-bold rounded shadow-sm hover:bg-red-600 cursor-pointer border-none transition-all" do %>
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    <%= heroicon "trash", variant: :outline, options: { class: "w-3.5 h-3.5", stroke_width: 2 } %>
                     确认删除
                   <% end %>
                   <div class="absolute top-[calc(100%-5px)] right-4 w-2.5 h-2.5 bg-white border-r border-b border-slate-200 rotate-45"></div>

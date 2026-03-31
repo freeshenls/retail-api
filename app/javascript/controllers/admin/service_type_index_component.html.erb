@@ -91,33 +91,33 @@
       <table class="min-w-full divide-y divide-slate-200">
         <thead class="bg-slate-50/50 text-left">
           <tr class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-            <th class="px-6 py-3">服务项目</th>
-            <th class="px-6 py-3">适用规格</th>
-            <th class="px-6 py-3">基准单价 (CNY)</th>
-            <th class="px-6 py-3 text-center">当前状态</th>
-            <th class="px-6 py-3 text-right">管理操作</th>
+            <th class="whitespace-nowrap px-6 py-3">服务项目</th>
+            <th class="whitespace-nowrap px-6 py-3">适用规格</th>
+            <th class="whitespace-nowrap px-6 py-3">基准单价 (CNY)</th>
+            <th class="whitespace-nowrap px-6 py-3 text-center">当前状态</th>
+            <th class="whitespace-nowrap px-6 py-3 text-right">管理操作</th>
           </tr>
         </thead>
         <tbody id="service_type_list_body" class="divide-y divide-slate-100 bg-white">
           <% @service_types.each do |unit| %>
             <tr id="<%= dom_id(unit) %>" class="hover:bg-slate-50/50 transition-colors group">
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center gap-2">
                   <div class="w-1 h-3.5 bg-[#0066b3] rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <span class="text-slate-900 font-bold text-sm"><%= unit.service_type %></span>
                 </div>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
                 <span class="px-2 py-0.5 bg-blue-50 text-[#0066b3] rounded text-[11px] font-bold border border-blue-100">
                   <%= unit.category&.name %>
                 </span>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
                 <span class="text-orange-600 font-mono font-bold text-sm italic tracking-tight">
                   ¥ <%= number_with_precision(unit.price, precision: 4) %>
                 </span>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-center text-[10px] font-bold">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap text-center text-[10px] font-bold">
                 <% if unit.status == "1" %>
                   <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-100">
                     <span class="w-1 h-1 bg-emerald-500 rounded-full mr-1.5"></span>启用中
@@ -126,7 +126,7 @@
                   <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-slate-50 text-slate-400 border border-slate-200">已禁用</span>
                 <% end %>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap text-right text-sm">
                 <div class="flex items-center justify-end gap-x-4">
                   <%= link_to "编辑", edit_admin_service_type_path(unit), 
                               data: { turbo: false }, 

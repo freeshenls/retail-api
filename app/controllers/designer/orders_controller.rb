@@ -15,6 +15,7 @@ class Designer::OrdersController < ApplicationController
     # 2. 预设订单数据
     @order = Biz::Order.new(
       status: :pending,
+      quantity: 0,
       customer_id: default_customer&.id,
       customer_name: default_customer&.name,
       unit_id: default_unit&.id,
@@ -51,24 +52,27 @@ class Designer::OrdersController < ApplicationController
     # 设计师视角：显示所有“待处理”或“被退回”且“未结算”的订单
     query = Biz::Order.for_designer(current_user)
                       .includes(draft: :user)
-                      .where(status: [:pending, :rejected], is_settled: false)
+                      .where(status: [:pending], is_settled: false)
                       .order(created_at: :desc)
 
-    query = query.where(order_no: params[:order_no]) if params[:order_no].present?
-    query = query.where("biz_order.created_at >= ?", params[:start_date].to_date.beginning_of_day) if params[:start_date].present?
-    query = query.where("biz_order.created_at <= ?", params[:end_date].to_date.end_of_day) if params[:end_date].present?
-
-    @pagy, @orders = pagy(:offset, query, limit: 5)
+    list query
   end
 
   def completed
     # 设计师视角：显示“已提交审核”、“已审核”或“已结算”的订单
     query = Biz::Order.for_designer(current_user)
                       .includes(draft: :user)
-                      .where.not(status: [:pending, :rejected])
+                      .where.not(status: [:pending])
                       .order(updated_at: :desc)
 
-    query = query.where(order_no: params[:order_no]) if params[:order_no].present?
+    list query
+  end
+
+  def list(query)
+    if params[:order_no_or_draft_name].present?
+      keyword = params[:order_no_or_draft_name]
+      query = query.where("order_no = ? OR draft_name LIKE ?", keyword, "%#{keyword}%")
+    end
     query = query.where("biz_order.created_at >= ?", params[:start_date].to_date.beginning_of_day) if params[:start_date].present?
     query = query.where("biz_order.created_at <= ?", params[:end_date].to_date.end_of_day) if params[:end_date].present?
 
@@ -88,8 +92,7 @@ class Designer::OrdersController < ApplicationController
         
         # 情况 B：如果是编辑表单提交，执行常规跳转
         format.html { 
-          path = @order.submitted? ? completed_designer_orders_path : pending_designer_orders_path
-          redirect_to path, notice: "订单已处理" 
+          redirect_to request.path, notice: "订单已处理"  if request.path == designer_order_path(@order)
         }
       end
     else

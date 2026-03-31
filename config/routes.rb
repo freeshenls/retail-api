@@ -52,7 +52,7 @@ Rails.application.routes.draw do
 
     namespace :staff do
       # 移除了 :index
-      resources :orders, only: [:show, :edit, :update] do
+      resources :orders, only: [:show, :edit, :update, :destroy] do
         collection do
           get :ready
           get :submitted

@@ -4,7 +4,7 @@
   <%# 1. 顶部导航与状态 - no-print %>
   <div class="mb-6 flex justify-between items-center px-1 border-b border-slate-100 pb-5 no-print">
     <div class="flex items-center gap-3">
-      <%= link_to request.referer, data: { turbo: false }, class: "p-2 bg-white border-2 border-slate-100 rounded-lg text-slate-400 hover:text-[#0066b3] hover:border-[#0066b3] transition-all shadow-sm" do %>
+      <%= link_to "#{URI.parse(request.referer).path}?#{request.query_parameters.to_query}", data: { turbo: false }, class: "p-2 bg-white border-2 border-slate-100 rounded-lg text-slate-400 hover:text-[#0066b3] hover:border-[#0066b3] transition-all shadow-sm" do %>
         <%= heroicon "chevron-left", variant: :mini, options: { class: "h-4 w-4", stroke_width: 2.5 } %>
       <% end %>
       <div>
@@ -170,6 +170,17 @@
         <% end %>
 
         <% if can_approve?(user: helpers.current_user, order: @order) %>
+          <% if @order.amount == 0.0 %>
+            <div class="mb-4 p-4 bg-red-50 border-2 border-dashed border-red-200 rounded-xl flex items-start gap-3">
+              <div class="mt-0.5 text-red-500">
+                <%= heroicon "exclamation-triangle", variant: :solid, options: { class: "h-5 w-5" } %>
+              </div>
+              <div>
+                <p class="text-xs font-black text-red-600 tracking-tight">强制提醒：当前订单金额为 0</p>
+                <p class="text-[10px] text-red-500 font-bold mt-1">请务必在“说明备注”中填写免费原因或特殊说明，否则无法通过后期财务核实。</p>
+              </div>
+            </div>
+          <% end %>
         	<div class="space-y-4" >
             <% if @order.delivery_method == "快递" %>
               <%= render OrderAction::ApproveComponent.new(order: @order) %>
@@ -182,7 +193,7 @@
             <% end %>
 
             <div class="text-center mt-3 no-print flex items-center justify-center gap-1">
-              <%= render OrderAction::RejectComponent.new(order: @order) %>
+              <%= render OrderAction::DestroyComponent.new(order: @order) %>
               <%# 分隔符 %>
               <span class="text-slate-200 text-[10px]">/</span>
 
@@ -195,8 +206,8 @@
 
         <% if can_receive?(user: helpers.current_user, order: @order) %>
         <%= render OrderAction::NormalComponent.new(
-            url: finance_order_path(@order),
-            params: { order: { status: :received } }, 
+            url: designer_order_path(@order),
+            params: { biz_order: { status: :received } }, 
             title: "执行确认收货",
             sub_title:  "确定，已收货",
             hint: "请核实货物无误后执行，确认后将转交财务进行核实。",
@@ -215,7 +226,7 @@
 
         <% if can_settle?(user: helpers.current_user, order: @order) %>
           <%= render OrderAction::NormalComponent.new(
-              url: finance_order_path(@order),
+              url: admin_order_path(@order),
               params: { order: { is_settled: :true } }, 
               title: "执行结算入账",
               sub_title:  "确定，现在结算",
@@ -225,6 +236,7 @@
 
       	<% if can_print_tag?(user: helpers.current_user, order: @order) %>
           <button data-order="<%= @order.order_no %>" 
+                  data-customer="<%= @order.customer_name %>" 
                   data-draft="<%= @order.draft_name %>" 
                   data-quantity="<%= @order.quantity %>" 
                   data-action="order--show-component#printTag" 

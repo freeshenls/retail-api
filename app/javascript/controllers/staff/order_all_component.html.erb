@@ -7,18 +7,19 @@
       <table class="min-w-full divide-y divide-slate-200">
         <thead class="bg-slate-50/50">
           <tr>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-wider">订单编号</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-wider">规格/类型</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-wider">客户</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-wider">状态</th>
-            <th scope="col" class="px-6 py-3 text-right text-xs font-black text-slate-500 uppercase tracking-wider">操作</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-wider">订单编号</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-wider">稿件详情</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-wider">规格/类型</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-wider">客户</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-3 text-left text-xs font-black text-slate-500 uppercase tracking-wider">状态</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-3 text-right text-xs font-black text-slate-500 uppercase tracking-wider">操作</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-200 bg-white text-slate-700">
           <% @orders.each do |order| %>
             <tr class="hover:bg-slate-50/50 transition-colors group">
               <%# 1. 订单编号 %>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <div class="flex items-center">
                   <div class="w-1 h-4 bg-[#0066b3] rounded-full mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <span class="text-slate-900 font-mono font-bold tracking-tight">
@@ -27,8 +28,28 @@
                 </div>
               </td>
 
+              <%# 1.1. 稿件名 %>
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
+                <% if order.draft %>
+                  <div class="text-sm font-semibold text-slate-700"><%= order.draft.name %></div>
+                  <div class="mt-1 flex items-center gap-2">
+                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-orange-50 text-orange-600 border border-orange-100 uppercase">
+                      BY: <%= order.draft.user&.name %>
+                    </span>
+                    <% if order.draft.file.attached? %>
+                      <%= link_to order.draft.file.url(disposition: "attachment"), 
+                                  data: { turbo: false },
+                                  class: "flex items-center text-[10px] font-bold text-emerald-600 hover:text-emerald-700 transition-colors" do %>
+                        <%= heroicon "arrow-down-tray", variant: :mini, options: { class: "w-3.5 h-3.5", stroke_width: 2.5 } %>
+                        附件下载
+                      <% end %>
+                    <% end %>
+                  </div>
+                <% end %>
+              </td>
+
               <%# 2. 规格/类型 %>
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
                 <div class="text-sm font-black text-slate-700"><%= order.category_name %></div>
                 <div class="mt-1 flex items-center gap-2">
                   <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200 uppercase">
@@ -39,7 +60,7 @@
               </td>
 
               <%# 3. 客户 %>
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
                 <span class="text-xs font-bold text-slate-500 uppercase tracking-tighter">
                   <%= order.customer_name %>
                 </span>
@@ -47,19 +68,19 @@
 
               <%# 4. 状态：所有 %>
               <% if order.rejected? %>
-                <td class="px-6 py-4 whitespace-nowrap">
+                <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
                   <span class="px-2.5 py-1 bg-red-50 text-red-600 border border-red-100 text-[10px] font-black rounded-lg uppercase tracking-wider">
                     审核驳回
                   </span>
                 </td>
               <% elsif order.submitted? %>
-                <td class="px-6 py-4 whitespace-nowrap">
+                <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
                   <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-[#0066b3] border border-blue-100 uppercase">
                     已接单 / 待发货
                   </span>
                 </td>
               <% else %>
-                <td class="px-6 py-4 whitespace-nowrap">
+                <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
                   <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
                   <% if order.approved? %>
                     已发货
@@ -71,8 +92,8 @@
               <% end %>
               
               <%# 5. 操作 %>
-              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <%= link_to "详情", staff_order_path(order), 
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <%= link_to "详情", staff_order_path(order, request.query_parameters), 
                             data: { turbo: false },
                             class: "text-[#0066b3] hover:text-[#005596] font-black transition-colors" %>
               </td>
@@ -81,7 +102,6 @@
         </tbody>
       </table>
     </div>
-    <%= render Common::PagyComponent.new(pagy: @pagy) %>
 
     <% if @orders.empty? %>
       <div class="px-6 py-16 text-center text-slate-400 italic text-sm">

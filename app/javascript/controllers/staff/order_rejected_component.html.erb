@@ -7,18 +7,18 @@
       <table class="min-w-full divide-y divide-slate-100">
         <thead class="bg-slate-50/50">
           <tr>
-            <th scope="col" class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">订单编号</th>
-            <th scope="col" class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">产品规格</th>
-            <th scope="col" class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">结算金额</th>
-            <th scope="col" class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">状态</th>
-            <th scope="col" class="px-6 py-4 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">操作</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">订单编号</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">产品规格</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">结算金额</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">状态</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-4 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">操作</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100 bg-white">
           <% @orders.each do |order| %>
             <tr class="hover:bg-slate-50/50 transition-colors group">
               <%# 1. 订单编号 %>
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
                   <div class="w-1 h-4 bg-red-500 rounded-full mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <span class="font-mono font-bold text-slate-900 tracking-tight"><%= order.order_no %></span>
@@ -26,25 +26,25 @@
               </td>
 
               <%# 2. 产品规格 %>
-              <td class="px-6 py-4">
+              <td class="whitespace-nowrap px-6 py-4">
                 <div class="text-sm font-black text-slate-800"><%= order.category_name %></div>
                 <div class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter"><%= order.service_type %></div>
               </td>
 
               <%# 3. 结算金额 %>
-              <td class="px-6 py-4 whitespace-nowrap font-mono font-black text-slate-900">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap font-mono font-black text-slate-900">
                 ¥ <%= number_with_precision(order.amount, precision: 2) %>
               </td>
 
               <%# 4. 状态：已驳回 %>
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
                 <span class="px-2.5 py-1 bg-red-50 text-red-600 border border-red-100 text-[10px] font-black rounded-lg uppercase tracking-wider">
                   审核驳回
                 </span>
               </td>
 
               <%# 5. 操作 %>
-              <td class="px-6 py-4 whitespace-nowrap text-right">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap text-right">
                 <%= link_to staff_order_path(order), 
                             data: { turbo: false }, 
                             class: "text-[#0066b3] hover:text-[#005596] font-black text-sm transition-colors" do %>

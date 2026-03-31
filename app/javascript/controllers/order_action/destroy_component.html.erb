@@ -1,0 +1,29 @@
+<div class="flex relative group/popover" 
+     data-controller="order-action--destroy-component"
+     data-order-action--destroy-component-id-value="<%= @order.id %>">
+     
+  <span class="text-[11px] text-red-400 group-hover/popover:text-red-600 font-bold cursor-help transition-colors underline underline-offset-4 decoration-slate-200 hover:decoration-[#0066b3]/30">
+    删除
+  </span>
+
+  <div class="invisible opacity-0 group-hover/popover:visible group-hover/popover:opacity-100 
+              absolute bottom-full right-0 mb-3 z-[60] transition-all duration-200 
+              translate-y-1 group-hover/popover:translate-y-0">
+    <div class="bg-white border border-slate-200 shadow-xl rounded-lg p-2 flex items-center gap-1.5 whitespace-nowrap">
+      
+      <%= button_to staff_order_path(@order), 
+                    method: :delete,
+                    data: { 
+                      turbo_frame: false,
+                      # 绑定点击事件到 handleDelete 方法
+                      action: "order-action--destroy-component#handleDelete" 
+                    },
+                    class: "flex items-center gap-2 px-4 py-1.5 bg-red-500 text-white text-[11px] font-bold rounded shadow-sm hover:bg-red-600 cursor-pointer border-none transition-all" do %>
+        <%= heroicon "trash", variant: :outline, options: { class: "w-3.5 h-3.5", stroke_width: 2 } %>
+        确认删除
+      <% end %>
+      
+      <div class="absolute top-[calc(100%-5px)] right-4 w-2.5 h-2.5 bg-white border-r border-b border-slate-200 rotate-45"></div>
+    </div>
+  </div>
+</div>

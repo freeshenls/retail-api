@@ -21,30 +21,30 @@
       <table class="min-w-full divide-y divide-slate-200">
         <thead class="bg-slate-50/50">
           <tr class="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-left">
-            <th class="px-6 py-3 w-20">排序</th>
-            <th class="px-6 py-3">规格名称</th>
-            <th class="px-6 py-3">创建时间</th>
-            <th class="px-6 py-3 text-right">管理操作</th>
+            <th class="whitespace-nowrap px-6 py-3 w-20">排序</th>
+            <th class="whitespace-nowrap px-6 py-3">规格名称</th>
+            <th class="whitespace-nowrap px-6 py-3">创建时间</th>
+            <th class="whitespace-nowrap px-6 py-3 text-right">管理操作</th>
           </tr>
         </thead>
         <tbody id="category_list_body" class="divide-y divide-slate-100 bg-white">
           <% @categories.each do |category| %>
             <tr id="<%= dom_id(category) %>" class="hover:bg-slate-50/50 transition-colors group">
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
                 <span class="inline-flex items-center justify-center w-7 h-7 bg-slate-100 text-slate-500 text-[11px] font-mono font-bold rounded-md border border-slate-200/50">
                   <%= category.position %>
                 </span>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
                   <div class="w-1 h-3.5 bg-[#0066b3] rounded-full mr-3 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <span class="text-slate-900 font-bold text-sm tracking-tight"><%= category.name %></span>
                 </div>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-[11px] text-slate-400 font-mono">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap text-[11px] text-slate-400 font-mono">
                 <%= category.created_at.strftime("%Y-%m-%d %H:%M") %>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap text-right text-sm">
                 <div class="flex items-center justify-end gap-x-4">
                   <%= link_to "编辑", edit_admin_category_path(category), 
                               data: { turbo_frame: "main_content" },

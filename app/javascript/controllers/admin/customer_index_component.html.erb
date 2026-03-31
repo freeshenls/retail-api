@@ -20,17 +20,17 @@
       <table class="min-w-full divide-y divide-slate-200">
         <thead class="bg-slate-50/50">
           <tr>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">客户基础信息 / 地址</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">财务证件信息</th>
-            <th scope="col" class="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">信用额度</th>
-            <th scope="col" class="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">操作</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">客户基础信息 / 地址</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">财务证件信息</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">信用额度</th>
+            <th scope="col" class="whitespace-nowrap px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">操作</th>
           </tr>
         </thead>
         <tbody id="customer_list_body" class="divide-y divide-slate-200 bg-white text-slate-700">
           <% @customers.each do |customer| %>
             <tr id="<%= dom_id(customer) %>" class="hover:bg-slate-50/50 transition-colors group">
               <%# 1. 客户名称与地址 %>
-              <td class="px-6 py-4">
+              <td class="whitespace-nowrap px-6 py-4">
                 <div class="flex items-start">
                   <div class="w-1 h-4 bg-[#0066b3] rounded-full mr-3 mt-1 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <div class="flex flex-col">
@@ -41,7 +41,7 @@
               </td>
 
               <%# 2. 财务证件 (Card Name & No) %>
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap">
                 <div class="flex flex-col space-y-0.5">
                   <span class="text-slate-600 font-bold text-[12px]"><%= customer.card_name %></span>
                   <span class="text-slate-400 font-mono text-[10px] tracking-wider"><%= customer.card_no %></span>
@@ -49,14 +49,14 @@
               </td>
 
               <%# 3. 信用额度 (高亮展示数字) %>
-              <td class="px-6 py-4 whitespace-nowrap text-right">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap text-right">
                 <span class="text-slate-900 font-mono font-bold text-sm">
                   <%= number_to_currency(customer.credit_limit, unit: "￥") %>
                 </span>
               </td>
 
               <%# 4. 操作按钮 %>
-              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <div class="flex items-center justify-end gap-x-4">
                   <%= link_to "档案", edit_admin_customer_path(customer), 
                               data: { turbo_frame: "main_content" },
