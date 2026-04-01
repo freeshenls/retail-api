@@ -7,7 +7,7 @@
     <%# 这里的代码会注入到 layout 的 yield 位置，也就是 main_content 内部 %>
     <%= render Order::IndexComponent.new do |c| %>
       <% c.with_query do %>
-        <%= render OrderQuery::AdminComponent.new(url: completed_designer_orders_path) %>
+        <%= render OrderQuery::AdminComponent.new(url: admin_orders_path, can_export: true, export_url: admin_orders_path(format: :xlsx, params: request.query_parameters)) %>
       <% end %>
       <% c.with_table do %>
         <%= render Admin::OrderIndexComponent.new(orders: @orders) %>

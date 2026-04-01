@@ -80,7 +80,7 @@
 
           <%# 5. 操作 %>
           <td class="whitespace-nowrap px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-            <%= link_to "查看", designer_order_path(order), 
+            <%= link_to "查看", designer_order_path(order, request.query_parameters), 
                         data: { turbo: false },
                         class: "text-[#0066b3] hover:text-[#005596] font-bold transition-colors" %>
           </td>

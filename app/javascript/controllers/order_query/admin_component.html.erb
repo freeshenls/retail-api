@@ -5,7 +5,7 @@
     订单综合查询
   </h3>
 
-  <%= form_with url: admin_orders_path, method: :get, class: "flex flex-wrap items-end gap-4" do |f| %>
+  <%= form_with url: @url, method: :get, class: "flex flex-wrap items-end gap-4" do |f| %>
     
     <%# 万能搜索下拉 %>
     <div class="w-80 group" data-controller="dropdown">
@@ -80,12 +80,16 @@
     <%# 按钮组 %>
     <div class="flex items-center gap-3 ml-2">
       <%= f.submit "查询", class: "px-5 py-2 bg-[#0066b3] text-white text-xs font-bold rounded-md hover:bg-[#005596] active:scale-95 transition-all cursor-pointer shadow-sm tracking-widest" %>
-      <%= link_to "重置", admin_orders_path, class: "text-[10px] font-bold text-slate-400 hover:text-slate-600 px-1" %>
+      <%= link_to "重置", @url, class: "text-[10px] font-bold text-slate-400 hover:text-slate-600 px-1" %>
+
+      <% if @can_export %>
       
-      <div class="w-px h-4 bg-slate-200 mx-1"></div>
+        <div class="w-px h-4 bg-slate-200 mx-1"></div>
+        
+        <%= link_to @export_url, class: "text-[10px] font-bold text-slate-400 hover:text-[#0066b3] tracking-wider" do %>
+          导出
+        <% end %>
       
-      <%= link_to admin_orders_path(format: :xlsx, params: request.query_parameters), class: "text-[10px] font-bold text-slate-400 hover:text-[#0066b3] tracking-wider" do %>
-        导出
       <% end %>
     </div>
   <% end %>

@@ -4,7 +4,17 @@ class Admin::OrdersController < ApplicationController
   def index
     query = Biz::Order.order(created_at: :desc)
     
-    # 1. 客户/员工 过滤
+    list query
+  end
+
+	def show
+	end
+
+	def edit
+	end
+
+	def list(query)
+		# 1. 客户/员工 过滤
 	  query = query.where(customer_id: params[:customer_id]) if params[:customer_id].present?
 	  query = query.where(staff_id: params[:staff_id]) if params[:staff_id].present?
 	  
@@ -22,12 +32,6 @@ class Admin::OrdersController < ApplicationController
 	      response.headers['Content-Disposition'] = 'attachment; filename="订单查询	.xlsx"'
 	    }
 	  end
-  end
-
-	def show
-	end
-
-	def edit
 	end
 
 	def update
@@ -49,8 +53,8 @@ class Admin::OrdersController < ApplicationController
 	  query = Biz::Order.includes(draft: :user) 
 	                    .where(is_settled: false)
 	                    .order(created_at: :desc)
-
-	  @pagy, @orders = pagy(:offset, query, limit: 5)
+	                    
+	  list query
 	end
 
 	def settled
@@ -58,7 +62,7 @@ class Admin::OrdersController < ApplicationController
 	                    .where(is_settled: true)
 	                    .order(created_at: :desc)
 	                    
-	  @pagy, @orders = pagy(:offset, query, limit: 5)
+	  list query
 	end
 
 	private

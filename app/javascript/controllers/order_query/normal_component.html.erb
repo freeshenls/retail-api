@@ -33,6 +33,16 @@
     <div class="flex items-center gap-3 ml-2">
       <%= f.submit "查询", class: "px-5 py-2 bg-[#0066b3] text-white text-xs font-bold rounded-md hover:bg-[#005596] active:scale-95 transition-all cursor-pointer shadow-sm tracking-widest" %>
       <%= link_to "重置", @url, class: "text-[10px] font-bold text-slate-400 hover:text-slate-600 px-1" %>
+
+      <% if @can_export %>
+      
+        <div class="w-px h-4 bg-slate-200 mx-1"></div>
+        
+        <%= link_to @export_url, class: "text-[10px] font-bold text-slate-400 hover:text-[#0066b3] tracking-wider" do %>
+          导出
+        <% end %>
+      
+      <% end %>
     </div>
   <% end %>
 </div>

@@ -14,7 +14,7 @@ class Finance::OrdersController < ApplicationController
 	                    .where(is_settled: false)
 	                    .order(created_at: :desc)
 
-	  @pagy, @orders = pagy(:offset, query, limit: 5)
+	  list query, "未结算订单"
 	end
 
 	def settled
@@ -23,8 +23,28 @@ class Finance::OrdersController < ApplicationController
 	                    .where(is_settled: true)
 	                    .order(created_at: :desc)
 	                    
-	  @pagy, @orders = pagy(:offset, query, limit: 5)
+	  list query, "已结算订单"
 	end
+
+	def list(query, filename)
+    if params[:order_no_or_draft_name].present?
+      keyword = params[:order_no_or_draft_name]
+      query = query.where("order_no = ? OR draft_name LIKE ?", keyword, "%#{keyword}%")
+    end
+    query = query.where("biz_order.created_at >= ?", params[:start_date].to_date.beginning_of_day) if params[:start_date].present?
+    query = query.where("biz_order.created_at <= ?", params[:end_date].to_date.end_of_day) if params[:end_date].present?
+
+    respond_to do |format|
+	    format.html {
+	    	@pagy, @orders = pagy(:offset, query, limit: 5)
+	    }
+	    format.xlsx {
+	    	@orders = query
+	      # 这里调用你的导出逻辑，比如使用 axlsx_rails
+	      response.headers['Content-Disposition'] = "attachment; filename=\"#{filename}.xlsx\""
+	    }
+	  end
+  end
 
 	def update
     @order.update(order_params)
