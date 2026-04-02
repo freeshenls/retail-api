@@ -10,7 +10,7 @@
         <%= render OrderQuery::AdminComponent.new(url: admin_orders_path, can_export: true, export_url: admin_orders_path(format: :xlsx, params: request.query_parameters)) %>
       <% end %>
       <% c.with_table do %>
-        <%= render Admin::OrderIndexComponent.new(orders: @orders) %>
+        <%= render Admin::OrderIndexComponent.new(orders: @orders, all_orders: @all_orders) %>
       <% end %>
       <% c.with_pagy do %>
         <%= render Common::PagyComponent.new(pagy: @pagy) %>

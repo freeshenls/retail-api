@@ -4,6 +4,7 @@ import Chartjs from '@stimulus-components/chartjs'
 import Popover from '@stimulus-components/popover'
 import Dropdown from '@stimulus-components/dropdown'
 import Clipboard from '@stimulus-components/clipboard'
+import Notification from '@stimulus-components/notification'
 const application = Application.start()
 
 // Configure Stimulus development experience
@@ -18,4 +19,5 @@ application.register('chartjs', Chartjs)
 application.register('popover', Popover)
 application.register('dropdown', Dropdown)
 application.register('clipboard', Clipboard)
+application.register('notification', Notification)
 export { application }

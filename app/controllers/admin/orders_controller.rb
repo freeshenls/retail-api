@@ -24,6 +24,7 @@ class Admin::OrdersController < ApplicationController
 
     respond_to do |format|
 	    format.html {
+	    	@all_orders = query
 	    	@pagy, @orders = pagy(:offset, query, limit: 5)
 	    }
 	    format.xlsx {

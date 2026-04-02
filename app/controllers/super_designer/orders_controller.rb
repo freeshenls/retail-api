@@ -1,5 +1,5 @@
-# app/controllers/designer/orders_controller.rb
-class Designer::OrdersController < ApplicationController
+# app/controllers/super_designer/orders_controller.rb
+class SuperDesigner::OrdersController < ApplicationController
   before_action :set_order, only: [:edit, :update, :show]
 
   def new
@@ -50,8 +50,7 @@ class Designer::OrdersController < ApplicationController
 
   def pending
     # 设计师视角：显示所有“待处理”或“被退回”且“未结算”的订单
-    query = Biz::Order.for_designer(current_user)
-                      .includes(draft: :user)
+    query = Biz::Order.includes(draft: :user)
                       .where(status: [:pending], is_settled: false)
                       .order(created_at: :desc)
 
@@ -60,8 +59,7 @@ class Designer::OrdersController < ApplicationController
 
   def completed
     # 设计师视角：显示“已提交审核”、“已审核”或“已结算”的订单
-    query = Biz::Order.for_designer(current_user)
-                      .includes(draft: :user)
+    query = Biz::Order.includes(draft: :user)
                       .where.not(status: [:pending])
                       .order(updated_at: :desc)
 

@@ -1,16 +1,15 @@
-<%# app/views/designer/orders/completed.html.erb %>
+<%# app/views/designer/orders/pending.html.erb %>
 <%= render layout: "designer/layout" do %>
   <div data-controller="layout--tab-init" 
-       data-layout--tab-init-label-value="已提交订单" 
+       data-layout--tab-init-label-value="待处理订单" 
        data-layout--tab-init-path-value="<%= request.path %>">
-
-    <%# 这里的代码会注入到 layout 的 yield 位置，也就是 main_content 内部 %>
+    
     <%= render Order::IndexComponent.new do |c| %>
       <% c.with_query do %>
-        <%= render OrderQuery::NormalComponent.new(url: completed_designer_orders_path) %>
+        <%= render OrderQuery::NormalComponent.new(url: pending_designer_orders_path) %>
       <% end %>
       <% c.with_table do %>
-        <%= render Designer::OrderCompletedComponent.new(orders: @orders, all_orders: @all_orders) %>
+        <%= render Designer::OrderPendingComponent.new(orders: @orders) %>
       <% end %>
       <% c.with_pagy do %>
         <%= render Common::PagyComponent.new(pagy: @pagy) %>
@@ -18,4 +17,3 @@
     <% end %>
   </div>
 <% end %>
-

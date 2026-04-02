@@ -85,6 +85,20 @@ Rails.application.routes.draw do
     end
   end
 
+  authenticated :user, ->(u) { u.role.name == "super-designer" } do
+    root to: redirect("/super_designer/orders/new"), as: :super_designer_root
+
+    namespace :super_designer do
+      # 移除了 :index
+      resources :orders, only: [:new, :create, :edit, :update, :show, :destroy] do
+        collection do
+          get :pending
+          get :completed
+        end
+      end
+    end
+  end
+
   authenticated :user, ->(u) { u.role.name == "finance" } do
     root to: redirect("/finance/orders/unsettled"), as: :finance_root
 

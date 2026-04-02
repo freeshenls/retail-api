@@ -1,7 +1,7 @@
 <%# app/components/designer/order_completed_component.html.erb %>
 <div class="bg-slate-50/50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
    <span class="text-xs font-bold text-slate-500 tracking-wider">订单交易明细</span>
-   <span class="text-[10px] font-bold text-slate-400">共计 <%= @orders.count %> 笔订单, 总金额 ¥<%= @orders.map{|item| item.amount}.sum %></span>
+   <span class="text-[10px] font-bold text-slate-400">当前 <%= @orders.size %> 笔订单, 总金额 ¥<%= @orders.map{|item| item.amount}.sum %><br>共计 <%= @all_orders.size %> 笔订单, 总金额 ¥<%= @all_orders.sum(:amount) %></span>
 </div>
 
 <div class="overflow-x-auto">
