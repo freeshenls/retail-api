@@ -25,53 +25,5 @@
 
   <body>
     <%= yield %>
-    <div class="fixed top-[60px] right-4 z-[100] flex flex-col gap-2 pointer-events-none w-72">
-      
-      <%# 警告提示 (Alert) %>
-      <% if alert.present? %>
-        <div
-          data-controller="notification"
-          data-notification-delay-value="3000"
-          class="transition transform duration-500 pointer-events-auto"
-          data-transition-enter-from="opacity-0 translate-x-12"
-          data-transition-enter-to="opacity-100 translate-x-0"
-          data-transition-leave-from="opacity-100 translate-x-0"
-          data-transition-leave-to="opacity-0 translate-x-12"
-        >
-          <div class="relative flex items-center justify-between bg-red-50 border border-red-100 py-2.5 px-4 rounded-lg shadow-lg">
-            <div class="flex items-center gap-2">
-              <%= heroicon "exclamation-circle", variant: :mini, options: { class: "h-4 w-4 text-red-400" } %>
-              <p class="text-[11px] font-black text-red-600"><%= alert %></p>
-            </div>
-            <button data-action="notification#hide" class="text-red-300 hover:text-red-500 transition-colors ml-4">
-              <%= heroicon "x-mark", variant: :mini, options: { class: "h-3.5 w-3.5" } %>
-            </button>
-          </div>
-        </div>
-      <% end %>
-
-      <%# 普通通知 (Notice) %>
-      <% if notice.present? %>
-        <div
-          data-controller="notification"
-          data-notification-delay-value="2000"
-          class="transition transform duration-500 pointer-events-auto"
-          data-transition-enter-from="opacity-0 translate-x-12"
-          data-transition-enter-to="opacity-100 translate-x-0"
-          data-transition-leave-from="opacity-100 translate-x-0"
-          data-transition-leave-to="opacity-0 translate-x-12"
-        >
-          <div class="relative flex items-center justify-between bg-green-50 border border-green-100 py-2.5 px-4 rounded-lg shadow-lg">
-            <div class="flex items-center gap-2">
-              <%= heroicon "check-circle", variant: :mini, options: { class: "h-4 w-4 text-green-400" } %>
-              <p class="text-[11px] font-black text-green-600"><%= notice %></p>
-            </div>
-            <button data-action="notification#hide" class="text-green-300 hover:text-green-600 transition-colors ml-4">
-              <%= heroicon "x-mark", variant: :mini, options: { class: "h-3.5 w-3.5" } %>
-            </button>
-          </div>
-        </div>
-      <% end %>
-    </div>
   </body>
 </html>

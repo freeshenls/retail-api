@@ -29,12 +29,9 @@ class Admin::UsersController < ApplicationController
       p.delete(:password_confirmation)
     end
 
-    if @user.update(p)
-      # 成功后跳转回列表，利用 Turbo Frame 局部刷新
-      redirect_to admin_users_path, notice: "用户 [#{@user.name}] 资料已更新"
-    else
-      redirect_to edit_admin_user_path(@user), alert: "更新失败：#{@user.errors.full_messages.join(', ')}"
-    end
+    @user.update(p)
+    # 成功后跳转回列表，利用 Turbo Frame 局部刷新
+    redirect_to admin_users_path, notice: "用户 [#{@user.name}] 资料已更新"
   end
 
   def destroy

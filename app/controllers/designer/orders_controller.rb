@@ -7,7 +7,8 @@ class Designer::OrdersController < ApplicationController
     @units = Biz::Unit.all.includes(:category)
 
     # 1. 找到默认值
-    default_customer = @user.customers.first
+    default_customer = @user.customers.first if @user.role.name == "designer"
+    default_customer = Biz::Customer.order(name: :asc).first if @user.role.name == "super-designer"
     default_category = Biz::Category.order(:position).first
     # 寻找第一个分类对应的第一个服务项目（规格）
     default_unit = @units.find { |u| u.category_id == default_category&.id }

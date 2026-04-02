@@ -24,7 +24,8 @@ class Order::EditComponent < ViewComponent::Base
     @display_cls = "text-slate-600"
     @display = "点击上传设计原稿"
     @upload_hint = "支持文件: PDF, AI, JPG, PNG, ZIP"
-    @customers = @user.customers.order(name: :asc)
+    @customers = @user.customers.order(name: :asc) if @user.role.name == "designer"
+    @customers = Biz::Customer.order(name: :asc) if @user.role.name == "super-designer"
   end
 
   def load_edit_config
