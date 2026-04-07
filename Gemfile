@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 8.1.2"
+gem "rails", "~> 8.1.3"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
 # Use postgresql as the database for Active Record
@@ -55,15 +55,13 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "view_component", "~> 4.4"
+gem "view_component", "~> 4.6"
 gem "rails-i18n", "~> 8.1"
 gem "seed_dump", "~> 3.4"
 gem "devise", "~> 5.0"
 gem "heroicons", "~> 2.2"
-gem "pagy", "~> 43.3"
+gem "pagy", "~> 43.4"
 gem "redis", "~> 5.4"
-gem "groupdate", "~> 6.7"
-gem "aws-sdk-s3", "~> 1.213"
-
-
-gem "caxlsx_rails", "~> 0.6.4"
+gem "groupdate", "~> 6.8"
+gem "aws-sdk-s3", "~> 1.218"
+gem "caxlsx_rails", "~> 0.7.1"
