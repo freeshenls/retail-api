@@ -25,8 +25,8 @@ class Sys::User < ApplicationRecord
     role&.name == "designer"
   end
 
-  def super_designer?
-    role&.name == "super-designer"
+  def front?
+    role&.name == "front"
   end
 
   def admin?

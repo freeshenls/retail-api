@@ -4,6 +4,7 @@
   template = "staff/layout" if current_user.staff?
   template = "finance/layout" if current_user.finance?
   template = "admin/layout" if current_user.admin?
+  template = "front/layout" if current_user.front?
 %>
 <%= render layout: template do %>
   <div data-controller="layout--tab-init" 

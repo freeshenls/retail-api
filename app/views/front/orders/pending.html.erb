@@ -1,0 +1,19 @@
+<%# app/views/front/orders/pending.html.erb %>
+<%= render layout: "front/layout" do %>
+  <div data-controller="layout--tab-init" 
+       data-layout--tab-init-label-value="待处理订单" 
+       data-layout--tab-init-path-value="<%= request.path %>">
+    
+    <%= render Order::IndexComponent.new do |c| %>
+      <% c.with_query do %>
+        <%= render OrderQuery::NormalComponent.new(url: pending_front_orders_path) %>
+      <% end %>
+      <% c.with_table do %>
+        <%= render Front::OrderPendingComponent.new(orders: @orders) %>
+      <% end %>
+      <% c.with_pagy do %>
+        <%= render Common::PagyComponent.new(pagy: @pagy) %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>

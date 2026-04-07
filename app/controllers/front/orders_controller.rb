@@ -1,13 +1,75 @@
-# app/controllers/designer/orders_controller.rb
-class Designer::OrdersController < ApplicationController
-  before_action :set_order, only: [:edit, :update, :show]
+class Front::OrdersController < ApplicationController
+	before_action :set_order, only: [:edit, :update, :show]
+
+  def index
+    query = Biz::Order.order(created_at: :desc)
+    
+    list_a query
+  end
+
+  def list_a(query)
+    # 1. 客户/员工 过滤
+    query = query.where(customer_id: params[:customer_id]) if params[:customer_id].present?
+    query = query.where(staff_id: params[:staff_id]) if params[:staff_id].present?
+    
+    # 2. 时间范围 过滤
+    query = query.where("created_at >= ?", params[:start_date].to_date.beginning_of_day) if params[:start_date].present?
+    query = query.where("created_at <= ?", params[:end_date].to_date.end_of_day) if params[:end_date].present?
+
+    respond_to do |format|
+      format.html {
+        @all_orders = query
+        @pagy, @orders = pagy(:offset, query, limit: 5)
+      }
+      format.xlsx {
+        @orders = query
+        # 这里调用你的导出逻辑，比如使用 axlsx_rails
+        response.headers['Content-Disposition'] = 'attachment; filename="订单查询 .xlsx"'
+      }
+    end
+  end
+
+  def approved
+    params[:start_date] = Time.now.strftime("%Y-%m-%d") unless params[:start_date].present?
+    params[:end_date] = Time.now.strftime("%Y-%m-%d") unless params[:end_date].present?
+
+    query = Biz::Order.where(status: [:approved, :received])
+
+    # 1. 客户/员工 过滤
+    query = query.where(customer_id: params[:customer_id]) if params[:customer_id].present?
+    query = query.where(staff_id: params[:staff_id]) if params[:staff_id].present?
+    
+    # 2. 时间范围 过滤
+    query = query.where("created_at >= ?", params[:start_date].to_date.beginning_of_day) if params[:start_date].present?
+    query = query.where("created_at <= ?", params[:end_date].to_date.end_of_day) if params[:end_date].present?
+
+    query = query.group(:customer_name)
+                .select("customer_name, COUNT(*) as orders_count, MAX(printed_at) as printed_at, string_agg(order_no, ',') as order_nos, SUM(CASE WHEN printed_at is null THEN 0 ELSE 1 END) AS printed_count")
+                .order("MAX(updated_at) DESC")
+
+    @all_orders = query
+    @pagy, @orders = pagy(:offset, query, limit: 5)
+  end
+
+  def syncStatus
+    nos_array = params[:nos].split(',')
+    Biz::Order.where(order_no: nos_array).update_all(printed_at: Time.current)
+
+    @group = Biz::Order.where(order_no: nos_array)
+                .group(:customer_name)
+                .select("customer_name, COUNT(*) as orders_count, MAX(printed_at) as printed_at, string_agg(order_no, ',') as order_nos, SUM(CASE WHEN printed_at is null THEN 0 ELSE 1 END) AS printed_count")
+                .order("MAX(updated_at) DESC")
+                .first
+
+    render turbo_stream: turbo_stream.replace("nos_#{params[:nos]}", Front::OrderApprovedRowComponent.new(group: @group))
+  end
 
   def new
     @user = current_user
     @units = Biz::Unit.all.includes(:category)
 
     # 1. 找到默认值
-    default_customer = @user.customers.first
+    default_customer = Biz::Customer.order(name: :asc).first
     default_category = Biz::Category.order(:position).first
     # 寻找第一个分类对应的第一个服务项目（规格）
     default_unit = @units.find { |u| u.category_id == default_category&.id }

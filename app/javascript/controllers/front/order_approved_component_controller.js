@@ -1,10 +1,13 @@
-// app/javascript/controllers/order/show_component_controller.js
-import { Controller } from "@hotwired/stimulus"
+import { Controller } from "@hotwired/stimulus";
+import { TurboUtil } from "controllers/util/turbo_util"
 
 export default class extends Controller {
-  printTag(event) {
-    const { order, customer, draft, quantity } = event.currentTarget.dataset
-    const limit_draft = draft.length > 30 ? draft.substring(0, 30) + "..." : draft
+  connect() {
+    console.log("Hello, Stimulus!", this.element);
+  }
+
+  print(event) {
+    const { count, customer, date } = event.currentTarget.dataset
 
     const iframe = document.createElement('iframe');
     Object.assign(iframe.style, {
@@ -58,8 +61,8 @@ export default class extends Controller {
 
             .item { 
               /* 核心：标准小五号字体 (9pt) */
-              font-size: 8pt; 
-              line-height: 1.2;
+              font-size: 9pt; 
+              line-height: 1.5;
               margin-bottom: 0.2mm;
               display: flex; 
               align-items: center;
@@ -68,13 +71,6 @@ export default class extends Controller {
             }
 
             .label { 
-              font-weight: bold;
-              min-width: 13mm; /* 稍微加宽 label 确保对齐 */
-              display: inline-block;
-            }
-
-            .label-small { 
-              font-size: 4pt;
               font-weight: bold;
               min-width: 13mm; /* 稍微加宽 label 确保对齐 */
               display: inline-block;
@@ -95,27 +91,19 @@ export default class extends Controller {
           </style>
         </head>
         <body>
-          <div class="header">共点科技订单复验单</div>
+          <div class="header">共点科技发货单</div>
           <div class="content">
-            <div class="item">
-              <span class="label">订单号:</span>
-              <span class="label">${order}</span>
-            </div>
             <div class="item">
               <span class="label">客户名:</span>
               <span class="label">${customer}</span>
             </div>
             <div class="item">
-              <span class="label">稿件名:</span>
-              <span class="label-small">${limit_draft}</span>
-            </div>
-            <div class="item">
-              <span class="label">数&nbsp;&nbsp;&nbsp;量:</span>
-              <span class="label">${quantity}</span>
+              <span class="label">订单数:</span>
+              <span class="label">${count}</span>
             </div>
             <div class="item">
               <span class="label">日期时间:</span>
-              <span class="label">${new Date().toLocaleDateString('zh-CN')}</span>
+              <span class="label">${date}</span>
             </div>
           </div>
         </body>
@@ -129,5 +117,10 @@ export default class extends Controller {
       iframe.contentWindow.print();
       document.body.removeChild(iframe);
     }, 250);
+  }
+
+  syncStatus() {
+    const { nos } = event.currentTarget.dataset
+    TurboUtil.syncStatus(nos)
   }
 }

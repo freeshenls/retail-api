@@ -71,7 +71,7 @@ Rails.application.routes.draw do
     end
   end
   
-  authenticated :user, ->(u) { u.role.name == "designer" || u.role.name == "super-designer" } do
+  authenticated :user, ->(u) { u.role.name == "designer" } do
     root to: redirect("/designer/orders/new"), as: :designer_root
 
     namespace :designer do
@@ -80,6 +80,22 @@ Rails.application.routes.draw do
         collection do
           get :pending
           get :completed
+        end
+      end
+    end
+  end
+
+  authenticated :user, ->(u) { u.role.name == "front" } do
+    root to: redirect("/front/orders/approved"), as: :front_root
+
+    namespace :front do
+      # 移除了 :index
+      resources :orders, only: [:index, :new, :create, :edit, :update, :show, :destroy] do
+        collection do
+          get "syncStatus"
+          get :pending
+          get :completed
+          get :approved
         end
       end
     end

@@ -1,0 +1,26 @@
+<%# app/components/front/order_approved_component.html.erb %>
+<div class="w-full space-y-3" data-controller="front--order-approved-component">
+  
+  <%# 顶部统计概览 %>
+  <div class="flex items-center justify-between px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-500 shadow-sm">
+    <div class="flex items-center gap-4">
+      <span>统计日期：<%= params[:start_date] %> - <%= params[:end_date] %></span>
+      <span class="text-slate-300">|</span>
+      <span>当前待打客户数：<%= @all_orders.filter{|group| group.printed_count != group.orders_count }.size %></span>
+    </div>
+    <div class="text-[#0066b3]">※ 点击打印将汇总该客户时间范围内所有订单</div>
+  </div>
+
+  <%# 按客户分组的统计条 %>
+  <div class="grid grid-cols-1 gap-2">
+    <% @orders&.each do |group| %>
+      <%= render Front::OrderApprovedRowComponent.new(group: group)%>
+    <% end %>
+  </div>
+
+  <% if @orders.empty? %>
+    <div class="py-20 text-center border-2 border-dashed border-slate-100 rounded-2xl">
+      <p class="text-slate-400 text-sm italic">今日暂无已发货记录</p>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,20 @@
+<%# app/views/front/orders/index.html.erb %>
+<%= render layout: "front/layout" do %>
+  <div data-controller="layout--tab-init" 
+       data-layout--tab-init-label-value="订单信息查询" 
+       data-layout--tab-init-path-value="<%= request.path %>">
+
+    <%# 这里的代码会注入到 layout 的 yield 位置，也就是 main_content 内部 %>
+    <%= render Order::IndexComponent.new do |c| %>
+      <% c.with_query do %>
+        <%= render OrderQuery::AdminComponent.new(url: front_orders_path) %>
+      <% end %>
+      <% c.with_table do %>
+        <%= render Front::OrderIndexComponent.new(orders: @orders, all_orders: @all_orders) %>
+      <% end %>
+      <% c.with_pagy do %>
+        <%= render Common::PagyComponent.new(pagy: @pagy) %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>

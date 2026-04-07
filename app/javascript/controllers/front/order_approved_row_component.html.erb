@@ -1,0 +1,51 @@
+<%# 每一行的容器：关键是 relative 和 group %>
+<div id="<%= "nos_#{@group.order_nos}" %>" class="relative flex items-center justify-between p-4 bg-white border border-slate-200 rounded-xl shadow-sm hover:border-blue-500 transition-all">
+  
+  <%# --- 1. 醒目的红色“印章”水印 (仅已打印时显示) --- %>
+  <% if @group.printed_count ==  @group.orders_count %>
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0">
+      <%# 用 red-500 边框和文字，配合 -rotate-12 倾斜，模拟真实印章 %>
+      <div class="px-4 py-1 border-4 border-red-500/30 rounded-lg -rotate-12">
+        <span class="text-3xl font-black text-red-500/40 tracking-widest uppercase">
+          已打印
+        </span>
+      </div>
+    </div>
+  <% end %>
+
+  <%# --- 2. 正常内容层 (z-10 确保在水印上方) --- %>
+  <div class="flex items-center gap-4 z-10">
+    <div class="w-1.5 h-8 bg-[#0066b3] rounded-full"></div>
+    
+    <div>
+      <%# 客户名：保持黑色加粗，不受水印干扰 %>
+      <div class="text-sm font-black text-slate-900"><%= @group.customer_name %></div>
+      <div class="flex items-center gap-2 mt-0.5">
+        <span class="text-[11px] font-bold text-[#0066b3]">
+          共 <%= @group.orders_count %> 笔
+        </span>
+        <% if @group.printed_count == @group.orders_count %>
+          <span class="text-[11px] font-bold text-[#0066b3]">
+            (打印时间: <%= @group.printed_at&.strftime("%Y-%m-%d %H:%M") %>)
+          </span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <%# --- 3. 按钮区 --- %>
+  <div class="z-10">
+    <%= link_to "javascript:void(0)",
+                data: {
+                  nos: @group.order_nos,
+                  count: @group.orders_count,
+                  customer: @group.customer_name,
+                  date: Time.now.strftime("%Y年%-m月%-d日"),
+                  action: "front--order-approved-component#print front--order-approved-component#syncStatus"
+                },
+                class: "flex items-center gap-2 px-4 py-2 rounded-lg font-black text-xs transition-all active:scale-95 bg-[#0066b3] hover:bg-[#005596] text-white" do %>
+      <%= heroicon "printer", variant: :mini, options: { class: "w-4 h-4" } %>
+      <%= @group.printed_count == @group.orders_count ? "重新打印" : "打印发货单" %>
+    <% end %>
+  </div>
+</div>

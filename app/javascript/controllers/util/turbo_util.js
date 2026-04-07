@@ -9,5 +9,17 @@ export const TurboUtil = {
       const html = await response.text()
       Turbo.renderStreamMessage(html)
     }
+  },
+
+  async syncStatus(nos) {
+    let url = `/front/orders/syncStatus?nos=${nos}`
+    
+    const response = await fetch(url, {
+      headers: { "Accept": "text/vnd.turbo-stream.html" }
+    })
+    if (response.ok) {
+      const html = await response.text()
+      Turbo.renderStreamMessage(html)
+    }
   }
 }

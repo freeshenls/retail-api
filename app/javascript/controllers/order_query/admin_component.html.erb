@@ -10,7 +10,7 @@
     <%# 万能搜索下拉 %>
     <div class="w-80 group" data-controller="dropdown">
       <label class="block text-[10px] font-bold text-slate-400 tracking-tight mb-1.5 ml-1">
-        查询主体 (客户/员工)
+        <%= @desc %>
       </label>
       
       <div class="relative">
@@ -37,29 +37,33 @@
 
         <div data-dropdown-target="menu" 
              class="hidden absolute z-50 mt-1 w-full bg-white border border-slate-200 rounded-md shadow-xl py-1 animate-in fade-in zoom-in-95 duration-100 max-h-64 overflow-y-auto">
-          
-          <div class="px-3 py-1.5 bg-slate-50 text-[9px] font-bold text-slate-400 border-b border-slate-100">客户列表</div>
-          <% @customers.each do |c| %>
-            <button type="button" 
-                    data-action="click->order-query--admin-component#quickSelect dropdown#toggle"
-                    data-order-query--admin-component-type-param="customer"
-                    data-order-query--admin-component-id-param="<%= c.id %>"
-                    data-order-query--admin-component-name-param="<%= c.name %>"
-                    class="w-full text-left px-3 py-2 text-xs font-bold text-slate-600 hover:bg-[#0066b3]/5 hover:text-[#0066b3] transition-colors cursor-pointer">
-              👤 <%= c.name %>
-            </button>
+
+          <% if @show_customer %>
+            <div class="px-3 py-1.5 bg-slate-50 text-[9px] font-bold text-slate-400 border-b border-slate-100">客户列表</div>
+            <% @customers.each do |c| %>
+              <button type="button" 
+                      data-action="click->order-query--admin-component#quickSelect dropdown#toggle"
+                      data-order-query--admin-component-type-param="customer"
+                      data-order-query--admin-component-id-param="<%= c.id %>"
+                      data-order-query--admin-component-name-param="<%= c.name %>"
+                      class="w-full text-left px-3 py-2 text-xs font-bold text-slate-600 hover:bg-[#0066b3]/5 hover:text-[#0066b3] transition-colors cursor-pointer">
+                👤 <%= c.name %>
+              </button>
+            <% end %>
           <% end %>
 
-          <div class="px-3 py-1.5 bg-slate-50 text-[9px] font-bold text-slate-400 border-y border-slate-100">员工列表</div>
-          <% @users.each do |u| %>
-            <button type="button" 
-                    data-action="click->order-query--admin-component#quickSelect dropdown#toggle"
-                    data-order-query--admin-component-type-param="user"
-                    data-order-query--admin-component-id-param="<%= u.id %>"
-                    data-order-query--admin-component-name-param="<%= u.name %>"
-                    class="w-full text-left px-3 py-2 text-xs font-bold text-slate-600 hover:bg-[#0066b3]/5 hover:text-[#0066b3] transition-colors cursor-pointer">
-              👔 <%= u.name %>
-            </button>
+          <% if @show_staff %>
+            <div class="px-3 py-1.5 bg-slate-50 text-[9px] font-bold text-slate-400 border-y border-slate-100">员工列表</div>
+            <% @users.each do |u| %>
+              <button type="button" 
+                      data-action="click->order-query--admin-component#quickSelect dropdown#toggle"
+                      data-order-query--admin-component-type-param="user"
+                      data-order-query--admin-component-id-param="<%= u.id %>"
+                      data-order-query--admin-component-name-param="<%= u.name %>"
+                      class="w-full text-left px-3 py-2 text-xs font-bold text-slate-600 hover:bg-[#0066b3]/5 hover:text-[#0066b3] transition-colors cursor-pointer">
+                👔 <%= u.name %>
+              </button>
+            <% end %>
           <% end %>
         </div>
       </div>
