@@ -86,7 +86,7 @@ Rails.application.routes.draw do
   end
 
   authenticated :user, ->(u) { u.role.name == "front" } do
-    root to: redirect("/front/orders/approved"), as: :front_root
+    root to: redirect("/front/orders/approved?group=info"), as: :front_root
 
     namespace :front do
       # 移除了 :index
@@ -96,6 +96,12 @@ Rails.application.routes.draw do
           get :pending
           get :completed
           get :approved
+          get :unsettled
+          get :settled
+        end
+        member do
+          patch :receive
+          patch :check
         end
       end
     end

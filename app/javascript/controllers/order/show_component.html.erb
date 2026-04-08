@@ -206,7 +206,7 @@
 
         <% if can_receive?(user: helpers.current_user, order: @order) %>
         <%= render OrderAction::NormalComponent.new(
-            url: designer_order_path(@order),
+            url: @receive_url || designer_order_path(@order),
             params: { biz_order: { status: :received } }, 
             title: "执行确认收货",
             sub_title:  "确定，已收货",
@@ -216,7 +216,7 @@
 
         <% if can_check?(user: helpers.current_user, order: @order) %>
           <%= render OrderAction::NormalComponent.new(
-              url: finance_order_path(@order),
+              url: @check_url || finance_order_path(@order),
               params: { order: { status: :checked } }, 
               title: "执行财务核实",
               sub_title:  "确定，已核实",

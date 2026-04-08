@@ -115,6 +115,10 @@ export default class extends Controller {
     this.lockSubmit(true) // 上传失败，保持锁定，不准提交
   }
 
+  lockSubmitDelay() {
+    setTimeout(() => this.lockSubmit(true), 1)
+  }
+
   lockSubmit(disabled, text = null) {
     this.submitBtnTargets.forEach(btn => {
       if (btn.tagName == "A") {

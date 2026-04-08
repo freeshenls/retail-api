@@ -86,7 +86,7 @@
 
             <%# 按钮与 Hover 气泡区 %>
             <div class="flex justify-end gap-2 items-center relative">
-              <%= link_to designer_order_path(order), data: { turbo: false }, 
+              <%= link_to designer_order_path(order, request.query_parameters), data: { turbo: false }, 
                           class: "py-1 text-[11px] font-black text-slate-400 hover:text-[#0066b3] rounded transition-all" do %>
                 详情
               <% end %>

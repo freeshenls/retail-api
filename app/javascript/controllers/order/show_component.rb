@@ -14,7 +14,8 @@ class Order::ShowComponent < ViewComponent::Base
   end
 
   def can_receive?(user:, order:)
-    order.approved? && user.designer? && user == order.draft.user
+    @receive_url = receive_front_order_path(order) if user.front?
+    order.approved? && (user.designer? || user.front?) && user == order.draft.user
   end
 
   def can_print_tag?(user:, order:)
@@ -26,7 +27,7 @@ class Order::ShowComponent < ViewComponent::Base
       order.approved? || order.received? || order.checked?
     elsif user.staff? && user == order.staff
       order.approved? || order.received? || order.checked?
-    elsif user.designer? && order.draft.user == user
+    elsif (user.designer? || user.front?) && order.draft.user == user
       order.received? || order.checked?
     end
   end
@@ -38,6 +39,7 @@ class Order::ShowComponent < ViewComponent::Base
   end
 
   def can_check?(user:, order:)
-    user.finance? && user.customers.include?(order.customer) && order.received?
+    @check_url = check_front_order_path(order) if user.front?
+    ((user.finance? && user.customers.include?(order.customer)) || user.front?)  && order.received?
   end
 end

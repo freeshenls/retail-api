@@ -1,5 +1,5 @@
-<%# app/views/admin/orders/settled.html.erb %>
-<%= render layout: "admin/layout" do %>
+<%# app/views/front/orders/settled.html.erb %>
+<%= render layout: "front/layout" do %>
   <div data-controller="layout--tab-init" 
        data-layout--tab-init-label-value="已结算订单" 
        data-layout--tab-init-path-value="<%= request.path %>">
@@ -7,10 +7,10 @@
     <%# 这里的代码会注入到 layout 的 yield 位置，也就是 main_content 内部 %>
     <%= render Order::IndexComponent.new do |c| %>
       <% c.with_query do %>
-        <%= render OrderQuery::AdminComponent.new(url: settled_admin_orders_path, can_export: true, export_url: settled_admin_orders_path(format: :xlsx, params: request.query_parameters)) %>
+        <%= render OrderQuery::NormalComponent.new(url: settled_front_orders_path, can_export: true, export_url: settled_front_orders_path(format: :xlsx, params: request.query_parameters)) %>
       <% end %>
       <% c.with_table do %>
-        <%= render Admin::OrderIndexComponent.new(orders: @orders, all_orders: @all_orders) %>
+        <%= render Front::OrderSettledComponent.new(orders: @orders) %>
       <% end %>
       <% c.with_pagy do %>
         <%= render Common::PagyComponent.new(pagy: @pagy) %>

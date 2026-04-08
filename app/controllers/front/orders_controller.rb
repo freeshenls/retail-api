@@ -1,13 +1,13 @@
 class Front::OrdersController < ApplicationController
-	before_action :set_order, only: [:edit, :update, :show]
+	before_action :set_order, only: [:edit, :update, :show, :receive, :check]
 
   def index
     query = Biz::Order.order(created_at: :desc)
     
-    list_a query
+    list_a query, "订单查询"
   end
 
-  def list_a(query)
+  def list_a(query, filename)
     # 1. 客户/员工 过滤
     query = query.where(customer_id: params[:customer_id]) if params[:customer_id].present?
     query = query.where(staff_id: params[:staff_id]) if params[:staff_id].present?
@@ -24,9 +24,28 @@ class Front::OrdersController < ApplicationController
       format.xlsx {
         @orders = query
         # 这里调用你的导出逻辑，比如使用 axlsx_rails
-        response.headers['Content-Disposition'] = 'attachment; filename="订单查询 .xlsx"'
+        response.headers['Content-Disposition'] = "attachment; filename=\"#{filename}.xlsx\""
       }
     end
+  end
+
+  def unsettled
+    # 只需要 includes 稿件和稿件的设计师
+    query = Biz::Order.for_front(current_user)
+                      .includes(draft: :user) 
+                      .where(is_settled: false)
+                      .order(created_at: :desc)
+
+    list_a query, "未结算订单"
+  end
+
+  def settled
+    query = Biz::Order.for_front(current_user)
+                      .includes(draft: :user)
+                      .where(is_settled: true)
+                      .order(created_at: :desc)
+                      
+    list_a query, "已结算订单"
   end
 
   def approved
@@ -101,7 +120,7 @@ class Front::OrdersController < ApplicationController
         format.turbo_stream { head :no_content }
         format.html {
           # 即使是普通 HTML 提交，我们也根据 status 自动分流
-          path = @order.submitted? ? completed_front_orders_path : pending_front_orders_path
+          path = @order.submitted? ? completed_front_orders_path(group: :mine) : pending_front_orders_path(group: :mine)
           redirect_to path, notice: "订单 #{@order.order_no} 操作成功"
         }
       end
@@ -112,7 +131,7 @@ class Front::OrdersController < ApplicationController
 
   def pending
     # 设计师视角：显示所有“待处理”或“被退回”且“未结算”的订单
-    query = Biz::Order.for_designer(current_user)
+    query = Biz::Order.for_front(current_user)
                       .includes(draft: :user)
                       .where(status: [:pending], is_settled: false)
                       .order(created_at: :desc)
@@ -122,7 +141,7 @@ class Front::OrdersController < ApplicationController
 
   def completed
     # 设计师视角：显示“已提交审核”、“已审核”或“已结算”的订单
-    query = Biz::Order.for_designer(current_user)
+    query = Biz::Order.for_front(current_user)
                       .includes(draft: :user)
                       .where.not(status: [:pending])
                       .order(updated_at: :desc)
@@ -155,12 +174,22 @@ class Front::OrdersController < ApplicationController
         
         # 情况 B：如果是编辑表单提交，执行常规跳转
         format.html { 
-          redirect_to request.path, notice: "订单已处理"  if request.path == front_order_path(@order)
+          redirect_to edit_front_order_path(@order, group: :mine), notice: "订单已处理"
         }
       end
     else
       render :edit, status: :unprocessable_entity
     end
+  end
+
+  def receive
+    @order.update(receive_params)
+    redirect_to front_order_path(@order, group: :mine), notice: "订单已确认收货" 
+  end
+
+  def check
+    @order.update(check_params)
+    redirect_to front_order_path(@order, group: :mine), notice: "订单已核实" 
   end
 
   private
@@ -180,6 +209,14 @@ class Front::OrdersController < ApplicationController
       :status,
       draft_attributes: [:id, :file, :user_id] # update 动作建议加上 :id 以便更新现有附件
     )
+  end
+
+  def receive_params
+    params.require(:biz_order).permit(:status)
+  end
+
+  def check_params
+    params.require(:order).permit(:status)
   end
 
   def set_order

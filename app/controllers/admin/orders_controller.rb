@@ -13,7 +13,7 @@ class Admin::OrdersController < ApplicationController
 	def edit
 	end
 
-	def list(query)
+	def list(query, filename)
 		# 1. 客户/员工 过滤
 	  query = query.where(customer_id: params[:customer_id]) if params[:customer_id].present?
 	  query = query.where(staff_id: params[:staff_id]) if params[:staff_id].present?
@@ -30,7 +30,7 @@ class Admin::OrdersController < ApplicationController
 	    format.xlsx {
 	    	@orders = query
 	      # 这里调用你的导出逻辑，比如使用 axlsx_rails
-	      response.headers['Content-Disposition'] = 'attachment; filename="订单查询	.xlsx"'
+	      response.headers['Content-Disposition'] = "attachment; filename=\"#{filename}.xlsx\""
 	    }
 	  end
 	end
@@ -55,7 +55,7 @@ class Admin::OrdersController < ApplicationController
 	                    .where(is_settled: false)
 	                    .order(created_at: :desc)
 	                    
-	  list query
+	  list query, "未结算订单"
 	end
 
 	def settled
@@ -63,7 +63,7 @@ class Admin::OrdersController < ApplicationController
 	                    .where(is_settled: true)
 	                    .order(created_at: :desc)
 	                    
-	  list query
+	  list query, "已结算订单"
 	end
 
 	private

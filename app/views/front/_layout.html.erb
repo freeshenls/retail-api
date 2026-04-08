@@ -4,12 +4,14 @@
     curr_path = request.path
     is_profile = curr_path.start_with?("/profile")
 
-    path_new       = new_front_order_path
-    path_pending   = pending_front_orders_path
-    path_completed = completed_front_orders_path
+    path_new       = new_front_order_path group: :mine
+    path_pending   = pending_front_orders_path group: :mine
+    path_completed = completed_front_orders_path group: :mine
+    path_unsettled = unsettled_front_orders_path group: :mine
+    path_settled   = settled_front_orders_path group: :mine
 
-    path_orders   = front_orders_path
-    path_approved   = approved_front_orders_path
+    path_orders   = front_orders_path group: :info
+    path_approved   = approved_front_orders_path group: :info
 
     is_order = curr_path.start_with?("/front/orders")
 
@@ -23,19 +25,21 @@
       submenus: [{ 
         label: "订单信息", 
         icon: "paper-airplane", 
-        active: curr_path == path_approved || curr_path == path_orders || request.referer&.include?(path_approved) || request.referer&.include?(path_orders),
+        active: params[:group] == "info",
         items: [
-          { label: "已发货汇总", path: path_approved, active: curr_path == path_approved },
-          { label: "订单信息查询", path: path_orders, active: curr_path == path_orders }
+          { label: "已发货汇总", path: path_approved, active: current_page?(path_approved) },
+          { label: "订单信息查询", path: path_orders, active: current_page?(path_orders) }
         ]
       },{ 
         label: "我的订单", 
         icon: "clipboard-document-list", 
-        active: curr_path == path_new || curr_path == path_pending || curr_path == path_completed || request.referer&.include?(path_new) || request.referer&.include?(path_pending) || request.referer&.include?(path_completed),
+        active: params[:group] == "mine",
         items: [
-          { label: "新增订单", path: path_new, active: curr_path == path_new },
-          { label: "待提交订单", path: path_pending, active: curr_path == path_pending },
-          { label: "已提交订单", path: path_completed, active: curr_path == path_completed }
+          { label: "新增订单", path: path_new, active: current_page?(path_new) },
+          { label: "待提交订单", path: path_pending, active: current_page?(path_pending) },
+          { label: "已提交订单", path: path_completed, active: current_page?(path_completed) },
+          { label: "未结算订单", path: path_unsettled, active: current_page?(path_unsettled) },
+          { label: "已结算订单", path: path_settled, active: current_page?(path_settled) }
         ]
       }]
     }

@@ -3,7 +3,7 @@
     <%= heroicon "check", variant: :outline, options: { class: "h-3 w-3 text-white", stroke_width: 3 } %>
   </div>
   <div class="flex items-center gap-2">
-    <p class="text-[11px] font-black text-slate-700"><%= @title %></p>
+    <p class="whitespace-nowrap text-[11px] font-black text-slate-700"><%= @title %></p>
 
     <%# --- 新增：物流单号展示与复制逻辑 --- %>
     <% if @title == "已发货" && @order.delivery_method == "快递" %>
@@ -14,7 +14,7 @@
            data-action="click->clipboard#copy">
         
         <%# 单号文本 %>
-        <span data-clipboard-target="source" class="text-[10px] font-mono font-bold text-slate-500 group-hover:text-[#0066b3]">
+        <span data-clipboard-target="source" class="whitespace-nowrap text-[10px] font-mono font-bold text-slate-500 group-hover:text-[#0066b3]">
           <%= @order.tracking_number %>
         </span>
 
@@ -26,6 +26,6 @@
     <% end %>
   </div>
   <% if @show_time %>
-  	<p class="text-[10px] text-slate-400 font-mono font-bold mt-0.5"><%= @order.updated_at.strftime("%m/%d %H:%M") %></p>
+  	<p class="whitespace-nowrap text-[10px] text-slate-400 font-mono font-bold mt-0.5"><%= @order.updated_at.strftime("%m/%d %H:%M") %></p>
   <% end %>
 </div>
