@@ -101,7 +101,7 @@ class Front::OrdersController < ApplicationController
         format.turbo_stream { head :no_content }
         format.html {
           # 即使是普通 HTML 提交，我们也根据 status 自动分流
-          path = @order.submitted? ? completed_designer_orders_path : pending_designer_orders_path
+          path = @order.submitted? ? completed_front_orders_path : pending_front_orders_path
           redirect_to path, notice: "订单 #{@order.order_no} 操作成功"
         }
       end
@@ -155,7 +155,7 @@ class Front::OrdersController < ApplicationController
         
         # 情况 B：如果是编辑表单提交，执行常规跳转
         format.html { 
-          redirect_to request.path, notice: "订单已处理"  if request.path == designer_order_path(@order)
+          redirect_to request.path, notice: "订单已处理"  if request.path == front_order_path(@order)
         }
       end
     else
