@@ -4,7 +4,7 @@ class Admin::OrdersController < ApplicationController
   def index
     query = Biz::Order.order(created_at: :desc)
     
-    list query
+    list query, "订单查询"
   end
 
 	def show
@@ -19,8 +19,8 @@ class Admin::OrdersController < ApplicationController
 	  query = query.where(staff_id: params[:staff_id]) if params[:staff_id].present?
 	  
 	  # 2. 时间范围 过滤
-	  query = query.where("created_at >= ?", params[:start_date].to_date.beginning_of_day) if params[:start_date].present?
-	  query = query.where("created_at <= ?", params[:end_date].to_date.end_of_day) if params[:end_date].present?
+	  query = query.where("biz_order.created_at >= ?", params[:start_date].to_date.beginning_of_day) if params[:start_date].present?
+	  query = query.where("biz_order.created_at <= ?", params[:end_date].to_date.end_of_day) if params[:end_date].present?
 
     respond_to do |format|
 	    format.html {
